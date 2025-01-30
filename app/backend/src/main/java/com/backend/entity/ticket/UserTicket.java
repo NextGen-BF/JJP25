@@ -1,5 +1,6 @@
-package com.backend.entity;
+package com.backend.entity.ticket;
 
+import com.backend.entity.BaseEntity;
 import com.backend.entity.paymentExecution.PaymentExecution;
 import com.backend.entity.user.User;
 import jakarta.persistence.CascadeType;

@@ -1,11 +1,8 @@
 package com.backend.entity.event;
 
 import com.backend.entity.BaseEntity;
-import com.backend.entity.EventDate;
-import com.backend.entity.EventStatistics;
-import com.backend.entity.Feedback;
-import com.backend.entity.TicketTemplate;
-import com.backend.entity.Venue;
+import com.backend.entity.feedback.Feedback;
+import com.backend.entity.ticket.TicketTemplate;
 import com.backend.entity.rsvp.RSVP;
 import com.backend.entity.user.User;
 import jakarta.persistence.CascadeType;

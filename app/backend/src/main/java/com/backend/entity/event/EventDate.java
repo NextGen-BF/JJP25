@@ -1,6 +1,6 @@
-package com.backend.entity;
+package com.backend.entity.event;
 
-import com.backend.entity.event.Event;
+import com.backend.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

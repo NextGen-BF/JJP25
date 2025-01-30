@@ -1,7 +1,7 @@
 package com.backend.entity.paymentExecution;
 
 import com.backend.entity.BaseEntity;
-import com.backend.entity.UserTicket;
+import com.backend.entity.ticket.UserTicket;
 import com.backend.entity.payment.Payment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

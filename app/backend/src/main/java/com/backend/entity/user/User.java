@@ -1,11 +1,11 @@
 package com.backend.entity.user;
 
 import com.backend.entity.BaseEntity;
-import com.backend.entity.Feedback;
+import com.backend.entity.feedback.Feedback;
 import com.backend.entity.event.Event;
 import com.backend.entity.notification.Notification;
 import com.backend.entity.rsvp.RSVP;
-import com.backend.entity.UserTicket;
+import com.backend.entity.ticket.UserTicket;
 import com.backend.entity.payment.Payment;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
