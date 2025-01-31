@@ -14,19 +14,22 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "ticket_templates")
 public class TicketTemplate extends BaseEntity {
     @OneToMany(mappedBy = "ticketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserTicket> userTickets;
+    private List<UserTicket> userTickets = new ArrayList<>();
 
     @ManyToOne()
     @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = false)

@@ -11,15 +11,21 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "payments")
 public class Payment extends BaseEntity {
@@ -29,13 +35,13 @@ public class Payment extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentExecution> paymentExecutions;
+    private List<PaymentExecution> paymentExecutions = new ArrayList<>();
 
     @Column(name = "external_id", nullable = false, length = 64)
     private String externalId;
 
     @Column(name = "amount", nullable = false, precision = 4, scale = 2)
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
@@ -58,6 +64,16 @@ public class Payment extends BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "created_at")
+    @Column(name = "is_disputed")
     private Boolean isDisputed;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -11,16 +11,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "user_tickets")
 public class UserTicket extends BaseEntity {
-    @OneToOne(mappedBy = "id", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "userTicket", cascade = CascadeType.ALL)
     PaymentExecution paymentExecution;
 
     @ManyToOne
