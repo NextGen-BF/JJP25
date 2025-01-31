@@ -44,21 +44,21 @@ public class Feedback extends BaseEntity {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    @PreUpdate
-    private void checkRating() {
-        if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5");
-        }
-    }
-
-    @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        validateFields();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        validateFields();
+    }
+
+    private void validateFields() {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
     }
 
     @Override
