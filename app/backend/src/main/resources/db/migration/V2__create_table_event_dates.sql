@@ -3,4 +3,4 @@ create table if not exists event_dates (
     date datetime(6) not null,
     event_id integer not null,
     primary key (id)
-)
+);
