@@ -7,13 +7,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "event_statistics")
 public class EventStatistics extends BaseEntity {
@@ -35,4 +38,29 @@ public class EventStatistics extends BaseEntity {
 
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EventStatistics that = (EventStatistics) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "EventStatistics{" +
+                "id=" + getId() +
+                ", event=" + (event != null ? event.getId() : null) +  // Avoid lazy loading in toString
+                ", totalTicketsSold=" + totalTicketsSold +
+                ", totalRevenue=" + totalRevenue +
+                ", averageRating=" + averageRating +
+                ", feedbackCount=" + feedbackCount +
+                '}';
+    }
 }

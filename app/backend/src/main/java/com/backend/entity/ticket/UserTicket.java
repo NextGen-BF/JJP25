@@ -11,18 +11,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "user_tickets")
 public class UserTicket extends BaseEntity {
 
     @OneToOne(mappedBy = "userTicket", cascade = CascadeType.ALL)
-    PaymentExecution paymentExecution;
+    private PaymentExecution paymentExecution;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -34,4 +36,27 @@ public class UserTicket extends BaseEntity {
 
     @Column(name = "bought_at", nullable = false)
     private LocalDateTime boughtAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserTicket that = (UserTicket) o;
+        return getId() != null && getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "UserTicket{" +
+                "id=" + getId() +
+                ", user=" + (user != null ? user.getId() : null) +
+                ", ticketTemplate=" + (ticketTemplate != null ? ticketTemplate.getId() : null) +
+                ", boughtAt=" + boughtAt +
+                '}';
+    }
 }

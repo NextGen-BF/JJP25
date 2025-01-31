@@ -14,19 +14,22 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "ticket_templates")
 public class TicketTemplate extends BaseEntity {
     @OneToMany(mappedBy = "ticketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserTicket> userTickets;
+    private List<UserTicket> userTickets = new ArrayList<>();
 
     @ManyToOne()
     @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = false)
@@ -64,6 +67,34 @@ public class TicketTemplate extends BaseEntity {
         if (totalQuantity < 0) {
             throw new IllegalArgumentException("Total quantity cannot be negative");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TicketTemplate that = (TicketTemplate) o;
+        return getId() != null && getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketTemplate{" +
+                "id=" + getId() +
+                ", event=" + (event != null ? event.getId() : null) +
+                ", ticketType=" + ticketType +
+                ", venueType=" + venueType +
+                ", price=" + price +
+                ", eventDate=" + eventDate +
+                ", availableQuantity=" + availableQuantity +
+                ", totalQuantity=" + totalQuantity +
+                ", description='" + description + '\'' +
+                '}';
     }
 
 }
