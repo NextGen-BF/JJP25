@@ -9,7 +9,7 @@ create table if not exists users (
 	created_at timestamp not null,
 	updated_at timestamp not null
 );
-
+ 
 create table if not exists notifications (
 	id int primary key,
 	user_id int,
@@ -36,7 +36,9 @@ create table if not exists venues (
 
 create table if not exists event_dates (
 	id int primary key,
-	date timestamp not null
+	event_id int not null
+	date timestamp not null,
+	constraint fk_dates_events foreign key (event_id) references events(id) on delete cascade;
 );
 
 create table if not exists events (
@@ -67,8 +69,6 @@ create table if not exists events (
 	),
 	constraint fk_events_users foreign key (admin_id) 
 	references users(id) on delete cascade,
-	constraint fk_events_dates foreign key (event_date_id) 
-	references event_dates(id) on delete cascade
 );
 
 create table venues_events (
