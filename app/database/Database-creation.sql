@@ -23,7 +23,7 @@ create table if not exists notifications (
 	description text not null,
 	sent_at timestamp not null,
 	constraint fk_notifications_users foreign key (user_id) 
-	references users(id)
+	references users(id) on delete cascade
 );
 
 create table if not exists venues (
@@ -66,16 +66,17 @@ create table if not exists events (
 		'Cancelled'
 	),
 	constraint fk_events_users foreign key (admin_id) 
-	references users(id),
-	constraint fk_events_dates foreign key (event_date_id) references event_dates(id)
+	references users(id) on delete cascade,
+	constraint fk_events_dates foreign key (event_date_id) 
+	references event_dates(id) on delete cascade
 );
 
 create table venues_events (
 	venue_id int not null,
 	event_id int not null,
 	primary key (venue_id, event_id),
-	constraint fk_venues foreign key (venue_id) references venues(id),
-	constraint fk_events foreign key (event_id) references events(id)
+	constraint fk_venues foreign key (venue_id) references venues(id) on delete cascade,
+	constraint fk_events foreign key (event_id) references events(id) on delete cascade
 );
 
 
@@ -88,11 +89,11 @@ create table if not exists rsvp_invitations (
 	sent_at timestamp not null,
 	expiration_date timestamp not null,
 	constraint fk_invitations_users_senders foreign key (sender_id) 
-	references users(id),
+	references users(id) on delete cascade,
 	constraint fk_invitations_users_receivers foreign key (receiver_id)
-	references users(id),
+	references users(id) on delete cascade,
 	constraint fk_invitaions_events foreign key (event_id)
-	references events(id) 
+	references events(id) on delete cascade
 );
 
 create table if not exists event_statistics (
@@ -104,7 +105,7 @@ create table if not exists event_statistics (
 	feedback_count int default 0,
 	last_updated timestamp,
 	constraint fk_statistics_events foreign key (event_id)
-	references events(id)
+	references events(id) on delete cascade
 );
 
 create table if not exists feedbacks (
@@ -116,9 +117,9 @@ create table if not exists feedbacks (
 	created_at timestamp not null,
 	updated_at timestamp not null,
 	constraint fk_feedbacks_users foreign key (user_id) 
-	references users(id),
+	references users(id) on delete cascade,
 	constraint fk_feedbacks_events foreign key (event_id)
-	references events(id),
+	references events(id) on delete cascade,
 	constraint chk_rating check(rating between 1 and 5)
 );
 
@@ -144,7 +145,7 @@ create table if not exists ticket_templates (
 	total_quantity int not null,
 	constraint chk_available_quantity check (available_quantity >= 0),
 	constraint chk_total_quantity check (total_quantity >= 0),
-	constraint fk_templates_events foreign key (event_id) references events(id)
+	constraint fk_templates_events foreign key (event_id) references events(id) on delete cascade
 );
 
 
@@ -154,9 +155,9 @@ create table if not exists user_tickets (
 	user_id int not null,
 	bought_at timestamp not null,
 	constraint fk_tickets_templates foreign key (ticket_template_id)
-	references ticket_templates(id),
+	references ticket_templates(id) on delete cascade,
 	constraint fk_tickets_users foreign key (user_id)
-	references users(id)
+	references users(id) on delete cascade
 );
 
 create table if not exists payments (
@@ -181,7 +182,7 @@ create table if not exists payments (
 	updated_at timestamp,
 	is_disputed boolean,
 	constraint fk_payments_users foreign key (user_id)
-	references users(id)
+	references users(id) on delete cascade
 );
 
 create table if not exists payment_executions (
@@ -196,14 +197,14 @@ create table if not exists payment_executions (
 		'Chargeback'
 	),
 	description text,
-	error_code varchar(24),
+	error_code varchar(40),
 	created_at timestamp not null,
 	updated_at timestamp,
 	refund_expiration_date timestamp not null,
-	refunded_amount int,
+	refunded_amount decimal(4, 2),
 	refunc_reason text,
 	constraint fk_executions_payments foreign key (payment_id)
-	references payments(id),
+	references payments(id) on delete cascade,
 	constraint fk_executions_tickets foreign key (user_ticket_id)
-	references user_tickets(id)
+	references user_tickets(id) on delete cascade
 );
