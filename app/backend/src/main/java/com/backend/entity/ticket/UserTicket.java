@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Table(name = "user_tickets")
 public class UserTicket extends BaseEntity {
     @OneToOne(mappedBy = "userTicket", cascade = CascadeType.ALL)
-    PaymentExecution paymentExecution;
+    private PaymentExecution paymentExecution;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
