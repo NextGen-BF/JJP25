@@ -35,4 +35,27 @@ public class UserTicket extends BaseEntity {
 
     @Column(name = "bought_at", nullable = false)
     private LocalDateTime boughtAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserTicket that = (UserTicket) o;
+        return getId() != null && getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "UserTicket{" +
+                "id=" + getId() +
+                ", user=" + (user != null ? user.getId() : null) +
+                ", ticketTemplate=" + (ticketTemplate != null ? ticketTemplate.getId() : null) +
+                ", boughtAt=" + boughtAt +
+                '}';
+    }
 }

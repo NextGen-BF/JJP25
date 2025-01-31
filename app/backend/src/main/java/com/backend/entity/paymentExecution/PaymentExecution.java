@@ -71,4 +71,31 @@ public class PaymentExecution extends BaseEntity {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PaymentExecution that = (PaymentExecution) o;
+        return getId() != null && getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentExecution{" +
+                "id=" + getId() +
+                ", externalPaymentStatus='" + externalPaymentStatus + '\'' +
+                ", actionType=" + actionType +
+                ", description='" + description + '\'' +
+                ", refundExpirationDate=" + refundExpirationDate +
+                ", refundedAmount=" + refundedAmount +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

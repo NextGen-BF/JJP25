@@ -69,4 +69,33 @@ public class TicketTemplate extends BaseEntity {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TicketTemplate that = (TicketTemplate) o;
+        return getId() != null && getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketTemplate{" +
+                "id=" + getId() +
+                ", event=" + (event != null ? event.getId() : null) +
+                ", ticketType=" + ticketType +
+                ", venueType=" + venueType +
+                ", price=" + price +
+                ", eventDate=" + eventDate +
+                ", availableQuantity=" + availableQuantity +
+                ", totalQuantity=" + totalQuantity +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+
 }

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -35,4 +36,28 @@ public class Notification extends BaseEntity {
 
     @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Notification that = (Notification) o;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Notification{" +
+                "id=" + getId() +
+                ", user=" + (user != null ? user.getId() : null)+
+                ", type=" + type +
+                ", description='" + description + '\'' +
+                ", sentAt=" + sentAt +
+                '}';
+    }
 }

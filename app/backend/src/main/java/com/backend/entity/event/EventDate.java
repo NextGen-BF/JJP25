@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -24,4 +25,26 @@ public class EventDate extends BaseEntity {
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EventDate eventDate = (EventDate) o;
+        return Objects.equals(getId(), eventDate.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "EventDate{" +
+                "id=" + getId() +
+                ", event=" + (event != null ? event.getId() : null) +
+                ", date=" + date +
+                '}';
+    }
 }
