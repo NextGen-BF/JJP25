@@ -45,7 +45,6 @@ create table if not exists events (
 	id int primary key,
 	admin_id int not null,
 	venue_id int not null,
-	event_date_id int not null,
 	title varchar(255) not null, 
 	description text not null, 
 	category enum(
