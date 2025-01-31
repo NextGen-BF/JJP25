@@ -13,6 +13,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,11 +24,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "ticket_templates")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "ticket_templates")
+@AllArgsConstructor
+@Builder
 public class TicketTemplate extends BaseEntity {
     @OneToMany(mappedBy = "ticketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTicket> userTickets = new ArrayList<>();

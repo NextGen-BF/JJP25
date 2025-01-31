@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,13 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "notifications")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "notifications")
+@AllArgsConstructor
+@Builder
 public class Notification extends BaseEntity {
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)

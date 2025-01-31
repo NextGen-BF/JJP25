@@ -14,6 +14,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,11 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
+@Entity
+@Table(name = "payments")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "payments")
+@AllArgsConstructor
+@Builder
 public class Payment extends BaseEntity {
 
     @ManyToOne

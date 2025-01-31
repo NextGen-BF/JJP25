@@ -10,17 +10,21 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "rsvp_invitations")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "rsvp_invitations")
+@AllArgsConstructor
+@Builder
 public class RSVP extends BaseEntity {
     @ManyToOne()
     @JoinColumn(name = "sender_id", referencedColumnName = "id", nullable = false)

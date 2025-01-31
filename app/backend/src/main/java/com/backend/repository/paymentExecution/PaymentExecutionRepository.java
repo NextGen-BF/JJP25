@@ -1,4 +1,4 @@
-package com.backend.repository;
+package com.backend.repository.payment;
 
 import com.backend.entity.paymentExecution.PaymentExecution;
 import org.springframework.data.jpa.repository.JpaRepository;

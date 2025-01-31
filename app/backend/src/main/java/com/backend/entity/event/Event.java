@@ -19,6 +19,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,11 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "events")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "events")
+@AllArgsConstructor
+@Builder
 public class Event extends BaseEntity {
     @ManyToOne()
     @JoinColumn(name = "admin_id", referencedColumnName = "id", nullable = false)
@@ -45,18 +49,23 @@ public class Event extends BaseEntity {
     @JoinTable(name = "venues_events",
             joinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "venue_id", referencedColumnName = "id"))
-    private List<Venue> venues;
+    @Builder.Default
+    private List<Venue> venues = new ArrayList<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<EventDate> eventDates = new ArrayList<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<RSVP> rsvpInvitations = new ArrayList<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Feedback> feedbacks= new ArrayList<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TicketTemplate> ticketTemplates= new ArrayList<>();
 
     @Column(name = "title", nullable = false, length = 255)
@@ -100,12 +109,15 @@ public class Event extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(getId(), event.getId());
+        return Objects.equals(getId(), event.getId()) &&
+                Objects.equals(title, event.title) &&
+                category == event.category &&
+                status == event.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), title, category, status);
     }
 
     @Override

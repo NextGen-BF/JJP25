@@ -10,6 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,11 +19,13 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "feedbacks")
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "feedbacks")
+@AllArgsConstructor
+@Builder
 public class Feedback extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
@@ -67,12 +71,17 @@ public class Feedback extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Feedback feedback = (Feedback) o;
-        return Objects.equals(getId(), feedback.getId());
+        return Objects.equals(getId(), feedback.getId()) &&
+                Objects.equals(user != null ? user.getId()
+                        : null, feedback.user != null ? feedback.user.getId() : null) &&
+                Objects.equals(event != null ? event.getId()
+                        : null, feedback.event != null ? feedback.event.getId() : null) &&
+                Objects.equals(rating, feedback.rating);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), user != null ? user.getId() : null, event != null ? event.getId() : null, rating);
     }
 
     @Override
