@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "ticket_templates")
@@ -33,6 +34,7 @@ import java.util.List;
 @Builder
 public class TicketTemplate extends BaseEntity {
     @OneToMany(mappedBy = "ticketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserTicket> userTickets = new ArrayList<>();
 
     @ManyToOne()
@@ -78,12 +80,15 @@ public class TicketTemplate extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TicketTemplate that = (TicketTemplate) o;
-        return getId() != null && getId().equals(that.getId());
+        return getId() != null && getId().equals(that.getId()) &&
+                Objects.equals(event, that.event) &&
+                Objects.equals(price, that.price) &&
+                ticketType == that.ticketType;
     }
 
     @Override
     public int hashCode() {
-        return getId() != null ? getId().hashCode() : 0;
+        return Objects.hash(getId(), event, price, ticketType);
     }
 
     @Override

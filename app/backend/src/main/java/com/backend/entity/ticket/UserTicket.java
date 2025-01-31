@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_tickets")
@@ -45,12 +46,14 @@ public class UserTicket extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserTicket that = (UserTicket) o;
-        return getId() != null && getId().equals(that.getId());
+        return getId() != null && getId().equals(that.getId()) &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(ticketTemplate, that.ticketTemplate);
     }
 
     @Override
     public int hashCode() {
-        return getId() != null ? getId().hashCode() : 0;
+        return Objects.hash(getId(), user, ticketTemplate);
     }
 
     @Override

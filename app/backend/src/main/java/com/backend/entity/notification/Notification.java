@@ -46,12 +46,15 @@ public class Notification extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Notification that = (Notification) o;
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(user, that.user) &&
+                type == that.type &&
+                Objects.equals(sentAt, that.sentAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), user, type, sentAt);
     }
 
     @Override

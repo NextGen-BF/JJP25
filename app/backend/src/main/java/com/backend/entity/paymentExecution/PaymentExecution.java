@@ -21,6 +21,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "payment_executions")
@@ -81,12 +82,14 @@ public class PaymentExecution extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PaymentExecution that = (PaymentExecution) o;
-        return getId() != null && getId().equals(that.getId());
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(payment, that.payment) &&
+                Objects.equals(userTicket, that.userTicket);
     }
 
     @Override
     public int hashCode() {
-        return getId() != null ? getId().hashCode() : 0;
+        return Objects.hash(getId(), payment, userTicket);
     }
 
     @Override

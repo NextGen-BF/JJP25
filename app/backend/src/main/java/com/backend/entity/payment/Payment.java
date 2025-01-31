@@ -41,6 +41,7 @@ public class Payment extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PaymentExecution> paymentExecutions = new ArrayList<>();
 
     @Column(name = "external_id", nullable = false, length = 64)
@@ -88,12 +89,17 @@ public class Payment extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Payment payment = (Payment) o;
-        return Objects.equals(getId(), payment.getId());
+        return Objects.equals(getId(), payment.getId()) &&
+                Objects.equals(user, payment.user) &&
+                Objects.equals(amount, payment.amount) &&
+                Objects.equals(currency, payment.currency) &&
+                Objects.equals(createdAt, payment.createdAt) &&
+                Objects.equals(updatedAt, payment.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), user, amount, currency, createdAt, updatedAt);
     }
 
     @Override
