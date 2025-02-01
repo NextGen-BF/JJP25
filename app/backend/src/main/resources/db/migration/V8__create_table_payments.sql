@@ -1,6 +1,6 @@
 create table if not exists payments (
     id integer not null auto_increment,
-    amount decimal(4,2) not null,
+    amount decimal(6,2) not null,
     created_at datetime(6) not null,
     currency varchar(3) not null,
     external_id varchar(64) not null,

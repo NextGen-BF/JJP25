@@ -7,7 +7,7 @@ create table if not exists payment_executions (
     external_payment_status varchar(50) not null,
     refund_expiration_date datetime(6) not null,
     refund_reason varchar(255),
-    refunded_amount integer,
+    refunded_amount decimal(8,2),
     updated_at datetime(6),
     payment_id integer not null,
     user_ticket_id integer not null,

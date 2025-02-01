@@ -3,7 +3,7 @@ create table if not exists ticket_templates (
     available_quantity integer not null,
     description TEXT,
     event_date datetime(6) not null,
-    price decimal(4,2) not null,
+    price decimal(6,2) not null,
     ticket_type enum ('GENERAL_ADMISSION','SEAT','VIP') not null,
     total_quantity integer not null,
     venue_type enum ('CINEMA_HALL','CONFERENCE_CENTRE','STADIUM','THEATRE') not null,
