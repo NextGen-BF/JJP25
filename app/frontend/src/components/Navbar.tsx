@@ -1,37 +1,27 @@
-import { AppBar, Toolbar, Button, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
-import Logo from '../assets/logo.png';
+import { AppBar, Toolbar, Button, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import Logo from "../assets/logo.png";
+import { NavbarStyles } from "./NavbarStyles";
+import "./Navbar.scss"
 
-export const Navbar = () => {
+const Navbar = () => {
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        backgroundColor: '#080731',
-        width: '100%',
-        top: 0,
-        left: 0,
-        boxShadow: 'none',
-      }}
-    >
-      <Toolbar
-        disableGutters
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingLeft: '16px',
-          paddingRight: '16px',
-          height: '64px',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            <img src={Logo} alt="Event Manager Logo" style={{ height: '40px' }} />
+    <AppBar position="fixed" sx={NavbarStyles.navbarStyles}>
+      <Toolbar disableGutters sx={NavbarStyles.toolbarStyles}>
+        <Box sx={NavbarStyles.boxStyles}>
+          <Link
+            to="/"
+            className="link-styles"
+          >
+            <img
+              src={Logo}
+              alt="Event Manager Logo"
+              className="logo-styles"
+            />
           </Link>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={NavbarStyles.boxStyles}>
           <Button color="inherit" component={Link} to="/events">
             Events
           </Button>
@@ -46,8 +36,8 @@ export const Navbar = () => {
           </Button>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button color="inherit" component={Link} to="/login" sx={{ mr: 1 }}>
+        <Box sx={NavbarStyles.boxStyles}>
+          <Button color="inherit" component={Link} to="/login">
             Login
           </Button>
           <Button color="inherit" component={Link} to="/register">
@@ -58,3 +48,5 @@ export const Navbar = () => {
     </AppBar>
   );
 };
+
+export default Navbar;

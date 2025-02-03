@@ -1,6 +1,5 @@
-import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Navbar } from './components/Navbar';
+import Navbar  from './components/Navbar';
 import Login from './pages/LoginPage/LoginPage';
 import HomePage from './pages/HomePage/HomePage';
 import DashboardPage from './pages/DashboardPage/DashboardPage';
@@ -10,13 +9,14 @@ import TicketsPage from './pages/TicketsPage/TicketsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
 import CssBaseline from '@mui/material/CssBaseline';
+import './App.scss'
 
 export default function App() {
   return (
     <Router>
       <CssBaseline />
-      <Navbar />
-      <div style={{ paddingTop: '64px', paddingLeft: '16px', paddingRight: '16px' }}>
+    <Navbar />
+      <div className='routes-container' >
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
