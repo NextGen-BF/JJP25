@@ -1,4 +1,4 @@
 package com.backend.service.ticket;
 
-public class TicketService {
+public interface TicketService {
 }
