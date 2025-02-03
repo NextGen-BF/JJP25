@@ -10,6 +10,7 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
 import CssBaseline from '@mui/material/CssBaseline';
 import './App.scss'
+import MockUserList from './pages/MockUserList/MockUserList';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/not-found" element={<NotFoundPage />} />
+          <Route path="/mock-users" element={<MockUserList />} />
           <Route path="*" element={<Navigate to="/not-found" replace />} />
         </Routes>
       </div>
