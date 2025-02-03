@@ -1,4 +1,4 @@
-package com.backend.repository;
+package com.backend.repository.ticket;
 
 import com.backend.entity.ticket.TicketTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
