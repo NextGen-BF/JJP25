@@ -1,4 +1,7 @@
 package com.backend.service.event.eventStatistics;
 
-public class EventStatisticsServiceImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class EventStatisticsServiceImpl implements EventStatisticsService {
 }

@@ -1,4 +1,7 @@
 package com.backend.service.event.eventDate;
 
-public class EventDateServiceImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class EventDateServiceImpl implements EventDateService {
 }

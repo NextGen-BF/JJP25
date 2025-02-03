@@ -1,4 +1,7 @@
 package com.backend.service.event;
 
-public class EventServiceImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class EventServiceImpl implements EventService {
 }
