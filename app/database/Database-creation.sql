@@ -99,8 +99,8 @@ create table if not exists event_statistics (
 	id int primary key,
 	event_id int not null,
 	total_tickets_sold int default 0,
-	total_revenue decimal(6, 2) default 0.00,
-	average_rating decimal(1, 1) default 0.0,
+	total_revenue decimal(8, 2) default 0.00,
+	average_rating decimal(2, 1) default 0.0,
 	feedback_count int default 0,
 	last_updated timestamp,
 	constraint fk_statistics_events foreign key (event_id)
@@ -137,7 +137,7 @@ create table if not exists ticket_templates (
 		'Cinema Hall',
 		'Theatre'
 	),
-	price decimal(4, 2) not null,
+	price decimal(6, 2) not null,
 	event_date timestamp not null,
 	description text,
 	available_quantity int not null,
@@ -163,7 +163,7 @@ create table if not exists payments (
 	id int primary key,
 	user_id int not null,
 	external_id varchar(64) not null,
-	amount decimal(4, 2) not null,
+	amount decimal(6, 2) not null,
 	currency varchar(3) not null,
 	payment_processor enum('Stripe'),
 	payment_provider enum(
@@ -200,7 +200,7 @@ create table if not exists payment_executions (
 	created_at timestamp not null,
 	updated_at timestamp,
 	refund_expiration_date timestamp not null,
-	refunded_amount decimal(4, 2),
+	refunded_amount decimal(6, 2),
 	refunc_reason text,
 	constraint fk_executions_payments foreign key (payment_id)
 	references payments(id) on delete cascade,
