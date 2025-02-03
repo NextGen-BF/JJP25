@@ -61,7 +61,7 @@ public class PaymentExecution extends BaseEntity {
     @Column(name = "refund_expiration_date", nullable = false)
     private LocalDateTime refundExpirationDate;
 
-    @Column(name = "refunded_amount", precision = 4, scale = 2)
+    @Column(name = "refunded_amount", precision = 6, scale = 2)
     private BigDecimal refundedAmount;
 
     @Column(name = "refund_reason")

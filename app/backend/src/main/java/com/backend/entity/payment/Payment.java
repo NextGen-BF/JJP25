@@ -47,7 +47,7 @@ public class Payment extends BaseEntity {
     @Column(name = "external_id", nullable = false, length = 64)
     private String externalId;
 
-    @Column(name = "amount", nullable = false, precision = 4, scale = 2)
+    @Column(name = "amount", nullable = false, precision = 6, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "currency", nullable = false, length = 3)

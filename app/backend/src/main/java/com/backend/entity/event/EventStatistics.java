@@ -31,10 +31,10 @@ public class EventStatistics extends BaseEntity {
     @Column(name = "total_tickets_sold", nullable = false)
     private Integer totalTicketsSold = 0;
 
-    @Column(name = "total_revenue", nullable = false, columnDefinition = "decimal(6,2)")
+    @Column(name = "total_revenue", nullable = false, precision = 8, scale = 2)
     private BigDecimal totalRevenue = BigDecimal.ZERO;
 
-    @Column(name = "average_rating", nullable = false, columnDefinition = "decimal(1,1)")
+    @Column(name = "average_rating", nullable = false, precision = 2, scale = 1)
     private BigDecimal averageRating = BigDecimal.ZERO;
 
     @Column(name = "feedback_count", nullable = false)

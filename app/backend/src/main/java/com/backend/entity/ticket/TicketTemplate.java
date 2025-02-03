@@ -49,7 +49,7 @@ public class TicketTemplate extends BaseEntity {
     @Column(name = "venue_type", nullable = false)
     private VenueType venueType;
 
-    @Column(name = "price", nullable = false, precision = 4, scale = 2)
+    @Column(name = "price", nullable = false, precision = 6, scale = 2)
     private BigDecimal price;
 
     @Column(name = "event_date", nullable = false)
