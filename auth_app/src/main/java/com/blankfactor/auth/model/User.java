@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Basic(optional = false)
     private String email;
 
-    @Basic(optional = true)
+    @Basic(optional = false)
     private String password;
 
     @Column(name = "fist_name", nullable = false)
