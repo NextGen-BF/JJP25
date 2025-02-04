@@ -4,6 +4,7 @@ import com.blankfactor.auth.model.User;
 import com.blankfactor.auth.model.dto.RegisterRequest;
 import com.blankfactor.auth.model.dto.VerifiedUserDTO;
 import com.blankfactor.auth.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<User> register(@RequestBody @Valid RegisterRequest registerRequest) {
         return ResponseEntity.ok().body(this.authService.register(registerRequest));
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody VerifiedUserDTO verifiedUserDTO) {
+    public ResponseEntity<?> verify(@RequestBody @Valid VerifiedUserDTO verifiedUserDTO) {
         try {
             this.authService.verifyUser(verifiedUserDTO);
             return ResponseEntity.ok("Account verified successfully!");
