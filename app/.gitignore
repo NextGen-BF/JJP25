@@ -2,6 +2,8 @@
 
 #VSCode gitignore
 
+package-lock.json
+
 # Logs
 logs
 *.log
