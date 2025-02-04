@@ -14,12 +14,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VerifiedUserDTO {
 
-    @NotBlank(message = "Email must not be blank.")
-    @Email(message = "Email must be in valid format.")
+    @NotBlank(message = "{email.blank}")
+    @Email(message = "{email.format}")
     private String email;
 
-    @NotBlank
-    @Size(min = 6, max = 6, message = "Provide valid verification code.")
+    @NotBlank(message = "{verificationCode.blank}")
+    @Size(min = 6, max = 6, message = "{verificationCode.size}")
     private String verificationCode;
-
 }

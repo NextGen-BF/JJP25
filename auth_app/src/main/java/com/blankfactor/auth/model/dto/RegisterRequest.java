@@ -14,23 +14,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class RegisterRequest {
 
-    @NotBlank(message = "Email must not be blank.")
-    @Email(message = "Email must be in valid format.")
+    @NotBlank(message = "{email.blank}")
+    @Email(message = "{email.format}")
     private String email;
 
-    @NotBlank(message = "Password must not be blank.")
-    @Size(min = 8, max = 25, message = "Password must be between 8 and 25 characters.")
+    @NotBlank(message = "{password.blank}")
+    @Size(min = 8, max = 25, message = "{password.size}")
     private String password;
 
-    @NotBlank(message = "First name must not be blank.")
-    @Size(min = 2, message = "First name must be at least 2 characters.")
+    @NotBlank(message = "{firstName.blank}")
+    @Size(min = 2, message = "{firstName.size}")
     private String firstName;
 
-    @NotBlank(message = "Last name must not be blank.")
-    @Size(min = 2, message = "Last name must be at least 2 characters.")
+    @NotBlank(message = "{lastName.blank}")
+    @Size(min = 2, message = "{lastName.size}")
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "{birthDate.null}")
     private LocalDateTime birthDate;
 
 }

@@ -17,6 +17,13 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String CODE_NULL = "Verification code is null! You might have already verified your account!";
+    private static final String CODE_EXPIRED = "Verification code has expired!";
+    private static final String CODE_INCORRECT = "Incorrect verification code!";
+    private static final String ACCOUNT_ALREADY_VERIFIED = "Account is already verified!";
+    private static final String USER_NOT_FOUND = "User not found!";
+    private static final String EMAIL_SUBJECT = "Account Verification";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
@@ -42,10 +49,10 @@ public class AuthService {
             User user = optionalUser.get();
             LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
             if (verificationCodeExpiresAt == null) {
-                throw new RuntimeException("Verification code is null! You might have already verified your account!");
+                throw new RuntimeException(CODE_NULL);
             }
             if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Verification code has expired!");
+                throw new RuntimeException(CODE_EXPIRED);
             }
             if (user.getVerificationCode().equals(verifiedUserDTO.getVerificationCode())) {
                 user.setEnabled(true);
@@ -53,10 +60,10 @@ public class AuthService {
                 user.setVerificationCodeExpiresAt(null);
                 this.userRepository.saveAndFlush(user);
             } else {
-                throw new RuntimeException("Incorrect verification code!");
+                throw new RuntimeException(CODE_INCORRECT);
             }
         } else {
-            throw new RuntimeException("User not found!");
+            throw new RuntimeException(USER_NOT_FOUND);
         }
     }
 
@@ -65,20 +72,36 @@ public class AuthService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.isEnabled()) {
-                throw new RuntimeException("Account is already verified!");
+                throw new RuntimeException(ACCOUNT_ALREADY_VERIFIED);
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
             sendVerificationEmail(user);
             this.userRepository.saveAndFlush(user);
         } else {
-            throw new RuntimeException("User not found!");
+            throw new RuntimeException(USER_NOT_FOUND);
         }
     }
 
     public void sendVerificationEmail(User user) {
-        String subject = "Account Verification";
-        String htmlMessage =
+        try {
+            this.emailService.sendVerificationEmail(
+                    user.getEmail(),
+                    EMAIL_SUBJECT,
+                    htmlMessage(user.getUsername(), user.getVerificationCode()));
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String generateVerificationCode() {
+        Random random = new Random();
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
+    }
+
+    private String htmlMessage(String username, String code) {
+        return
                 "<!DOCTYPE html>" +
                         "<html>" +
                         "<head>" +
@@ -98,11 +121,11 @@ public class AuthService {
                         "        <h1>Welcome to Our Service!</h1>" +
                         "    </div>" +
                         "    <div class='content'>" +
-                        "        <p>Hi " + user.getUsername() + ",</p>" +
+                        "        <p>Hi " + username + ",</p>" +
                         "        <p>Thank you for registering with us! Please use the following code to verify your email address:</p>" +
                         "    </div>" +
                         "    <div class='code-container'>" +
-                        "        " + user.getVerificationCode() +
+                        "        " + code +
                         "    </div>" +
                         "    <div class='content'>" +
                         "        <p>If you did not sign up for an account, please ignore this email.</p>" +
@@ -113,19 +136,6 @@ public class AuthService {
                         "</div>" +
                         "</body>" +
                         "</html>";
-
-        try {
-            this.emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public String generateVerificationCode() {
-        Random random = new Random();
-        int code = random.nextInt(900000) + 100000;
-        return String.valueOf(code);
     }
 
 }
