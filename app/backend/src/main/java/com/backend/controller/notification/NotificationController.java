@@ -1,4 +1,4 @@
-package com.backend.controller;
+package com.backend.controller.notification;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,4 +1,4 @@
-package com.backend.service.event;
+package com.backend.service.event.eventDate;
 
 public interface EventDateService {
 }
