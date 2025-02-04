@@ -83,7 +83,7 @@
 
   .login-button {
     padding: 10px;
-    background-color: #080731;
+    background-color: var(--blankfactor-oxford-color);
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -129,7 +129,7 @@
   text-align: center;
 
   a {
-    color: #080731;
+    color: var(--blankfactor-oxford-color);
     font-weight: bold;
     text-decoration: none;
   }
