@@ -1,4 +1,4 @@
-package com.backend.controller.payment;
+package com.backend.controller.paymentExecution;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
