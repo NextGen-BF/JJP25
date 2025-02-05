@@ -8,7 +8,8 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
@@ -27,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final TemplateEngine templateEngine;
 
     public User register(RegisterRequest registerRequest) {
         User user = User.builder()
@@ -102,41 +104,10 @@ public class AuthService {
     }
 
     private String htmlMessage(String username, String code) {
-        return
-                "<!DOCTYPE html>" +
-                        "<html>" +
-                        "<head>" +
-                        "<style>" +
-                        "body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; }" +
-                        ".email-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px; }" +
-                        ".header { text-align: center; padding: 10px 0; }" +
-                        ".header h1 { color: #4CAF50; }" +
-                        ".content { padding: 20px; line-height: 1.6; }" +
-                        ".code-container { text-align: center; font-size: 24px; font-weight: bold; padding: 15px; background-color: #f9f9f9; border: 1px dashed #4CAF50; margin-top: 20px; border-radius: 5px; color: #333; }" +
-                        ".footer { text-align: center; font-size: 12px; color: #888; padding-top: 20px; }" +
-                        "</style>" +
-                        "</head>" +
-                        "<body>" +
-                        "<div class='email-container'>" +
-                        "    <div class='header'>" +
-                        "        <h1>Welcome to Our Service!</h1>" +
-                        "    </div>" +
-                        "    <div class='content'>" +
-                        "        <p>Hi " + username + ",</p>" +
-                        "        <p>Thank you for registering with us! Please use the following code to verify your email address:</p>" +
-                        "    </div>" +
-                        "    <div class='code-container'>" +
-                        "        " + code +
-                        "    </div>" +
-                        "    <div class='content'>" +
-                        "        <p>If you did not sign up for an account, please ignore this email.</p>" +
-                        "    </div>" +
-                        "    <div class='footer'>" +
-                        "        <p>&copy; 2024 Your Company Name. All rights reserved.</p>" +
-                        "    </div>" +
-                        "</div>" +
-                        "</body>" +
-                        "</html>";
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("code", code);
+        return templateEngine.process("verify-account-mail", context);
     }
 
 }
