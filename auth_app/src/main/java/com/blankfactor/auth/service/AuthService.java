@@ -1,5 +1,6 @@
 package com.blankfactor.auth.service;
 
+import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.model.User;
 import com.blankfactor.auth.model.dto.RegisterRequest;
 import com.blankfactor.auth.model.dto.VerifiedUserDTO;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
@@ -18,10 +20,10 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final String CODE_NULL = "Verification code is null! You might have already verified your account!";
-    private static final String CODE_EXPIRED = "Verification code has expired!";
-    private static final String CODE_INCORRECT = "Incorrect verification code!";
-    private static final String ACCOUNT_ALREADY_VERIFIED = "Account is already verified!";
+    private static final String CODE_NULL = "You have already verified your account.";
+    private static final String CODE_EXPIRED = "Verification code has expired";
+    private static final String CODE_INCORRECT = "Incorrect verification code";
+    private static final String USER_ALREADY_VERIFIED = "Account is already verified!";
     private static final String USER_NOT_FOUND = "User not found!";
     private static final String EMAIL_SUBJECT = "Account Verification";
 
@@ -48,42 +50,39 @@ public class AuthService {
 
     public void verifyUser(VerifiedUserDTO verifiedUserDTO) {
         Optional<User> optionalUser = this.userRepository.findByEmail(verifiedUserDTO.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
-            if (verificationCodeExpiresAt == null) {
-                throw new RuntimeException(CODE_NULL);
-            }
-            if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
-                throw new RuntimeException(CODE_EXPIRED);
-            }
-            if (user.getVerificationCode().equals(verifiedUserDTO.getVerificationCode())) {
-                user.setEnabled(true);
-                user.setVerificationCode(null);
-                user.setVerificationCodeExpiresAt(null);
-                this.userRepository.saveAndFlush(user);
-            } else {
-                throw new RuntimeException(CODE_INCORRECT);
-            }
-        } else {
-            throw new RuntimeException(USER_NOT_FOUND);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(USER_NOT_FOUND);
         }
+        User user = optionalUser.get();
+        LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
+        if (verificationCodeExpiresAt == null) {
+            throw new NullVerificationCodeException(CODE_NULL);
+        }
+        if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
+            throw new ExpiredVerificationCodeException(CODE_EXPIRED);
+        }
+        if (!user.getVerificationCode().equals(verifiedUserDTO.getVerificationCode())) {
+            throw new IncorrectVerificationCodeException(CODE_INCORRECT);
+        }
+        user.setEnabled(true);
+        user.setVerificationCode(null);
+        user.setVerificationCodeExpiresAt(null);
+        this.userRepository.saveAndFlush(user);
     }
 
     public void resendVerificationCode(String email) {
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.isEnabled()) {
-                throw new RuntimeException(ACCOUNT_ALREADY_VERIFIED);
-            }
-            user.setVerificationCode(generateVerificationCode());
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-            sendVerificationEmail(user);
-            this.userRepository.saveAndFlush(user);
-        } else {
-            throw new RuntimeException(USER_NOT_FOUND);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(USER_NOT_FOUND);
         }
+        User user = optionalUser.get();
+        if (user.isEnabled()) {
+            throw new UserVerifiedException(USER_ALREADY_VERIFIED);
+        }
+        user.setVerificationCode(generateVerificationCode());
+        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+        sendVerificationEmail(user);
+        this.userRepository.saveAndFlush(user);
     }
 
     public void sendVerificationEmail(User user) {

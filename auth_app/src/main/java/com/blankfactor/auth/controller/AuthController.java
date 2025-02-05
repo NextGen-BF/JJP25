@@ -22,23 +22,15 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody @Valid VerifiedUserDTO verifiedUserDTO) {
-        try {
-            this.authService.verifyUser(verifiedUserDTO);
-            return ResponseEntity.ok("Account verified successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> verify(@RequestBody @Valid VerifiedUserDTO verifiedUserDTO) {
+        this.authService.verifyUser(verifiedUserDTO);
+        return ResponseEntity.ok("Account verified successfully!");
     }
 
     @PostMapping("/resend")
-    public ResponseEntity<?> resend(@RequestParam String email) {
-        try {
-            this.authService.resendVerificationCode(email);
-            return ResponseEntity.ok().body("Verification code resend successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> resend(@RequestParam String email) {
+        this.authService.resendVerificationCode(email);
+        return ResponseEntity.ok("Verification code resend successfully!");
     }
 
 }
