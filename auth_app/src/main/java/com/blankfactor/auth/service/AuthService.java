@@ -1,6 +1,12 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.exception.custom.*;
+import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.NullVerificationCodeException;
+import com.blankfactor.auth.exception.custom.user.UserFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.model.User;
 import com.blankfactor.auth.model.dto.exp.RegisterResponse;
 import com.blankfactor.auth.model.dto.exp.VerifyResponse;
@@ -23,12 +29,14 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final String USER_NOT_FOUND = "%s is not found!";
+    private static final String USER_NOT_FOUND = "%s is not found";
+    private static final String USER_FOUND = "%s is already in use";
     private static final String USER_ALREADY_VERIFIED = "%s is already verified";
     private static final String CODE_EXPIRED = "Verification code %s has expired";
-    private static final String CODE_INCORRECT = "Incorrect verification code: %s";
+    private static final String CODE_INCORRECT = "Incorrect verification code: %s.";
     private static final String EMAIL_SUBJECT = "Account Verification";
     private static final String EMAIL_NOT_SENT = "Failed to send verification email to %s";
+    private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,6 +45,7 @@ public class AuthService {
     private final ModelMapper modelMapper;
 
     public RegisterResponse register(RegisterRequest registerRequest) {
+        validateCredentials(registerRequest);
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .password(this.passwordEncoder.encode(registerRequest.getPassword()))
@@ -105,7 +114,15 @@ public class AuthService {
         }
     }
 
-    public String generateVerificationCode() {
+    private void validateCredentials(RegisterRequest registerRequest) {
+        this.userRepository.findByEmail(registerRequest.getEmail()).ifPresent(
+                (user) -> new UserFoundException(String.format(USER_FOUND, user.getEmail())));
+        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
+        }
+    }
+
+    private String generateVerificationCode() {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);

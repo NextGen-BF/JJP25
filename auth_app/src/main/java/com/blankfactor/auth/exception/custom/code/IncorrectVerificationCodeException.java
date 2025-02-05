@@ -1,4 +1,4 @@
-package com.blankfactor.auth.exception.custom;
+package com.blankfactor.auth.exception.custom.code;
 
 public class IncorrectVerificationCodeException extends RuntimeException {
     public IncorrectVerificationCodeException(String message) {

@@ -1,6 +1,12 @@
 package com.blankfactor.auth.exception;
 
 import com.blankfactor.auth.exception.custom.*;
+import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.NullVerificationCodeException;
+import com.blankfactor.auth.exception.custom.user.UserFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +24,6 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ExpiredVerificationCodeException.class)
-    public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(ExpiredVerificationCodeException ex) {
-        return new ResponseEntity<>(getErrorsMap("410", "GONE", ex.getMessage()), new HttpHeaders(), HttpStatus.GONE);
-    }
-
     @ExceptionHandler(IncorrectVerificationCodeException.class)
     public ResponseEntity<Map<String, String>> handleIncorrectVerificationCodeException(IncorrectVerificationCodeException ex) {
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -30,6 +31,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NullVerificationCodeException.class)
     public ResponseEntity<Map<String, String>> handleNullVerificationCodeException(NullVerificationCodeException ex) {
+        return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordsDoNotMatchException.class)
+    public ResponseEntity<Map<String, String>> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex) {
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -43,8 +49,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(UserFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserFoundException(UserFoundException ex) {
+        return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ExpiredVerificationCodeException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(ExpiredVerificationCodeException ex) {
+        return new ResponseEntity<>(getErrorsMap("410", "GONE", ex.getMessage()), new HttpHeaders(), HttpStatus.GONE);
+    }
+
     @ExceptionHandler(VerificationEmailNotSentException.class)
     public ResponseEntity<Map<String, String>> handleVerificationEmailNotSentException(VerificationEmailNotSentException ex) {
+        return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex) {
         return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -53,11 +74,6 @@ public class GlobalExceptionHandler {
         List<String> errors = ex.getBindingResult().getFieldErrors()
                 .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex) {
-        return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private Map<String, List<String>> getErrorsMap(List<String> errors) {
