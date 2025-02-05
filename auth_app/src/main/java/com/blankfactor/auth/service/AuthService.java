@@ -28,6 +28,7 @@ public class AuthService {
     private static final String CODE_EXPIRED = "Verification code %s has expired";
     private static final String CODE_INCORRECT = "Incorrect verification code: %s";
     private static final String EMAIL_SUBJECT = "Account Verification";
+    private static final String EMAIL_NOT_SENT = "Failed to send verification email to %s";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -100,7 +101,7 @@ public class AuthService {
                     EMAIL_SUBJECT,
                     htmlMessage(user.getUsername(), user.getVerificationCode()));
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw new VerificationEmailNotSentException(String.format(EMAIL_NOT_SENT, user.getEmail()), e);
         }
     }
 
