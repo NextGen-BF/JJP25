@@ -39,8 +39,9 @@ public class AuthService {
                 .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
                 .enabled(false)
                 .build();
+        User newUser = this.userRepository.saveAndFlush(user);
         sendVerificationEmail(user);
-        return this.userRepository.saveAndFlush(user);
+        return newUser;
     }
 
     public void verifyUser(VerifiedUserDTO verifiedUserDTO) {
