@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model.dto;
+package com.blankfactor.auth.model.dto.imp;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class VerifiedUserDTO {
+public class VerifyRequest {
 
     @NotBlank(message = "{email.blank}")
     @Email(message = "{email.format}")

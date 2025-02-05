@@ -2,11 +2,14 @@ package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.RegisterRequest;
-import com.blankfactor.auth.model.dto.VerifiedUserDTO;
+import com.blankfactor.auth.model.dto.exp.RegisterResponse;
+import com.blankfactor.auth.model.dto.exp.VerifyResponse;
+import com.blankfactor.auth.model.dto.imp.RegisterRequest;
+import com.blankfactor.auth.model.dto.imp.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -30,8 +33,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
+    private final ModelMapper modelMapper;
 
-    public User register(RegisterRequest registerRequest) {
+    public RegisterResponse register(RegisterRequest registerRequest) {
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .password(this.passwordEncoder.encode(registerRequest.getPassword()))
@@ -42,14 +46,14 @@ public class AuthService {
                 .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
                 .enabled(false)
                 .build();
-        User newUser = this.userRepository.saveAndFlush(user);
+        this.userRepository.saveAndFlush(user);
         sendVerificationEmail(user);
-        return newUser;
+        return this.modelMapper.map(user, RegisterResponse.class);
     }
 
-    public void verifyUser(VerifiedUserDTO verifiedUserDTO) {
-        String userEmail = verifiedUserDTO.getEmail();
-        String userVerificationCode = verifiedUserDTO.getVerificationCode();
+    public VerifyResponse verifyUser(VerifyRequest verifyRequest) {
+        String userEmail = verifyRequest.getEmail();
+        String userVerificationCode = verifyRequest.getVerificationCode();
         Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException(String.format(USER_NOT_FOUND, userEmail));
@@ -63,15 +67,16 @@ public class AuthService {
             throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
         }
         if (!user.getVerificationCode().equals(userVerificationCode)) {
-            throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userEmail));
+            throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
         }
         user.setEnabled(true);
         user.setVerificationCode(null);
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
+        return this.modelMapper.map(user, VerifyResponse.class);
     }
 
-    public void resendVerificationCode(String email) {
+    public String resendVerificationCode(String email) {
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException(String.format(USER_NOT_FOUND, email));
@@ -80,10 +85,12 @@ public class AuthService {
         if (user.isEnabled()) {
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, email));
         }
-        user.setVerificationCode(generateVerificationCode());
+        String newCode = generateVerificationCode();
+        user.setVerificationCode(newCode);
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         sendVerificationEmail(user);
         this.userRepository.saveAndFlush(user);
+        return newCode;
     }
 
     public void sendVerificationEmail(User user) {

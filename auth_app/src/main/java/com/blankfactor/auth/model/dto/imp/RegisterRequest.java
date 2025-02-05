@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model.dto;
+package com.blankfactor.auth.model.dto.imp;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

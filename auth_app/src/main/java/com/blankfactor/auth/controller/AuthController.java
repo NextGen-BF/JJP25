@@ -1,8 +1,10 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.RegisterRequest;
-import com.blankfactor.auth.model.dto.VerifiedUserDTO;
+import com.blankfactor.auth.model.dto.exp.RegisterResponse;
+import com.blankfactor.auth.model.dto.exp.VerifyResponse;
+import com.blankfactor.auth.model.dto.imp.RegisterRequest;
+import com.blankfactor.auth.model.dto.imp.VerifyRequest;
 import com.blankfactor.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +19,19 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegisterRequest registerRequest) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
         return ResponseEntity.ok().body(this.authService.register(registerRequest));
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verify(@RequestBody @Valid VerifiedUserDTO verifiedUserDTO) {
-        this.authService.verifyUser(verifiedUserDTO);
-        return ResponseEntity.ok("Account verified successfully!");
+    public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
+        return ResponseEntity.ok(this.authService.verifyUser(verifyRequest));
     }
 
     @PostMapping("/resend")
     public ResponseEntity<String> resend(@RequestParam String email) {
-        this.authService.resendVerificationCode(email);
-        return ResponseEntity.ok("Verification code resend successfully!");
+        return ResponseEntity.ok(String.format("Verification code resend successfully! New code: %s",
+                this.authService.resendVerificationCode(email)));
     }
 
 }
