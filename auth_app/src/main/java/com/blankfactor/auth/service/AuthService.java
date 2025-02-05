@@ -33,7 +33,7 @@ public class AuthService {
     private static final String USER_FOUND = "%s is already in use";
     private static final String USER_ALREADY_VERIFIED = "%s is already verified";
     private static final String CODE_EXPIRED = "Verification code %s has expired";
-    private static final String CODE_INCORRECT = "Incorrect verification code: %s.";
+    private static final String CODE_INCORRECT = "Incorrect verification code: %s";
     private static final String EMAIL_SUBJECT = "Account Verification";
     private static final String EMAIL_NOT_SENT = "Failed to send verification email to %s";
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
@@ -115,8 +115,10 @@ public class AuthService {
     }
 
     private void validateCredentials(RegisterRequest registerRequest) {
-        this.userRepository.findByEmail(registerRequest.getEmail()).ifPresent(
-                (user) -> new UserFoundException(String.format(USER_FOUND, user.getEmail())));
+        Optional<User> byEmail = this.userRepository.findByEmail(registerRequest.getEmail());
+        if (byEmail.isPresent()) {
+            throw new UserFoundException(String.format(USER_FOUND, registerRequest.getEmail()));
+        }
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
         }

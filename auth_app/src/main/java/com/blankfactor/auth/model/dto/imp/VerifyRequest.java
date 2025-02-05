@@ -14,11 +14,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VerifyRequest {
 
-    @NotBlank(message = "{email.blank}")
-    @Email(message = "{email.format}")
+    @NotBlank(message = "{email.required}")
+    @Email(message = "{email.invalidFormat}")
     private String email;
 
-    @NotBlank(message = "{verificationCode.blank}")
-    @Size(min = 6, max = 6, message = "{verificationCode.size}")
+    @NotBlank(message = "{verificationCode.required}")
+    @Size(min = 6, max = 6, message = "{verificationCode.invalid}")
     private String verificationCode;
 }
