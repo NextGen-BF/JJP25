@@ -20,11 +20,10 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final String CODE_NULL = "You have already verified your account.";
-    private static final String CODE_EXPIRED = "Verification code has expired";
-    private static final String CODE_INCORRECT = "Incorrect verification code";
-    private static final String USER_ALREADY_VERIFIED = "Account is already verified!";
-    private static final String USER_NOT_FOUND = "User not found!";
+    private static final String USER_NOT_FOUND = "%s is not found!";
+    private static final String USER_ALREADY_VERIFIED = "%s is already verified";
+    private static final String CODE_EXPIRED = "Verification code %s has expired";
+    private static final String CODE_INCORRECT = "Incorrect verification code: %s";
     private static final String EMAIL_SUBJECT = "Account Verification";
 
     private final UserRepository userRepository;
@@ -49,20 +48,22 @@ public class AuthService {
     }
 
     public void verifyUser(VerifiedUserDTO verifiedUserDTO) {
-        Optional<User> optionalUser = this.userRepository.findByEmail(verifiedUserDTO.getEmail());
+        String userEmail = verifiedUserDTO.getEmail();
+        String userVerificationCode = verifiedUserDTO.getVerificationCode();
+        Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException(String.format(USER_NOT_FOUND, userEmail));
         }
         User user = optionalUser.get();
         LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
         if (verificationCodeExpiresAt == null) {
-            throw new NullVerificationCodeException(CODE_NULL);
+            throw new NullVerificationCodeException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
         if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
-            throw new ExpiredVerificationCodeException(CODE_EXPIRED);
+            throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
         }
-        if (!user.getVerificationCode().equals(verifiedUserDTO.getVerificationCode())) {
-            throw new IncorrectVerificationCodeException(CODE_INCORRECT);
+        if (!user.getVerificationCode().equals(userVerificationCode)) {
+            throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userEmail));
         }
         user.setEnabled(true);
         user.setVerificationCode(null);
@@ -73,11 +74,11 @@ public class AuthService {
     public void resendVerificationCode(String email) {
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException(String.format(USER_NOT_FOUND, email));
         }
         User user = optionalUser.get();
         if (user.isEnabled()) {
-            throw new UserVerifiedException(USER_ALREADY_VERIFIED);
+            throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, email));
         }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
