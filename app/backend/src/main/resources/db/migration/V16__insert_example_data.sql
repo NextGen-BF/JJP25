@@ -1,9 +1,9 @@
-INSERT INTO users (created_at, phone, profile_pic, type, updated_at, username) VALUES
-(NOW(), '1234567890', 'pic1.jpg', 'ATTENDEE', NOW(), 'john_doe'),
-(NOW(), '9876543210', 'pic2.jpg', 'ORGANISER', NOW(), 'jane_smith'),
-(NOW(), '5551234567', NULL, 'ATTENDEE', NOW(), 'michael_lee'),
-(NOW(), '4449871234', 'pic4.png', 'ORGANISER', NOW(), 'sarah_wilson'),
-(NOW(), '3332221111', NULL, 'ATTENDEE', NOW(), 'david_clark');
+INSERT INTO users (created_at, phone, profile_pic, type, updated_at) VALUES
+(NOW(), '1234567890', 'pic1.jpg', 'ATTENDEE', NOW()),
+(NOW(), '9876543210', 'pic2.jpg', 'ORGANISER', NOW()),
+(NOW(), '5551234567', NULL, 'ATTENDEE', NOW()),
+(NOW(), '4449871234', 'pic4.png', 'ORGANISER', NOW()),
+(NOW(), '3332221111', NULL, 'ATTENDEE', NOW());
 
 INSERT INTO events (age_restriction, category, charity_iban, created_at, description, status, title, updated_at, admin_id) VALUES
 (18, 'CONCERT', 'GB33BUKB20201555555555', NOW(), 'An electrifying rock concert.', 'INCOMING', 'Rock Fest 2025', NOW(), 1),

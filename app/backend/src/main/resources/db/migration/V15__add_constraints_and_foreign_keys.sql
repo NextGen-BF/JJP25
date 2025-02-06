@@ -1,6 +1,5 @@
 alter table event_statistics add constraint UKj4v94ymapgf9d18jy1vl0rxre unique (event_id);
 alter table users add constraint UKdu5v5sr43g5bfnji4vb8hg5s3 unique (phone);
-alter table users  add constraint UKr43af9ap4edm43mmtq01oddj6 unique (username);
 
 alter table event_dates
 add constraint FKt6eutgjmpfnfjlnc1j94wif88

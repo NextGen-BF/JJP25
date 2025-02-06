@@ -71,9 +71,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 15)
     private String phone;
 
-    @Column(nullable = false, unique = true, length = 255)
-    private String username;
-
     @Column(length = 255)
     private String profilePic;
 
@@ -99,20 +96,18 @@ public class User extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return getId() != null && getId().equals(user.getId()) &&
-                Objects.equals(username, user.username) &&
                 Objects.equals(phone, user.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), username, phone);
+        return Objects.hash(getId(), phone);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + getId() +
-                ", username='" + username + '\'' +
                 ", phone='" + phone + '\'' +
                 ", type=" + type +
                 ", createdAt=" + createdAt +

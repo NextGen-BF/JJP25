@@ -5,6 +5,5 @@ create table if not exists users (
     profile_pic varchar(255),
     type enum ('ATTENDEE','ORGANISER') not null,
     updated_at datetime(6) not null,
-    username varchar(255) not null,
     primary key (id)
 );
