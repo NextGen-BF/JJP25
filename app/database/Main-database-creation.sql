@@ -1,4 +1,4 @@
-use event_management_system;
+use ems;
 
 create table if not exists users (
 	id int primary key,
@@ -21,7 +21,7 @@ create table if not exists notifications (
 		'UserPaymentStatus',
 		'AdminPaymentPeriod'
 	) not null,
-	description text not null,
+	description varchar(255) not null,
 	sent_at timestamp not null,
 	constraint fk_notifications_users foreign key (user_id)
 	references users(id) on delete cascade
@@ -32,7 +32,10 @@ create table if not exists venues (
 	country varchar(255) not null,
 	city varchar(255) not null,
 	address varchar(255) not null,
-	name varchar(255) not null
+	name varchar(255) not null,
+	type enum('Staduim', 'Conference', 'Centre', 'Cinema Hall', 'Theatre'),
+	website varchar(255),
+	phone varchar(15)
 );
 
 create table if not exists events (
@@ -66,7 +69,7 @@ create table if not exists events (
 create table if not exists venues_events (
 	venue_id int not null,
 	event_id int not null,
-	constraint primary key (venue_id, event_id)
+	constraint primary key (venue_id, event_id),
 	constraint fk_venues foreign key (venue_id) references venues(id) on delete cascade,
 	constraint fk_events foreign key (event_id) references events(id) on delete cascade
 );
@@ -99,7 +102,7 @@ create table if not exists event_statistics (
 	event_id int not null,
 	total_tickets_sold int default 0,
 	total_revenue decimal(8, 2) default 0.00,
-	average_rating decimal(1, 1) default 0.0,
+	average_rating decimal(2, 1) default 0.0,
 	feedback_count int default 0,
 	last_updated timestamp,
 	constraint fk_statistics_events foreign key (event_id)
@@ -129,16 +132,9 @@ create table if not exists ticket_templates (
 		'Seat',
 		'VIP'
 	),
-	venue_type enum(
-		'Stadium',
-		'Conference',
-		'Centre',
-		'Cinema Hall',
-		'Theatre'
-	),
 	price decimal(6, 2) not null,
 	event_date timestamp not null,
-	description text,
+	description varchar(255),
 	available_quantity int not null,
 	total_quantity int not null,
 	constraint chk_available_quantity check (available_quantity >= 0),
@@ -160,6 +156,7 @@ create table if not exists user_tickets (
 create table if not exists payments (
 	id int primary key,
 	user_id int not null,
+	receiver_id int not null,
 	external_id varchar(64) not null,
 	amount decimal(6, 2) not null,
 	currency varchar(3) not null,
@@ -179,7 +176,9 @@ create table if not exists payments (
 	updated_at timestamp,
 	is_disputed boolean,
 	constraint fk_payments_users foreign key (user_id)
-	references users(id) on delete cascade
+	references users(id) on delete cascade,
+	constraint fk_payments_receivers foreign key (receiver_id)
+	references users(id)
 );
 
 create table if not exists payment_executions (
@@ -193,13 +192,13 @@ create table if not exists payment_executions (
 		'Cancellation',
 		'Chargeback'
 	),
-	description text,
+	description varchar(255),
 	error_code varchar(24),
 	created_at timestamp not null,
 	updated_at timestamp,
 	refund_expiration_date timestamp not null,
 	refunded_amount decimal (6, 2),
-	refunc_reason text,
+	refunc_reason varchar(255),
 	constraint fk_executions_payments foreign key (payment_id)
 	references payments(id) on delete cascade,
 	constraint fk_executions_tickets foreign key (user_ticket_id)
