@@ -10,9 +10,9 @@
     </parent>
     <groupId>com.blankfactor</groupId>
     <artifactId>auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>auth</name>
-    <description>Auth Service for The Main App</description>
+    <description>User Auth Service</description>
     <url/>
     <licenses>
         <license/>
