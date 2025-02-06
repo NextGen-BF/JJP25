@@ -24,48 +24,28 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(IncorrectVerificationCodeException.class)
-    public ResponseEntity<Map<String, String>> handleIncorrectVerificationCodeException(IncorrectVerificationCodeException ex) {
+    @ExceptionHandler({IncorrectVerificationCodeException.class, NullVerificationCodeException.class, PasswordsDoNotMatchException.class})
+    public ResponseEntity<Map<String, String>> handleCustomExceptions(RuntimeException ex) {
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NullVerificationCodeException.class)
-    public ResponseEntity<Map<String, String>> handleNullVerificationCodeException(NullVerificationCodeException ex) {
-        return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PasswordsDoNotMatchException.class)
-    public ResponseEntity<Map<String, String>> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex) {
-        return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
+    @ExceptionHandler({UserNotFoundException.class})
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(RuntimeException ex) {
         return new ResponseEntity<>(getErrorsMap("404", "NOT_FOUND", ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserVerifiedException.class)
-    public ResponseEntity<Map<String, String>> handleUserVerifiedException(UserVerifiedException ex) {
+    @ExceptionHandler({UserVerifiedException.class, UserFoundException.class})
+    public ResponseEntity<Map<String, String>> handleUserVerifiedException(RuntimeException ex) {
         return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(UserFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserFoundException(UserFoundException ex) {
-        return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ExpiredVerificationCodeException.class)
-    public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(ExpiredVerificationCodeException ex) {
+    @ExceptionHandler({ExpiredVerificationCodeException.class})
+    public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(RuntimeException ex) {
         return new ResponseEntity<>(getErrorsMap("410", "GONE", ex.getMessage()), new HttpHeaders(), HttpStatus.GONE);
     }
 
-    @ExceptionHandler(VerificationEmailNotSentException.class)
-    public ResponseEntity<Map<String, String>> handleVerificationEmailNotSentException(VerificationEmailNotSentException ex) {
-        return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex) {
+    @ExceptionHandler({Exception.class, VerificationEmailNotSentException.class})
+    public ResponseEntity<Map<String, String>> handleVerificationEmailNotSentException(Exception ex) {
         return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
