@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model.dto.imp;
+package com.blankfactor.auth.entity.dto.imp;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,6 +1,6 @@
 package com.blankfactor.auth.repository;
 
-import com.blankfactor.auth.model.User;
+import com.blankfactor.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

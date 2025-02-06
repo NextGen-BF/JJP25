@@ -1,10 +1,9 @@
 package com.blankfactor.auth.controller;
 
-import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.exp.RegisterResponse;
-import com.blankfactor.auth.model.dto.exp.VerifyResponse;
-import com.blankfactor.auth.model.dto.imp.RegisterRequest;
-import com.blankfactor.auth.model.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
+import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
+import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
+import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

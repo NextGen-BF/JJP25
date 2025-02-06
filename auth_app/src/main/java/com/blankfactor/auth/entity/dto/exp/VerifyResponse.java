@@ -1,6 +1,5 @@
-package com.blankfactor.auth.model.dto.exp;
+package com.blankfactor.auth.entity.dto.exp;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,19 +12,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse implements Serializable {
-
-    private Long id;
+public class VerifyResponse implements Serializable {
 
     private String email;
-
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private LocalDateTime birthDate;
 
     private boolean enabled;
 

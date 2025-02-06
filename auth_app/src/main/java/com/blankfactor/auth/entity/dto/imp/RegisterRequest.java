@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model.dto.imp;
+package com.blankfactor.auth.entity.dto.imp;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -22,9 +22,14 @@ public class RegisterRequest {
     @Size(min = 8, max = 25, message = "{password.length}")
     private String password;
 
-    @NotBlank(message = "{password.required}")
-    @Size(min = 8, max = 25, message = "{password.length}")
+    @NotBlank(message = "{confirmPassword.required}")
+    @Size(min = 8, max = 25, message = "{confirmPassword.length}")
     private String confirmPassword;
+
+    @NotBlank(message = "{username.required}")
+    @Size(max = 25, message = "{username.length}")
+    @Pattern(regexp = "^[a-zA-Z](?=(?:[^a-zA-Z]*[a-zA-Z]){3,})(?=(?:\\D*\\d){0,4}$)(?=(?:[^\\W_]*[_-]){0,2}$)[a-zA-Z0-9_-]{3,23}[a-zA-Z0-9]$", message = "{username.regex}")
+    private String username;
 
     @NotBlank(message = "{firstName.required}")
     @Size(min = 2, message = "{firstName.minLength}")

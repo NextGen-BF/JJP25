@@ -7,11 +7,11 @@ import com.blankfactor.auth.exception.custom.code.NullVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
-import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.exp.RegisterResponse;
-import com.blankfactor.auth.model.dto.exp.VerifyResponse;
-import com.blankfactor.auth.model.dto.imp.RegisterRequest;
-import com.blankfactor.auth.model.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.User;
+import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
+import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
+import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
+import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -98,8 +98,8 @@ public class AuthService {
         String newCode = generateVerificationCode();
         user.setVerificationCode(newCode);
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-        sendVerificationEmail(user);
         this.userRepository.saveAndFlush(user);
+        sendVerificationEmail(user);
         return newCode;
     }
 

@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model;
+package com.blankfactor.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,10 +22,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Basic(optional = false)
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Basic(optional = false)
+    @Column(nullable = false)
     private String password;
 
     @Column(name = "fist_name", nullable = false)
@@ -37,8 +40,8 @@ public class User implements UserDetails {
     @Column(name = "birth_date", nullable = false)
     private LocalDateTime birthDate;
 
-    @Basic(optional = false)
-    private boolean enabled;
+    @Column(name = "is_enabled", nullable = false)
+    private Boolean enabled;
 
     @Column(name = "verification_code")
     private String verificationCode;
