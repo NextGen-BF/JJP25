@@ -49,6 +49,7 @@ public class AuthService {
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .password(this.passwordEncoder.encode(registerRequest.getPassword()))
+                .username(registerRequest.getUsername())
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .birthDate(registerRequest.getBirthDate())
@@ -73,11 +74,11 @@ public class AuthService {
         if (verificationCodeExpiresAt == null) {
             throw new NullVerificationCodeException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
-        if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
-            throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
-        }
         if (!user.getVerificationCode().equals(userVerificationCode)) {
             throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
+        }
+        if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
+            throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
         }
         user.setEnabled(true);
         user.setVerificationCode(null);
@@ -118,6 +119,10 @@ public class AuthService {
         Optional<User> byEmail = this.userRepository.findByEmail(registerRequest.getEmail());
         if (byEmail.isPresent()) {
             throw new UserFoundException(String.format(USER_FOUND, registerRequest.getEmail()));
+        }
+        Optional<User> byUsername = this.userRepository.findByUsername(registerRequest.getUsername());
+        if (byUsername.isPresent()) {
+            throw new UserFoundException(String.format(USER_FOUND, registerRequest.getUsername()));
         }
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
