@@ -1,26 +1,34 @@
 package com.blankfactor.auth.service;
 
-import com.blankfactor.auth.exception.custom.*;
-import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
-import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.VerificationEmailNotSentException;
+import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.invalid.InvalidPasswordException;
+import com.blankfactor.auth.exception.custom.user.UserFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
+import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.model.dto.LoginUserDTO;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,12 +47,15 @@ public class AuthService {
     private static final String EMAIL_SUBJECT = "Account Verification";
     private static final String EMAIL_NOT_SENT = "Failed to send verification email to %s";
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
+    private static final String USER_NOT_VERIFIED = "Account is not verified!";
+    private static final String INCORRECT_PASSWORD = "Incorrect password.";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final ModelMapper modelMapper;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -65,6 +76,27 @@ public class AuthService {
         log.trace("User with email {} registered successfully", registerRequest.getEmail());
         sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
+    }
+
+    public User login(LoginUserDTO input) {
+        User user = userRepository.findByEmail(input.getEmail())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+
+        if (!user.isEnabled()) {
+            throw new UserNotVerifiedException(USER_NOT_VERIFIED);
+        }
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.getEmail(),
+                            input.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new InvalidPasswordException(INCORRECT_PASSWORD);
+        }
+
+        return user;
     }
 
     @Transactional
