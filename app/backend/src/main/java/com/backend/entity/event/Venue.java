@@ -39,6 +39,12 @@ public class Venue extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String name;
 
+    @Column(length = 255)
+    private String website;
+
+    @Column(length = 15)
+    private String phone;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,6 +66,9 @@ public class Venue extends BaseEntity {
     public String toString() {
         return "Venue{" +
                 "id=" + getId() +
+                "country=" + getCountry() +
+                "city=" + getCity() +
+                "address" + getAddress() +
                 '}';
     }
 }

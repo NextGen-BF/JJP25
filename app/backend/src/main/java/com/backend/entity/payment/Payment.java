@@ -38,7 +38,11 @@ public class Payment extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User receiver;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -90,7 +94,8 @@ public class Payment extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         Payment payment = (Payment) o;
         return Objects.equals(getId(), payment.getId()) &&
-                Objects.equals(user, payment.user) &&
+                Objects.equals(sender, payment.sender) &&
+                Objects.equals(receiver, payment.receiver) &&
                 Objects.equals(amount, payment.amount) &&
                 Objects.equals(currency, payment.currency) &&
                 Objects.equals(createdAt, payment.createdAt) &&
@@ -99,14 +104,16 @@ public class Payment extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), user, amount, currency, createdAt, updatedAt);
+        return Objects.hash(getId(), sender, receiver, amount,
+                currency, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
         return "Payment{" +
                 "id=" + getId() +
-                ", user=" + (user != null ? user.getId() : null) +
+                ", sender=" + (sender != null ? sender.getId() : null) +
+                ", receiver=" + (receiver != null ? receiver.getId() : null) +
                 ", externalId='" + externalId + '\'' +
                 ", amount=" + amount +
                 ", currency='" + currency + '\'' +

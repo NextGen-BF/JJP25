@@ -8,3 +8,4 @@ ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
 Expose 3306
 
 CMD ["mysqld"]
+
