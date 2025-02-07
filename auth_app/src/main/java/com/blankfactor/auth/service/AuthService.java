@@ -118,7 +118,7 @@ public class AuthService {
         }
     }
 
-    private void validateCredentials(RegisterRequest registerRequest) {
+    public void validateCredentials(RegisterRequest registerRequest) {
         Optional<User> byEmail = this.userRepository.findByEmail(registerRequest.getEmail());
         if (byEmail.isPresent()) {
             throw new UserFoundException(String.format(USER_FOUND, registerRequest.getEmail()));
