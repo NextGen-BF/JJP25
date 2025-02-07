@@ -55,7 +55,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowUserFoundExceptionWhenUserWithSuchEmailExists() {
+    public void validateCredentials_shouldThrowUserFoundExceptionWhenUserWithSuchEmailExists() {
         // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
@@ -72,7 +72,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowUserFoundExceptionWhenUserWithSuchUsernameExists() {
+    public void validateCredentials_shouldThrowUserFoundExceptionWhenUserWithSuchUsernameExists() {
         // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
@@ -90,7 +90,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowPasswordsDoNotMatchExceptionWhenThePasswordsDoNotMatch() {
+    public void validateCredentials_shouldThrowPasswordsDoNotMatchExceptionWhenThePasswordsDoNotMatch() {
         // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
@@ -108,7 +108,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldSuccessfullyRegisterUser() throws MessagingException {
+    public void register_shouldSuccessfullyRegisterUser() throws MessagingException {
         // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
@@ -135,7 +135,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
+    public void register_shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
         // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("test@example.com");
@@ -159,7 +159,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowUserNotFoundExceptionWhenUserWithSuchEmailDoesNotExits() {
+    public void verify_shouldThrowUserNotFoundExceptionWhenUserWithSuchEmailDoesNotExits() {
         // Given
         VerifyRequest verifyRequest = new VerifyRequest();
         String email = "test@example.com";
@@ -175,7 +175,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowUserVerifiedExceptionWhenTheUserIsVerified() {
+    public void verify_shouldThrowUserVerifiedExceptionWhenTheUserIsVerified() {
         // Given
         VerifyRequest verifyRequest = new VerifyRequest();
         String email = "test@example.com";
@@ -193,7 +193,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void shouldThrowIncorrectVerificationCodeExceptionWhenTheCodeIsIncorrect() {
+    public void verify_shouldThrowIncorrectVerificationCodeExceptionWhenTheCodeIsIncorrect() {
         // Given
         VerifyRequest verifyRequest = new VerifyRequest();
         String email = "test@example.com";
@@ -207,14 +207,12 @@ public class AuthServiceTest {
         when(this.userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         // Then
-        IncorrectVerificationCodeException exception = assertThrows(IncorrectVerificationCodeException.class, () -> {
-            authService.verify(verifyRequest);
-        });
+        IncorrectVerificationCodeException exception = assertThrows(IncorrectVerificationCodeException.class, () -> authService.verify(verifyRequest));
         assertEquals("Incorrect verification code: 123456", exception.getMessage());
     }
 
     @Test
-    public void shouldThrowExpiredVerificationCodeExceptionWhenTheCodeHasExpired() {
+    public void verify_shouldThrowExpiredVerificationCodeExceptionWhenTheCodeHasExpired() {
         // Given
         VerifyRequest verifyRequest = new VerifyRequest();
         String email = "test@example.com";
@@ -230,14 +228,12 @@ public class AuthServiceTest {
         when(this.userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         // Then
-        ExpiredVerificationCodeException exception = assertThrows(ExpiredVerificationCodeException.class, () -> {
-            authService.verify(verifyRequest);
-        });
+        ExpiredVerificationCodeException exception = assertThrows(ExpiredVerificationCodeException.class, () -> authService.verify(verifyRequest));
         assertEquals("Verification code 123456 has expired", exception.getMessage());
     }
 
     @Test
-    public void shouldSuccessfullyVerifyUser() {
+    public void verify_shouldSuccessfullyVerifyUser() {
         // Given
         VerifyRequest verifyRequest = new VerifyRequest();
         String email = "test@example.com";
@@ -260,6 +256,55 @@ public class AuthServiceTest {
         assertNull(user.getVerificationCode());
         assertNull(user.getVerificationCodeExpiresAt());
         verify(this.userRepository).saveAndFlush(user);
+    }
+
+    @Test
+    public void resendVerificationCode_shouldThrowUserNotFoundExceptionWhenUserWithEmailDoesNotExist() {
+        // Given
+        String email = "test@example.com";
+
+        // When
+        when(this.userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // Then
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> this.authService.resendVerificationCode(email));
+        assertEquals("test@example.com is not found", exception.getMessage());
+    }
+
+    @Test
+    public void resendVerificationCode_shouldThrowUserVerifiedExceptionWhenUserIsAlreadyVerified() {
+        // Given
+        User user = new User();
+        String email = "test@example.com";
+        user.setEmail(email);
+        user.setEnabled(true);
+
+        // When
+        when(this.userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // Then
+        UserVerifiedException exception = assertThrows(UserVerifiedException.class, () -> this.authService.resendVerificationCode(email));
+        assertEquals("test@example.com is already verified", exception.getMessage());
+    }
+
+    @Test
+    public void resendVerificationCode_shouldSuccessfullyResendVerificationCode() throws MessagingException {
+        // Given
+        User user = new User();
+        String email = "test@example.com";
+        user.setEmail(email);
+        user.setEnabled(false);
+
+        // When
+        when(this.userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(templateEngine.process(anyString(), any())).thenReturn("Mocked Email Content");
+        this.authService.resendVerificationCode(email);
+
+        // Then
+        assertNotNull(user.getVerificationCode());
+        assertTrue(user.getVerificationCodeExpiresAt().isAfter(LocalDateTime.now()));
+        verify(this.userRepository).saveAndFlush(user);
+        verify(this.emailService).sendVerificationEmail(eq(email), eq("Account Verification"), eq("Mocked Email Content"));
     }
 
 }
