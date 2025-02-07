@@ -48,7 +48,7 @@ public class AuthService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
-        log.trace("Registering user with email: {}", registerRequest.getEmail());
+        log.debug("Registering user with email: {}", registerRequest.getEmail());
         validateCredentials(registerRequest);
         User user = User.builder()
                 .email(registerRequest.getEmail())
@@ -62,14 +62,14 @@ public class AuthService {
                 .enabled(false)
                 .build();
         this.userRepository.saveAndFlush(user);
-        log.trace("User with email {} registered successfully", registerRequest.getEmail());
+        log.debug("User with email {} registered successfully", registerRequest.getEmail());
         sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
     @Transactional
     public VerifyResponse verify(VerifyRequest verifyRequest) {
-        log.trace("Verifying user with email: {}", verifyRequest.getEmail());
+        log.debug("Verifying user with email: {}", verifyRequest.getEmail());
         String userEmail = verifyRequest.getEmail();
         String userVerificationCode = verifyRequest.getVerificationCode();
         Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);
@@ -95,13 +95,13 @@ public class AuthService {
         user.setVerificationCode(null);
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
-        log.trace("User with email {} verified successfully", userEmail);
+        log.debug("User with email {} verified successfully", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
     @Transactional
     public String resendVerificationCode(String email) {
-        log.trace("Resending verification code to email: {}", email);
+        log.debug("Resending verification code to email: {}", email);
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
             log.warn("User with email {} is not found", email);
@@ -117,7 +117,7 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         this.userRepository.saveAndFlush(user);
         sendVerificationEmail(user);
-        log.trace("Verification code resent successfully to email: {}", email);
+        log.debug("Verification code resent successfully to email: {}", email);
         return newCode;
     }
 
@@ -127,7 +127,7 @@ public class AuthService {
                     user.getEmail(),
                     EMAIL_SUBJECT,
                     htmlMessage(user.getUsername(), user.getVerificationCode()));
-            log.trace("Verification email sent to: {}", user.getEmail());
+            log.debug("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
             log.error("Failed to send verification email to: {}", user.getEmail());
             throw new VerificationEmailNotSentException(String.format(EMAIL_NOT_SENT, user.getEmail()), e);
