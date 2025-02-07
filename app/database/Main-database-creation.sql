@@ -153,7 +153,7 @@ create table if not exists user_tickets (
 
 create table if not exists payments (
 	id int primary key,
-	user_id int not null,
+	sender_id int not null,
 	receiver_id int not null,
 	external_id varchar(64) not null,
 	amount decimal(6, 2) not null,
@@ -173,10 +173,10 @@ create table if not exists payments (
 	created_at timestamp not null,
 	updated_at timestamp,
 	is_disputed boolean,
-	constraint fk_payments_users foreign key (user_id)
+	constraint fk_payments_senders foreign key (user_id)
 	references users(id) on delete cascade,
 	constraint fk_payments_receivers foreign key (receiver_id)
-	references users(id)
+	references users(id) on delete cascade
 );
 
 create table if not exists payment_executions (
