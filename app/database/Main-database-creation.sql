@@ -173,7 +173,7 @@ create table if not exists payments (
 	created_at timestamp not null,
 	updated_at timestamp,
 	is_disputed boolean,
-	constraint fk_payments_senders foreign key (user_id)
+	constraint fk_payments_senders foreign key (sender_id)
 	references users(id) on delete cascade,
 	constraint fk_payments_receivers foreign key (receiver_id)
 	references users(id) on delete cascade
