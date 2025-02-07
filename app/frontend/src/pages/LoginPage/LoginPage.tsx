@@ -4,13 +4,25 @@ import './LoginPage.scss';
 import sideImage from '../../assets/side-image.png';     
 import gmailLogo from '../../assets/google-color.png';         
 
+interface FormValues {
+  username: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+interface Errors {
+  username: string;
+  password: string;
+}
+
 const LoginPage: FC = () => {
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<FormValues>({
     username: '',
     password: '',
     rememberMe: false,
   });
-  const [errors, setErrors] = useState({
+
+  const [errors, setErrors] = useState<Errors>({
     username: '',
     password: '',
   });
@@ -23,10 +35,9 @@ const LoginPage: FC = () => {
     });
   };
 
-  const validate = () => {
+  const handleInputValidation = () => {
     let valid = true;
-    const newErrors = { username: '', password: '' };
-
+    const newErrors: Errors = { username: '', password: '' };
     if (!formValues.username) {
       newErrors.username = 'Please enter your email or username';
       valid = false;
@@ -35,14 +46,13 @@ const LoginPage: FC = () => {
       newErrors.password = 'Please enter your password';
       valid = false;
     }
-
     setErrors(newErrors);
     return valid;
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validate()) {
+    if (handleInputValidation()) {
       // Placeholder for login action
       alert('Login successful (to be implemented)!');
     }
@@ -101,7 +111,7 @@ const LoginPage: FC = () => {
               Login
             </button>
           </form>
-
+          <div className="or-separator">or</div>
           <div className="gmail-login">
             <button onClick={handleGmailLogin} className="gmail-button">
               <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />

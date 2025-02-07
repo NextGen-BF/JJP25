@@ -3,15 +3,14 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
 }
 
 .login-container {
   display: flex;
   max-width: 900px;
   width: 100%;
-  min-height: 500px; 
-  background-color: #fff;
+  height: 540px; 
+  background-color: var(--background-ghostwhite);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -19,7 +18,6 @@
 
 .side-image {
   flex: 2;
-  background-color: #e0e0e0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -61,13 +59,13 @@
     input[type="text"],
     input[type="password"] {
       padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border-color);
       border-radius: 4px;
       font-size: 1rem;
     }
 
     .error {
-      color: red;
+      color: var(--error-color);
       font-size: 0.875rem;
     }
   }
@@ -83,8 +81,9 @@
 
   .login-button {
     padding: 10px;
+    width: 100%;
     background-color: var(--blankfactor-oxford-color);
-    color: #fff;
+    color: var(--white-color);
     border: none;
     border-radius: 4px;
     font-size: 1rem;
@@ -92,34 +91,59 @@
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #060520;
+    background-color: var(--blankfactor-ultramarine-color);
     }
   }
 }
 
-.gmail-login {
-  margin-top: 20px;
+.or-separator {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
   text-align: center;
+  color: var(--separator-text-color);
+  font-size: 0.9rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--separator-line-color);
+  }
+
+  &::before {
+    margin-right: 10px;
+  }
+
+  &::after {
+    margin-left: 10px;
+  }
+}
+
+.gmail-login {
+  margin: 0;
 
   .gmail-button {
+    padding: 10px;
+    width: 100%;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 8px 12px;
+    gap: 8px;
+    background-color: var(--white-color);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #f0f0f0;
+      background-color: var(--anti-flash-white-color);
     }
 
     .gmail-logo {
       height: 20px;
       width: 20px;
-      margin-right: 8px;
     }
   }
 }
@@ -132,5 +156,21 @@
     color: var(--blankfactor-oxford-color);
     font-weight: bold;
     text-decoration: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column; 
+    height: auto; 
+  }
+
+  .side-image {
+    display: none; 
+  }
+
+  .login-form-container {
+    flex: 1;
+    padding: 20px; 
   }
 }
