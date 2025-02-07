@@ -79,23 +79,33 @@ public class AuthService {
     }
 
     public User login(LoginUserDTO input) {
+        log.info("Attempting to log in user: {}", input.getEmail());
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("User not found with email: {}", input.getEmail());
+                    return new UserNotFoundException(USER_NOT_FOUND);
+                });
 
         if (!user.isEnabled()) {
+            log.warn("User account is not verified: {}", input.getEmail());
             throw new UserNotVerifiedException(USER_NOT_VERIFIED);
         }
+
         try {
+            log.debug("Authenticating user credentials for: {}", input.getEmail());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             input.getEmail(),
                             input.getPassword()
                     )
             );
+            log.info("User authenticated successfully: {}", input.getEmail());
         } catch (BadCredentialsException e) {
+            log.warn("Invalid password for user: {}", input.getEmail());
             throw new InvalidPasswordException(INCORRECT_PASSWORD);
         }
 
+        log.debug("Returning user details for: {}", input.getEmail());
         return user;
     }
 

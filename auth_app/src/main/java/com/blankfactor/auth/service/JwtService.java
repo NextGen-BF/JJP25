@@ -4,6 +4,9 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,9 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
@@ -22,23 +28,28 @@ public class JwtService {
     private long jwtExpiration;
 
     public String extractUsername(String token) {
+        logger.debug("Extracting username from token.");
         return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        logger.debug("Extracting claim from token.");
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
     public String generateToken(UserDetails userDetails) {
+        logger.debug("Generating token for user: {}", userDetails.getUsername());
         return generateToken(new HashMap<>(), userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        logger.debug("Generating token with extra claims for user: {}", userDetails.getUsername());
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
     public long getExpirationTime() {
+        logger.debug("Getting JWT expiration time.");
         return jwtExpiration;
     }
 
@@ -47,6 +58,7 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+        logger.debug("Building token for user: {}", userDetails.getUsername());
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -58,13 +70,16 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
+        logger.debug("Checking if token is valid for user: {}", userDetails.getUsername());
         final String username = extractUsername(token);
 
         if (!username.equals(userDetails.getUsername())) {
+            logger.warn("Token does not belong to the authenticated user.");
             throw new JwtException("Token does not belong to the authenticated user");
         }
 
         if (isTokenExpired(token)) {
+            logger.warn("JWT token has expired.");
             throw new ExpiredJwtException(null, null, "JWT token has expired");
         }
 
@@ -73,10 +88,12 @@ public class JwtService {
 
 
     private boolean isTokenExpired(String token) {
+        logger.debug("Checking if token is expired.");
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
+        logger.debug("Extracting expiration date from token.");
         return extractClaim(token, Claims::getExpiration);
     }
 
@@ -90,6 +107,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
+        logger.debug("Generating sign-in key.");
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

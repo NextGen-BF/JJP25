@@ -10,7 +10,7 @@ import com.blankfactor.auth.exception.custom.invalid.InvalidPasswordException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.LoginUserDto;
+import com.blankfactor.auth.model.dto.LoginUserDTO;
 import com.blankfactor.auth.repository.UserRepository;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.EmailService;
@@ -51,7 +51,7 @@ class AuthServiceTests {
      */
     @Test
     void login_withValidCredentials_returnsUser() {
-        LoginUserDto loginUserDto = new LoginUserDto();
+        LoginUserDTO loginUserDto = new LoginUserDTO();
         loginUserDto.setEmail("test@example.com");
         loginUserDto.setPassword("password");
 
@@ -79,7 +79,7 @@ class AuthServiceTests {
      */
     @Test
     void login_withNonExistentUser_throwsUserNotFoundException() {
-        LoginUserDto loginUserDto = new LoginUserDto();
+        LoginUserDTO loginUserDto = new LoginUserDTO();
         loginUserDto.setEmail("nonexistent@example.com");
         loginUserDto.setPassword("password");
 
@@ -93,7 +93,7 @@ class AuthServiceTests {
      */
     @Test
     void login_withUnverifiedUser_throwsUserNotVerifiedException() {
-        LoginUserDto loginUserDto = new LoginUserDto();
+        LoginUserDTO loginUserDto = new LoginUserDTO();
         loginUserDto.setEmail("test@example.com");
         loginUserDto.setPassword("password");
 
@@ -115,7 +115,7 @@ class AuthServiceTests {
      */
     @Test
     void login_withInvalidCredentials_throwsBadCredentialsException() {
-        LoginUserDto loginUserDto = new LoginUserDto();
+        LoginUserDTO loginUserDto = new LoginUserDTO();
         loginUserDto.setEmail("test@example.com");
         loginUserDto.setPassword("wrongPassword");
 

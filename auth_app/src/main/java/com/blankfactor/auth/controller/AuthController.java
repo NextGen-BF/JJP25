@@ -1,7 +1,9 @@
 package com.blankfactor.auth.controller;
 
-
-import com.blankfactor.auth.entity.User;
+import com.blankfactor.auth.model.User;
+import com.blankfactor.auth.model.dto.LoginUserDto;
+import com.blankfactor.auth.model.dto.RegisterRequest;
+import com.blankfactor.auth.model.dto.VerifiedUserDTO;
 import com.blankfactor.auth.responses.LoginResponse;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
@@ -36,9 +38,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDTO loginUserDto){
+        log.info("Authenticating user: {}", loginUserDto.getEmail());
         User authenticatedUser = authService.login(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        log.debug("Generated JWT token for user: {}", loginUserDto.getEmail());
         return ResponseEntity.ok(loginResponse);
     }
 
@@ -57,4 +61,5 @@ public class AuthController {
         log.info("Verification code {} resent successfully to email: {}", newCode, email);
         return ResponseEntity.ok(String.format("Verification code resent successfully! New code: %s", newCode));
     }
+
 }
