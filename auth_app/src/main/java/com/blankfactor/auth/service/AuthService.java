@@ -64,7 +64,7 @@ public class AuthService {
     }
 
     @Transactional
-    public VerifyResponse verifyUser(VerifyRequest verifyRequest) {
+    public VerifyResponse verify(VerifyRequest verifyRequest) {
         String userEmail = verifyRequest.getEmail();
         String userVerificationCode = verifyRequest.getVerificationCode();
         Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);

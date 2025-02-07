@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
-        return ResponseEntity.ok(this.authService.verifyUser(verifyRequest));
+        return ResponseEntity.ok(this.authService.verify(verifyRequest));
     }
 
     @PostMapping("/resend")
