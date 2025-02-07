@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -43,6 +44,7 @@ public class AuthService {
     private final TemplateEngine templateEngine;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
         validateCredentials(registerRequest);
         User user = User.builder()
@@ -61,6 +63,7 @@ public class AuthService {
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
+    @Transactional
     public VerifyResponse verifyUser(VerifyRequest verifyRequest) {
         String userEmail = verifyRequest.getEmail();
         String userVerificationCode = verifyRequest.getVerificationCode();
@@ -86,6 +89,7 @@ public class AuthService {
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
+    @Transactional
     public String resendVerificationCode(String email) {
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
