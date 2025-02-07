@@ -6,6 +6,7 @@ import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeExcep
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,30 +22,36 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({IncorrectVerificationCodeException.class, PasswordsDoNotMatchException.class})
     public ResponseEntity<Map<String, String>> handleCustomExceptions(RuntimeException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({UserNotFoundException.class})
     public ResponseEntity<Map<String, String>> handleUserNotFoundException(RuntimeException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("404", "NOT_FOUND", ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({UserVerifiedException.class, UserFoundException.class})
     public ResponseEntity<Map<String, String>> handleUserVerifiedException(RuntimeException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler({ExpiredVerificationCodeException.class})
     public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(RuntimeException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("410", "GONE", ex.getMessage()), new HttpHeaders(), HttpStatus.GONE);
     }
 
     @ExceptionHandler({Exception.class, VerificationEmailNotSentException.class})
     public ResponseEntity<Map<String, String>> handleVerificationEmailNotSentException(Exception ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -52,6 +59,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult().getFieldErrors()
                 .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
+        log.error("Validation errors: {}", errors);
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
