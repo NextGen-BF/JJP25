@@ -4,8 +4,6 @@ create table if not exists users (
 	id int primary key,
 	type enum('Attendee', 'Organiser') not null,
 	phone varchar(15) unique,
-	username varchar(255) unique not null,
-	email varchar(255) unique not null,
 	profile_pic varchar(255),
 	created_at timestamp not null,
 	updated_at timestamp not null
