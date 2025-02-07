@@ -3,7 +3,6 @@ package com.blankfactor.auth.exception;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.code.NullVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({IncorrectVerificationCodeException.class, NullVerificationCodeException.class, PasswordsDoNotMatchException.class})
+    @ExceptionHandler({IncorrectVerificationCodeException.class, PasswordsDoNotMatchException.class})
     public ResponseEntity<Map<String, String>> handleCustomExceptions(RuntimeException ex) {
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }

@@ -3,7 +3,6 @@ package com.blankfactor.auth.service;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.code.NullVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
@@ -71,8 +70,8 @@ public class AuthService {
         }
         User user = optionalUser.get();
         LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
-        if (verificationCodeExpiresAt == null) {
-            throw new NullVerificationCodeException(String.format(USER_ALREADY_VERIFIED, userEmail));
+        if (user.isEnabled()) {
+            throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
         if (!user.getVerificationCode().equals(userVerificationCode)) {
             throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
