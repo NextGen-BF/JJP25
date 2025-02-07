@@ -14,6 +14,7 @@ import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private static final String USER_NOT_FOUND = "%s is not found";
@@ -46,6 +48,7 @@ public class AuthService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
+        log.trace("Registering user with email: {}", registerRequest.getEmail());
         validateCredentials(registerRequest);
         User user = User.builder()
                 .email(registerRequest.getEmail())
@@ -59,44 +62,54 @@ public class AuthService {
                 .enabled(false)
                 .build();
         this.userRepository.saveAndFlush(user);
+        log.trace("User with email {} registered successfully", registerRequest.getEmail());
         sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
     @Transactional
     public VerifyResponse verify(VerifyRequest verifyRequest) {
+        log.trace("Verifying user with email: {}", verifyRequest.getEmail());
         String userEmail = verifyRequest.getEmail();
         String userVerificationCode = verifyRequest.getVerificationCode();
         Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);
         if (optionalUser.isEmpty()) {
+            log.warn("User with email {} is not found", userEmail);
             throw new UserNotFoundException(String.format(USER_NOT_FOUND, userEmail));
         }
         User user = optionalUser.get();
         LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
         if (user.isEnabled()) {
+            log.warn("User with email {} is already verified", userEmail);
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
         if (!user.getVerificationCode().equals(userVerificationCode)) {
+            log.warn("Incorrect verification code: {} for email: {}", userVerificationCode, userEmail);
             throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
         }
         if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
+            log.warn("Verification code expired: {} for email: {}", userVerificationCode, userEmail);
             throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
         }
         user.setEnabled(true);
         user.setVerificationCode(null);
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
+        log.trace("User with email {} verified successfully", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
     @Transactional
     public String resendVerificationCode(String email) {
+        log.trace("Resending verification code to email: {}", email);
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
+            log.warn("User with email {} is not found", email);
             throw new UserNotFoundException(String.format(USER_NOT_FOUND, email));
         }
         User user = optionalUser.get();
         if (user.isEnabled()) {
+            log.warn("User with email {} is already verified", email);
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, email));
         }
         String newCode = generateVerificationCode();
@@ -104,6 +117,7 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         this.userRepository.saveAndFlush(user);
         sendVerificationEmail(user);
+        log.trace("Verification code resent successfully to email: {}", email);
         return newCode;
     }
 
@@ -113,21 +127,27 @@ public class AuthService {
                     user.getEmail(),
                     EMAIL_SUBJECT,
                     htmlMessage(user.getUsername(), user.getVerificationCode()));
+            log.trace("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
+            log.error("Failed to send verification email to: {}", user.getEmail());
             throw new VerificationEmailNotSentException(String.format(EMAIL_NOT_SENT, user.getEmail()), e);
         }
     }
 
     public void validateCredentials(RegisterRequest registerRequest) {
+        log.debug("Validating credentials for email: {}", registerRequest.getEmail());
         Optional<User> byEmail = this.userRepository.findByEmail(registerRequest.getEmail());
         if (byEmail.isPresent()) {
+            log.warn("Email {} is already in use", registerRequest.getEmail());
             throw new UserFoundException(String.format(USER_FOUND, registerRequest.getEmail()));
         }
         Optional<User> byUsername = this.userRepository.findByUsername(registerRequest.getUsername());
         if (byUsername.isPresent()) {
+            log.warn("Username {} is already in use", registerRequest.getUsername());
             throw new UserFoundException(String.format(USER_FOUND, registerRequest.getUsername()));
         }
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            log.warn("Passwords do not match for email: {}", registerRequest.getEmail());
             throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
         }
     }
@@ -135,6 +155,7 @@ public class AuthService {
     private String generateVerificationCode() {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
+        log.debug("Generated verification code: {}", code);
         return String.valueOf(code);
     }
 
@@ -142,6 +163,7 @@ public class AuthService {
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("code", code);
+        log.debug("Generated HTML verification message for user: {}", username);
         return templateEngine.process("verify-account-mail", context);
     }
 
