@@ -1,9 +1,8 @@
 package com.blankfactor.auth.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import com.blankfactor.auth.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,9 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@Slf4j
 public class AppConfig {
-
-    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
     private final UserRepository userRepository;
 
@@ -28,12 +26,12 @@ public class AppConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
-        logger.info("Initializing UserDetailsService bean.");
-        return username -> {
-            logger.debug("Loading user by email: {}", username);
-            return userRepository.findByEmail(username)
+        log.info("Initializing UserDetailsService bean.");
+        return email -> {
+            log.debug("Loading user by email: {}", email);
+            return userRepository.findByEmail(email)
                     .orElseThrow(() -> {
-                        logger.warn("User not found with email: {}", username);
+                        log.warn("User not found with email: {}", email);
                         return new UsernameNotFoundException("User not found");
                     });
         };
@@ -46,13 +44,13 @@ public class AppConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        logger.info("Initializing AuthenticationManager bean.");
+        log.info("Initializing AuthenticationManager bean.");
         return config.getAuthenticationManager();
     }
 
     @Bean
     AuthenticationProvider authenticationProvider() {
-        logger.info("Initializing AuthenticationProvider bean.");
+        log.info("Initializing AuthenticationProvider bean.");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(userDetailsService());

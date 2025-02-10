@@ -1,15 +1,12 @@
 package com.blankfactor.auth.controller;
 
-import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.LoginUserDto;
-import com.blankfactor.auth.model.dto.RegisterRequest;
-import com.blankfactor.auth.model.dto.VerifiedUserDTO;
+import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.responses.LoginResponse;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
-import com.blankfactor.auth.model.dto.LoginUserDTO;
+import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
 import jakarta.validation.Valid;
@@ -37,12 +34,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDTO loginUserDto){
-        log.info("Authenticating user: {}", loginUserDto.getEmail());
-        User authenticatedUser = authService.login(loginUserDto);
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginRequest){
+        log.info("Authenticating user: {}", loginRequest.getLoginIdentifier());
+        User authenticatedUser = authService.login(loginRequest);
         String jwtToken = jwtService.generateToken(authenticatedUser);
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
-        log.debug("Generated JWT token for user: {}", loginUserDto.getEmail());
+        log.debug("Generated JWT token for user: {}", loginRequest.getLoginIdentifier());
         return ResponseEntity.ok(loginResponse);
     }
 

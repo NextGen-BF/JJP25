@@ -1,11 +1,10 @@
 package com.blankfactor.auth.controller;
 
-import com.blankfactor.auth.model.User;
-import com.blankfactor.auth.model.dto.UserResponseDTO;
+import com.blankfactor.auth.entity.User;
+import com.blankfactor.auth.entity.dto.exp.UserResponse;
 import com.blankfactor.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,25 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
     @GetMapping("/my-profile")
-    public ResponseEntity<UserResponseDTO> getAuthenticatedUser() {
+    public ResponseEntity<UserResponse> getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-        logger.info("Fetching authenticated user: {}", currentUser.getEmail());
-        UserResponseDTO userResponseDTO = new UserResponseDTO(
+        log.info("Fetching authenticated user: {}", currentUser.getEmail());
+        UserResponse userResponse = new UserResponse(
                 currentUser.getEmail(),
+                currentUser.getUsername(),
                 currentUser.getFirstName(),
                 currentUser.getLastName(),
                 currentUser.getBirthDate()
         );
-        logger.debug("UserResponseDTO: {}", userResponseDTO);
-        return ResponseEntity.ok(userResponseDTO);
+        log.debug("UserResponseDTO: {}", userResponse);
+        return ResponseEntity.ok(userResponse);
     }
 
 }

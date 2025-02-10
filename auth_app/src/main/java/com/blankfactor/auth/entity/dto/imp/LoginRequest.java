@@ -1,4 +1,4 @@
-package com.blankfactor.auth.model.dto;
+package com.blankfactor.auth.entity.dto.imp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = false)
-public class LoginUserDTO {
+public class LoginRequest {
 
-    private String email;
+    private String loginIdentifier;
     private String password;
 }

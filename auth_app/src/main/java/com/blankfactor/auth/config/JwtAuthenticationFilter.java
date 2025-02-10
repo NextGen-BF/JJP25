@@ -7,8 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,9 +22,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final HandlerExceptionResolver handlerExceptionResolver;
 
@@ -51,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.debug("Authorization header is missing or invalid. Continuing without authentication.");
+            log.debug("Authorization header is missing or invalid. Continuing without authentication.");
             filterChain.doFilter(request, response);
             return;
         }
@@ -59,15 +57,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String jwt = authHeader.substring(7);
             final String userEmail = jwtService.extractUsername(jwt);
-            logger.debug("Extracted user email from JWT: {}", userEmail);
+            log.debug("Extracted user email from JWT: {}", userEmail);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (userEmail != null && authentication == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                logger.debug("Loaded user details for email: {}", userEmail);
+                log.debug("Loaded user details for email: {}", userEmail);
                 if (!jwtService.isTokenValid(jwt, userDetails)) {
-                    logger.warn("JWT token is invalid for user: {}", userEmail);
+                    log.warn("JWT token is invalid for user: {}", userEmail);
                     throw new JwtException("JWT token is invalid");
                 }
 
@@ -79,18 +77,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.debug("Set authentication context for user: {}", userEmail);
+                log.debug("Set authentication context for user: {}", userEmail);
             }
 
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token has expired.", e);
+            log.error("JWT token has expired.", e);
             handlerExceptionResolver.resolveException(request, response, null, new ExpiredJwtException(null, null, "JWT token has expired"));
         } catch (JwtException e) {
-            logger.error("JWT token is invalid.", e);
+            log.error("JWT token is invalid.", e);
             handlerExceptionResolver.resolveException(request, response, null, new JwtException("JWT token is invalid"));
         } catch (Exception e) {
-            logger.error("An error occurred during JWT authentication.", e);
+            log.error("An error occurred during JWT authentication.", e);
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
     }

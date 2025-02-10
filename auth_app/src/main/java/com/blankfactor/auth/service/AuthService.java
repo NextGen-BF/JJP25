@@ -14,7 +14,7 @@ import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
-import com.blankfactor.auth.model.dto.LoginUserDTO;
+import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -78,34 +78,40 @@ public class AuthService {
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
-    public User login(LoginUserDTO input) {
-        log.info("Attempting to log in user: {}", input.getEmail());
-        User user = userRepository.findByEmail(input.getEmail())
+    public User login(LoginRequest input) {
+        if (input.getLoginIdentifier() == null || input.getLoginIdentifier().trim().isEmpty()) {
+            log.warn("Login identifier is null or empty");
+            throw new IllegalArgumentException("Login identifier cannot be null or empty");
+        }
+
+        log.info("Attempting to log in user with identifier: {}", input.getLoginIdentifier());
+
+        User user = userRepository.findByEmailOrUsername(input.getLoginIdentifier())
                 .orElseThrow(() -> {
-                    log.warn("User not found with email: {}", input.getEmail());
+                    log.warn("User not found with identifier: {}", input.getLoginIdentifier());
                     return new UserNotFoundException(USER_NOT_FOUND);
                 });
 
         if (!user.isEnabled()) {
-            log.warn("User account is not verified: {}", input.getEmail());
+            log.warn("User account is not verified: {}", input.getLoginIdentifier());
             throw new UserNotVerifiedException(USER_NOT_VERIFIED);
         }
 
         try {
-            log.debug("Authenticating user credentials for: {}", input.getEmail());
+            log.debug("Authenticating user credentials for: {}", input.getLoginIdentifier());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            input.getEmail(),
+                            user.getEmail(),
                             input.getPassword()
                     )
             );
-            log.info("User authenticated successfully: {}", input.getEmail());
+            log.info("User authenticated successfully: {}", input.getLoginIdentifier());
         } catch (BadCredentialsException e) {
-            log.warn("Invalid password for user: {}", input.getEmail());
+            log.warn("Invalid password for user: {}", input.getLoginIdentifier());
             throw new InvalidPasswordException(INCORRECT_PASSWORD);
         }
 
-        log.debug("Returning user details for: {}", input.getEmail());
+        log.debug("Returning user details for: {}", input.getLoginIdentifier());
         return user;
     }
 
