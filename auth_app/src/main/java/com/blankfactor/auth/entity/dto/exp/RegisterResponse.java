@@ -1,5 +1,6 @@
 package com.blankfactor.auth.entity.dto.exp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,12 +27,14 @@ public class RegisterResponse implements Serializable {
 
     private String lastName;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime birthDate;
 
     private boolean enabled;
 
     private String verificationCode;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime verificationCodeExpiresAt;
 
 }
