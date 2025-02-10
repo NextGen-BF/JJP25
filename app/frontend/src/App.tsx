@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar  from './components/Navbar';
+import Footer from './components/Footer/Footer';
 import Login from './pages/LoginPage/LoginPage';
 import HomePage from './pages/HomePage/HomePage';
 import DashboardPage from './pages/DashboardPage/DashboardPage';
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/not-found" replace />} />
         </Routes>
       </div>
+      <Footer/>
     </Router>
   );
 }
