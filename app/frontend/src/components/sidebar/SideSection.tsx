@@ -30,13 +30,14 @@ export const SideSection: React.FC<SidebarProps> = ({ items, title }) => {
       return isOpen ? "link-active link-open" : "link-active link-closed";
     } 
 
-    return "link-styles"
+    return "link-styles";
   }
 
   return (
     <Box>
       <ListSubheader
-        sx={styles.listSubheaderStyles}
+
+        sx={{...styles.listSubheaderStyles, fontSize: isOpen ? 25 : 16, paddingLeft: 1}}
       >
         {title}
       </ListSubheader>
