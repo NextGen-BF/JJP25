@@ -26,7 +26,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void testGetAllUsers_WhenUsersExist() {
+    void shouldSuccessfullyReturnTheExistingUsers() {
         // Given
         User user1 = new User(1L, "example1@email.com", "Pass_123", "UserName", "User", "Name", LocalDateTime.now(), false, null, null);
         User user2 = new User(2L, "example2@email.com", "456_Pass", "NameUser", "Name", "User", LocalDateTime.now(), true, null, null);
@@ -47,7 +47,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testGetAllUsers_WhenNoUsersExist() {
+    void shouldReturnEmptyListWhenThereArentUsers() {
         // When
         when(userRepository.findAll()).thenReturn(Collections.emptyList());
         List<User> result = userService.getAllUsers();
@@ -59,7 +59,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testGetAllUsers_WhenRepositoryThrowsException() {
+    void shouldThrowAnExceptionWhenThereIsProblemWithTheRepository() {
         // When
         when(userRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
@@ -68,5 +68,5 @@ class UserServiceTest {
         assertEquals("Database error", exception.getMessage());
         verify(userRepository, times(1)).findAll();
     }
-    
+
 }
