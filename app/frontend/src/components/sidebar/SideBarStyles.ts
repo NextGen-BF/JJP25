@@ -1,12 +1,8 @@
-import { store } from "../../redux/store";
-
-let isOpen;
-store.subscribe(() => {
-  isOpen = store.getState().sidebar.isOpen;
-});
 
 export const styles = {
   listSubheaderStyles: {
+    backgroundColor: "#D2D2DA",
+    transition: "0.3s ease"
   },
 
   listItemTextStyles: {

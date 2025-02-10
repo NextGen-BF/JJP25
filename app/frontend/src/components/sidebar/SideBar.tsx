@@ -31,7 +31,11 @@ export const SideBar: FC = () => {
   };
 
   const sidebarItemsEvents: SidebarItem[] = [
-    { icon: AddBoxIcon, message: "Create Event", linkTo: "/create-event" },
+    { 
+      icon: AddBoxIcon, 
+      message: "Create Event", 
+      linkTo: "/create-event" 
+    },
     {
       icon: CalendarTodayOutlinedIcon,
       message: "Check Your Events",
@@ -85,7 +89,7 @@ export const SideBar: FC = () => {
           boxSizing: "border-box",
           transition: "width 0.3s",
           top: 64,
-          height: `calc(100% - ${64}px)`,
+          height: `calc(100vh - ${64}px)`,
         },
       }}
     >
