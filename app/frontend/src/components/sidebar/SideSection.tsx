@@ -39,7 +39,6 @@ export const SideSection: FC<SidebarProps> = ({ items, title }) => {
 
     <Box>
       <ListSubheader
-
         sx={{...SideBarStyles.listSubheaderStyles, fontSize: isOpen ? 25 : 16, paddingLeft: 1}}
       >
         {title}
