@@ -1,9 +1,14 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
+import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
+import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.service.AuthService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -32,6 +38,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {AuthController.class})
 public class AuthControllerTest {
 
+    private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
+    private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,6 +49,16 @@ public class AuthControllerTest {
 
     @Nested
     class RegisterTests {
+
+        /* ---> TEST CASES <---
+        * 1.Successful registration
+        * 2.Email already in use
+        * 3.Username already in use
+        * 4.Passwords do not match
+        * 5.Blank values (ex. "email": "")
+        * 6.Plain object (ex. {})
+        * */
+
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponse() throws Exception {
             // Given
@@ -48,21 +67,21 @@ public class AuthControllerTest {
                     "username", "firstName", "lastName", LocalDateTime.parse("2000-01-01T01:01:01"),
                     false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"));
             String requestBody = """
-                    {
-                        "email": "example@email.com",
-                        "password": "Password1!",
-                        "confirmPassword": "Password1!",
-                        "username": "username",
-                        "firstName": "firstName",
-                        "lastName": "lastName",
-                        "birthDate": "2000-01-01T01:01:01"
-                    }""";
+                            {
+                                "email": "example@email.com",
+                                "password": "Password1!",
+                                "confirmPassword": "Password1!",
+                                "username": "username",
+                                "firstName": "firstName",
+                                "lastName": "lastName",
+                                "birthDate": "2000-01-01T01:01:01"
+                            }
+                    """;
 
             // When
             doReturn(registerResponse).when(authService).register(any(RegisterRequest.class));
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
                     // Then
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(1L))
@@ -81,72 +100,75 @@ public class AuthControllerTest {
         void shouldReturnResponseWithEmailIsAlreadyInUse() throws Exception {
             // Given
             String requestBody = """
-                    {
-                        "email": "example@email.com",
-                        "password": "Password1!",
-                        "confirmPassword": "Password1!",
-                        "username": "username",
-                        "firstName": "firstName",
-                        "lastName": "lastName",
-                        "birthDate": "2000-01-01T01:01:01"
-                    }""";
+                            {
+                                "email": "example@email.com",
+                                "password": "Password1!",
+                                "confirmPassword": "Password1!",
+                                "username": "username",
+                                "firstName": "firstName",
+                                "lastName": "lastName",
+                                "birthDate": "2000-01-01T01:01:01"
+                            }
+                    """;
+            String ERROR_MESSAGE = "example@email.com is already in use";
 
             // When
-            when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException("example@email.com is already in use"));
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
+            when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
                     // Then
                     .andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.message").value("example@email.com is already in use"));
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
 
         @Test
         void shouldReturnResponseWithUsernameIsAlreadyInUse() throws Exception {
             // Given
             String requestBody = """
-                    {
-                        "email": "example@email.com",
-                        "password": "Password1!",
-                        "confirmPassword": "Password1!",
-                        "username": "username__",
-                        "firstName": "firstName",
-                        "lastName": "lastName",
-                        "birthDate": "2000-01-01T01:01:01"
-                    }""";
+                            {
+                                "email": "example@email.com",
+                                "password": "Password1!",
+                                "confirmPassword": "Password1!",
+                                "username": "username__",
+                                "firstName": "firstName",
+                                "lastName": "lastName",
+                                "birthDate": "2000-01-01T01:01:01"
+                            }
+                    """;
+            String ERROR_MESSAGE = "username__ is already in use";
 
             // When
-            when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException("username__ is already in use"));
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
+            when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
                     // Then
                     .andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.message").value("username__ is already in use"));
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
 
         @Test
         void shouldReturnResponseWithPasswordsDoNotMatchError() throws Exception {
             // Given
             String requestBody = """
-                    {
-                        "email": "example@email.com",
-                        "password": "Password1!",
-                        "confirmPassword": "Password2!",
-                        "username": "username__",
-                        "firstName": "firstName",
-                        "lastName": "lastName",
-                        "birthDate": "2000-01-01T01:01:01"
-                    }""";
+                            {
+                                "email": "example@email.com",
+                                "password": "Password1!",
+                                "confirmPassword": "Password2!",
+                                "username": "username__",
+                                "firstName": "firstName",
+                                "lastName": "lastName",
+                                "birthDate": "2000-01-01T01:01:01"
+                            }
+                    """;
+            String ERROR_MESSAGE = "Passwords do not match. Please try again.";
 
             // When
-            when(authService.register(any(RegisterRequest.class))).thenThrow(new PasswordsDoNotMatchException("Passwords do not match. Please try again."));
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
+            when(authService.register(any(RegisterRequest.class))).thenThrow(new PasswordsDoNotMatchException(ERROR_MESSAGE));
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
                     // Then
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Passwords do not match. Please try again."));
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
 
 
@@ -154,20 +176,20 @@ public class AuthControllerTest {
         void shouldReturnResponseIncludingAllFieldErrors() throws Exception {
             // Given
             String requestBody = """
-                    {
-                      "email": "",
-                      "password": "",
-                      "confirmPassword": "",
-                      "username": "",
-                      "firstName": "",
-                      "lastName": "",
-                      "birthDate": ""
-                    }""";
+                            {
+                              "email": "",
+                              "password": "",
+                              "confirmPassword": "",
+                              "username": "",
+                              "firstName": "",
+                              "lastName": "",
+                              "birthDate": ""
+                            }
+                    """;
 
             // When
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
                     // Then
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.email").isArray())
@@ -190,9 +212,8 @@ public class AuthControllerTest {
         @Test
         void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {
             // When
-            mockMvc.perform(post("/api/v1/auth/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("{}"))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content("{}"))
+
                     // Then
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.email").isArray())
@@ -212,5 +233,137 @@ public class AuthControllerTest {
         }
     }
 
+    @Nested
+    class VerifyTests {
+
+        /* ---> TEST CASES <---
+         * 1.Successful verification
+         * 2.Email not found
+         * 3.Incorrect verification code
+         * 4.User already verified
+         * 5.Blank values (ex. "email": "")
+         * 6.Plain object (ex. {}) */
+
+        @Test
+        void shouldSuccessfullyVerifyUser() throws Exception {
+            // Given
+            String requestBody = """
+                        {
+                            "email": "example@email.com",
+                            "verificationCode": "123123"
+                        }
+                    """;
+            VerifyResponse verifyResponse = new VerifyResponse(
+                    "example@email.com",
+                    true,
+                    null,
+                    null);
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenReturn(verifyResponse);
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.email").value("example@email.com"))
+                    .andExpect(jsonPath("$.enabled").value(true))
+                    .andExpect(jsonPath("$.verificationCode").value(nullValue()))
+                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(nullValue()));
+        }
+
+        @Test
+        void shouldReturnResponseWithEmailNotFoundError() throws Exception {
+            // Given
+            String requestBody = """
+                        {
+                            "email": "example@email.com",
+                            "verificationCode": "123123"
+                        }
+                    """;
+            String ERROR_MESSAGE = "example@email.com is not found";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithIncorrectVerificationCodeError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123123"
+                    }
+                    """;
+            String ERROR_MESSAGE = "Incorrect verification code: 123123";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new IncorrectVerificationCodeException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithUserIsAlreadyVerifiedError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123123"
+                    }
+                    """;
+            String ERROR_MESSAGE = "example@email.com is already verified";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseIncludingAllFieldErrors() throws Exception {
+            // Given
+            String requestBody = """
+                            {
+                                "email": "",
+                                "verificationCode": ""
+                            }
+                    """;
+
+            // When
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.email").isArray())
+                    .andExpect(jsonPath("$.email", hasSize(2)))
+                    .andExpect(jsonPath("$.verificationCode").isArray())
+                    .andExpect(jsonPath("$.verificationCode", hasSize(2)));
+        }
+
+        @Test
+        void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {
+            // When
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content("{}"))
+
+                    // Then
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.email").isArray())
+                    .andExpect(jsonPath("$.email", hasSize(1)))
+                    .andExpect(jsonPath("$.verificationCode").isArray())
+                    .andExpect(jsonPath("$.verificationCode", hasSize(1)));
+        }
+    }
 
 }
