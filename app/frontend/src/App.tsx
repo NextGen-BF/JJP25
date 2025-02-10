@@ -9,16 +9,22 @@ import EventsPage from './pages/EventsPage/EventsPage';
 import TicketsPage from './pages/TicketsPage/TicketsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
+import CreateEventPage from './pages/adminPages/CreateEventPage/CreateEventPage';
+import CreateEventSucessPage from './pages/adminPages/CreateEventSucessPage/CreateEventSucessPage';
+import AccountPage from './pages/adminPages/AccountPage/AccountPage';
+import CreateVenuePage from './pages/adminPages/CreateVenuePage/CreateVenuePage';
+import CreateTicketPage from './pages/adminPages/CreateTicketPage/CreateTicketPage';
 import CssBaseline from '@mui/material/CssBaseline';
 import './App.scss'
 import MockUserList from './pages/MockUserList/MockUserList';
+import { Box } from '@mui/material';
 
 export default function App() {
   return (
     <Router>
       <CssBaseline />
     <Navbar />
-      <div className='routes-container' >
+      <Box height={"100vh"}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -30,8 +36,19 @@ export default function App() {
           <Route path="/not-found" element={<NotFoundPage />} />
           <Route path="/mock-users" element={<MockUserList />} />
           <Route path="*" element={<Navigate to="/not-found" replace />} />
+
+          // Admin routes
+
+          <Route path="/dashboard/event-creation/event" element={<CreateEventPage />}/>
+          <Route path="/dashboard/event-creation/venue" element={<CreateVenuePage />}/>
+          <Route path="/dashboard/event-creation/ticket" element={<CreateTicketPage />}/>
+          <Route path="/dashboard/event-creation/success" element={<CreateEventSucessPage />}/>
+          <Route path="/dashboard/your-events"/>
+          <Route path="/dashboard/your-events-statistics"/>
+          <Route path="/dashboard/rsvp-creation"/>
+          <Route path="/dashboard/account" element={<AccountPage />}/>
         </Routes>
-      </div>
+      </Box>
       <Footer/>
     </Router>
   );
