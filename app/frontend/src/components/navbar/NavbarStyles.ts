@@ -1,5 +1,7 @@
 import "../../styles/globalstyles.scss"
 
+export const navbarHeight = 64;
+ 
 export const NavbarStyles = {
   navbarStyles: {
     backgroundColor: "var(--navbar-background-color)", 
@@ -11,19 +13,15 @@ export const NavbarStyles = {
 
   toolbarStyles: {
     display: "flex",
-    gap: '50px',
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingLeft: "16px",
     paddingRight: "16px",
-    height: "64px",
+    height: navbarHeight,
   },
 
   boxStyles: { 
     display: "flex",
     width: "100vw",
     alignItems: "center",
-    justifyContent: "space-between"
   },
 
   iconBoxStyles: {
