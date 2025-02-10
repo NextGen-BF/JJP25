@@ -1,0 +1,138 @@
+2025-02-10T10:51:47.370+02:00  INFO 14649 --- [ems_auth_app] [main] c.blankfactor.auth.AuthApplicationTests  : Starting AuthApplicationTests using Java 23.0.2 with PID 14649 (started by Petar.Mitov in /Users/Petar.Mitov/Projects/JJP25/auth_app)
+2025-02-10T10:51:47.370+02:00  INFO 14649 --- [ems_auth_app] [main] c.blankfactor.auth.AuthApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2025-02-10T10:51:47.664+02:00  INFO 14649 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-02-10T10:51:47.687+02:00  INFO 14649 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 1 JPA repository interface.
+2025-02-10T10:51:47.938+02:00  INFO 14649 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-02-10T10:51:48.114+02:00  INFO 14649 --- [ems_auth_app] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3c60c681
+2025-02-10T10:51:48.115+02:00  INFO 14649 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-02-10T10:51:48.139+02:00  INFO 14649 --- [ems_auth_app] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/ems_auth_db (MySQL 9.1)
+2025-02-10T10:51:48.153+02:00  WARN 14649 --- [ems_auth_app] [main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: MySQL 9.1 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2025-02-10T10:51:48.181+02:00  INFO 14649 --- [ems_auth_app] [main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.021s)
+2025-02-10T10:51:48.205+02:00  INFO 14649 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `ems_auth_db`: 2
+2025-02-10T10:51:48.208+02:00  INFO 14649 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Schema `ems_auth_db` is up to date. No migration necessary.
+2025-02-10T10:51:48.252+02:00  INFO 14649 --- [ems_auth_app] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-02-10T10:51:48.278+02:00  INFO 14649 --- [ems_auth_app] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-02-10T10:51:48.291+02:00  INFO 14649 --- [ems_auth_app] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-02-10T10:51:48.410+02:00  INFO 14649 --- [ems_auth_app] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-02-10T10:51:48.454+02:00  INFO 14649 --- [ems_auth_app] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.1
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-02-10T10:51:48.804+02:00  INFO 14649 --- [ems_auth_app] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-02-10T10:51:48.806+02:00  INFO 14649 --- [ems_auth_app] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:51:48.979+02:00  WARN 14649 --- [ems_auth_app] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-02-10T10:51:48.989+02:00  WARN 14649 --- [ems_auth_app] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: c963d4e5-68a3-4eb8-825c-68282ecf4266
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-02-10T10:51:48.991+02:00  INFO 14649 --- [ems_auth_app] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-02-10T10:51:49.114+02:00 DEBUG 14649 --- [ems_auth_app] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-02-10T10:51:49.230+02:00  INFO 14649 --- [ems_auth_app] [main] c.blankfactor.auth.AuthApplicationTests  : Started AuthApplicationTests in 1.986 seconds (process running for 2.454)
+2025-02-10T10:51:49.520+02:00  INFO 14649 --- [ems_auth_app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:51:49.521+02:00  INFO 14649 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-02-10T10:51:49.533+02:00  INFO 14649 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-02-10T10:52:07.654+02:00  INFO 14707 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : Starting AuthApplication using Java 23.0.2 with PID 14707 (/Users/Petar.Mitov/Projects/JJP25/auth_app/target/classes started by Petar.Mitov in /Users/Petar.Mitov/Projects/JJP25/auth_app)
+2025-02-10T10:52:07.655+02:00  INFO 14707 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-02-10T10:52:07.982+02:00  INFO 14707 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-02-10T10:52:08.006+02:00  INFO 14707 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 1 JPA repository interface.
+2025-02-10T10:52:08.247+02:00  INFO 14707 --- [ems_auth_app] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2025-02-10T10:52:08.253+02:00  INFO 14707 --- [ems_auth_app] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-02-10T10:52:08.253+02:00  INFO 14707 --- [ems_auth_app] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-02-10T10:52:08.277+02:00  INFO 14707 --- [ems_auth_app] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-02-10T10:52:08.277+02:00  INFO 14707 --- [ems_auth_app] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 592 ms
+2025-02-10T10:52:08.381+02:00  INFO 14707 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-02-10T10:52:08.549+02:00  INFO 14707 --- [ems_auth_app] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4bcdd11
+2025-02-10T10:52:08.549+02:00  INFO 14707 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-02-10T10:52:08.573+02:00  INFO 14707 --- [ems_auth_app] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/ems_auth_db (MySQL 9.1)
+2025-02-10T10:52:08.590+02:00  WARN 14707 --- [ems_auth_app] [main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: MySQL 9.1 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2025-02-10T10:52:08.618+02:00  INFO 14707 --- [ems_auth_app] [main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.022s)
+2025-02-10T10:52:08.642+02:00  INFO 14707 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `ems_auth_db`: 2
+2025-02-10T10:52:08.644+02:00  INFO 14707 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Schema `ems_auth_db` is up to date. No migration necessary.
+2025-02-10T10:52:08.687+02:00  INFO 14707 --- [ems_auth_app] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-02-10T10:52:08.708+02:00  INFO 14707 --- [ems_auth_app] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-02-10T10:52:08.721+02:00  INFO 14707 --- [ems_auth_app] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-02-10T10:52:08.844+02:00  INFO 14707 --- [ems_auth_app] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-02-10T10:52:08.886+02:00  INFO 14707 --- [ems_auth_app] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.1
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-02-10T10:52:09.208+02:00  INFO 14707 --- [ems_auth_app] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-02-10T10:52:09.209+02:00  INFO 14707 --- [ems_auth_app] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:52:09.381+02:00  WARN 14707 --- [ems_auth_app] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-02-10T10:52:09.388+02:00  WARN 14707 --- [ems_auth_app] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: af955104-80c1-4f05-9680-ebc6d352d916
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-02-10T10:52:09.390+02:00  INFO 14707 --- [ems_auth_app] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-02-10T10:52:09.508+02:00 DEBUG 14707 --- [ems_auth_app] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-02-10T10:52:09.593+02:00  INFO 14707 --- [ems_auth_app] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2025-02-10T10:52:09.598+02:00  INFO 14707 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : Started AuthApplication in 2.21 seconds (process running for 2.428)
+2025-02-10T10:52:53.410+02:00  INFO 14707 --- [ems_auth_app] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-02-10T10:52:53.420+02:00 DEBUG 14707 --- [ems_auth_app] [http-nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing POST /api/v1/auth/register
+2025-02-10T10:52:53.423+02:00 DEBUG 14707 --- [ems_auth_app] [http-nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured POST /api/v1/auth/register
+2025-02-10T10:52:53.471+02:00 ERROR 14707 --- [ems_auth_app] [http-nio-8081-exec-2] c.b.a.exception.GlobalExceptionHandler   : Validation errors: [Please provide a valid password., Last name must be at least 2 characters long., Please, provide a valid username., Date of birth is required., Confirm password is required., Please provide a valid email address., Confirm password must be between 8 and 25 characters long., Last name is required., First name must be at least 2 characters long., Username is required., Email is required., First name is required.]
+2025-02-10T10:52:53.483+02:00 DEBUG 14707 --- [ems_auth_app] [http-nio-8081-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-02-10T10:55:45.207+02:00  INFO 14707 --- [ems_auth_app] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-02-10T10:55:45.213+02:00  INFO 14707 --- [ems_auth_app] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-02-10T10:55:45.215+02:00  INFO 14707 --- [ems_auth_app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:55:45.216+02:00  INFO 14707 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-02-10T10:55:45.232+02:00  INFO 14707 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-02-10T10:55:47.427+02:00  INFO 15238 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : Starting AuthApplication using Java 23.0.2 with PID 15238 (/Users/Petar.Mitov/Projects/JJP25/auth_app/target/classes started by Petar.Mitov in /Users/Petar.Mitov/Projects/JJP25/auth_app)
+2025-02-10T10:55:47.428+02:00  INFO 15238 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-02-10T10:55:47.717+02:00  INFO 15238 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-02-10T10:55:47.741+02:00  INFO 15238 --- [ems_auth_app] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 1 JPA repository interface.
+2025-02-10T10:55:47.978+02:00  INFO 15238 --- [ems_auth_app] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2025-02-10T10:55:47.985+02:00  INFO 15238 --- [ems_auth_app] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-02-10T10:55:47.985+02:00  INFO 15238 --- [ems_auth_app] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-02-10T10:55:48.012+02:00  INFO 15238 --- [ems_auth_app] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-02-10T10:55:48.012+02:00  INFO 15238 --- [ems_auth_app] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 558 ms
+2025-02-10T10:55:48.122+02:00  INFO 15238 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-02-10T10:55:48.288+02:00  INFO 15238 --- [ems_auth_app] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3cc3f13e
+2025-02-10T10:55:48.289+02:00  INFO 15238 --- [ems_auth_app] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-02-10T10:55:48.311+02:00  INFO 15238 --- [ems_auth_app] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/ems_auth_db (MySQL 9.1)
+2025-02-10T10:55:48.327+02:00  WARN 15238 --- [ems_auth_app] [main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: MySQL 9.1 is newer than this version of Flyway and support has not been tested. The latest supported version of MySQL is 8.1.
+2025-02-10T10:55:48.351+02:00  INFO 15238 --- [ems_auth_app] [main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.018s)
+2025-02-10T10:55:48.375+02:00  INFO 15238 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `ems_auth_db`: 2
+2025-02-10T10:55:48.377+02:00  INFO 15238 --- [ems_auth_app] [main] o.f.core.internal.command.DbMigrate      : Schema `ems_auth_db` is up to date. No migration necessary.
+2025-02-10T10:55:48.422+02:00  INFO 15238 --- [ems_auth_app] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-02-10T10:55:48.443+02:00  INFO 15238 --- [ems_auth_app] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-02-10T10:55:48.456+02:00  INFO 15238 --- [ems_auth_app] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-02-10T10:55:48.565+02:00  INFO 15238 --- [ems_auth_app] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-02-10T10:55:48.605+02:00  INFO 15238 --- [ems_auth_app] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 9.1
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-02-10T10:55:48.926+02:00  INFO 15238 --- [ems_auth_app] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-02-10T10:55:48.927+02:00  INFO 15238 --- [ems_auth_app] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:55:49.090+02:00  WARN 15238 --- [ems_auth_app] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-02-10T10:55:49.097+02:00  WARN 15238 --- [ems_auth_app] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 83791858-b766-4f74-b554-4ef10df54bb8
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-02-10T10:55:49.098+02:00  INFO 15238 --- [ems_auth_app] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-02-10T10:55:49.201+02:00 DEBUG 15238 --- [ems_auth_app] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-02-10T10:55:49.288+02:00  INFO 15238 --- [ems_auth_app] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2025-02-10T10:55:49.293+02:00  INFO 15238 --- [ems_auth_app] [main] com.blankfactor.auth.AuthApplication     : Started AuthApplication in 2.071 seconds (process running for 2.249)
+2025-02-10T10:55:50.872+02:00  INFO 15238 --- [ems_auth_app] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-02-10T10:55:50.878+02:00  INFO 15238 --- [ems_auth_app] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-02-10T10:55:50.882+02:00  INFO 15238 --- [ems_auth_app] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-02-10T10:55:50.883+02:00  INFO 15238 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-02-10T10:55:50.896+02:00  INFO 15238 --- [ems_auth_app] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
