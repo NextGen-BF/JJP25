@@ -1,4 +1,4 @@
-INSERT INTO users (created_at, phone, profile_pic, type, updated_at) VALUES
+INSERT INTO users (created_at, phone, profile_picture, type, updated_at) VALUES
 (NOW(), '1234567890', 'pic1.jpg', 'ATTENDEE', NOW()),
 (NOW(), '9876543210', 'pic2.jpg', 'ORGANISER', NOW()),
 (NOW(), '5551234567', NULL, 'ATTENDEE', NOW()),
