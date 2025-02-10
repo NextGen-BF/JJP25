@@ -2,7 +2,7 @@ import "../styles/globalstyles.scss"
 
 export const NavbarStyles = {
   navbarStyles: {
-    backgroundColor: "var(--navbar-background-color)", 
+    backgroundColor: "var(--blankfactor-oxford-color)", 
     width: "100%",
     top: 0,
     left: 0,
