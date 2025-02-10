@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +41,7 @@ public class AuthControllerTest {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
+    private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
 
     @Autowired
     private MockMvc mockMvc;
@@ -238,7 +240,7 @@ public class AuthControllerTest {
 
         /* ---> TEST CASES <---
          * 1.Successful verification
-         * 2.Email not found
+         * 2.User not found
          * 3.Incorrect verification code
          * 4.User already verified
          * 5.Blank values (ex. "email": "")
@@ -364,6 +366,70 @@ public class AuthControllerTest {
                     .andExpect(jsonPath("$.verificationCode").isArray())
                     .andExpect(jsonPath("$.verificationCode", hasSize(1)));
         }
+    }
+
+    @Nested
+    class ResendTests {
+
+        /* ---> TEST CASES <---
+         * 1.Successful resending
+         * 2.User not found
+         * 3.User already verified
+         * 4.Invalid request parameter (ex. ?email=)
+         * 5.Missing request parameter */
+
+        @Test
+        void shouldSuccessfullyResendVerificationEmail() throws Exception {
+            // Given
+            String code = "123123";
+            String RESPONSE_TEXT = "Verification code resent successfully! New code: ";
+            String to = "?email=example@email.com";
+
+            // When
+            when(authService.resendVerificationCode(any(String.class))).thenReturn(code);
+            mockMvc.perform(post(RESEND_ENDPOINT + to))
+
+                    // Then
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(RESPONSE_TEXT + code));
+        }
+
+        @Test
+        void shouldReturnResponseWithUserNotFoundError() throws Exception {
+            // Given
+            String ERROR_MESSAGE = "example@email.com is not found";
+            String to = "?email=example@email.com";
+
+            // When
+            when(authService.resendVerificationCode(any(String.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
+            mockMvc.perform(post(RESEND_ENDPOINT + to))
+
+                    // Then
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithUserAlreadyVerifiedError() throws Exception {
+            // Given
+            String ERROR_MESSAGE = "example@email.com is already verified";
+            String to = "?email=example@email.com";
+
+            // When
+            when(authService.resendVerificationCode(any(String.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
+            mockMvc.perform(post(RESEND_ENDPOINT + to))
+
+                    // Then
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseIncludingAllFieldErrors() throws Exception {/*TODO*/}
+
+        @Test
+        void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {/*TODO*/}
+
     }
 
 }

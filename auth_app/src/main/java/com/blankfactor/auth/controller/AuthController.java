@@ -22,7 +22,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
         log.info("Register request received for email: {}", registerRequest.getEmail());
-        RegisterResponse response = authService.register(registerRequest);
+        RegisterResponse response = this.authService.register(registerRequest);
         log.info("User registered successfully with email: {}", registerRequest.getEmail());
         return ResponseEntity.ok().body(response);
     }
@@ -30,7 +30,7 @@ public class AuthController {
     @PostMapping("/verify")
     public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
         log.info("Verification request received for email: {}", verifyRequest.getEmail());
-        VerifyResponse response = authService.verify(verifyRequest);
+        VerifyResponse response = this.authService.verify(verifyRequest);
         log.info("User verified successfully with email: {}", verifyRequest.getEmail());
         return ResponseEntity.ok(response);
     }
@@ -38,8 +38,9 @@ public class AuthController {
     @PostMapping("/resend")
     public ResponseEntity<String> resend(@RequestParam String email) {
         log.info("Resend verification code request received for email: {}", email);
-        String newCode = authService.resendVerificationCode(email);
+        String newCode = this.authService.resendVerificationCode(email);
         log.info("Verification code {} resent successfully to email: {}", newCode, email);
         return ResponseEntity.ok(String.format("Verification code resent successfully! New code: %s", newCode));
     }
+
 }
