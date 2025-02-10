@@ -76,7 +76,7 @@ public class User extends BaseEntity {
     private String phone;
 
     @Column(length = 255)
-    private String profilePic;
+    private String profilePicture;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
