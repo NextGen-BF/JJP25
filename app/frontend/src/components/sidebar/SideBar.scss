@@ -1,6 +1,3 @@
-$active-link-color: #ffffff65;
-$list-item-text-color: #000;
-
 .link-styles {
     display: flex;
     align-items: center;
@@ -48,5 +45,6 @@ $list-item-text-color: #000;
     justify-content: flex-start;
     padding-right: 0;
     height: 48px;
+    overflow: hidden;
   }
   
