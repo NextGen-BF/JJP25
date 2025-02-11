@@ -37,11 +37,11 @@ import java.util.Objects;
 public class Payment extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "sender_id", referencedColumnName = "id", nullable = false)
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id", nullable = false)
     private User receiver;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
