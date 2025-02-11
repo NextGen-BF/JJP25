@@ -1,49 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout
-                    pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1}}{bright,yellow}: %msg%n%throwable"/>
+            <PatternLayout>
+                <Pattern>%style{%d{ISO8601}}{black} %highlight{%-5level} [%style{%t}{bright,blue}]
+                    %style{%C{1}}{bright,yellow}: %msg%n%throwable
+                </Pattern>
+            </PatternLayout>
         </Console>
-
-        <RollingFile name="RollingFile"
-                     fileName="./logs/spring-boot-logger-log4j2.log"
+        <RollingFile name="RollingFile" fileName="./logs/spring-boot-logger-log4j2.log"
                      filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
             <PatternLayout>
-                <pattern>%d %p %C{1} [%t] %m%n</pattern>
+                <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
             </PatternLayout>
             <Policies>
-                <!-- rollover on startup, daily and when the file reaches
-                    10 MegaBytes -->
                 <OnStartupTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy
-                        size="10 MB"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
     </Appenders>
-
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>
-        <Root level="debug">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Root>
-        <Root level="warn">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Root>
-        <Root level="error">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Root>
-        <Root level="trace">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Root>
     </Loggers>
-
 </Configuration>
