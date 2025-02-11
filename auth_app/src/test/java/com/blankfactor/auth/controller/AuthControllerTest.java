@@ -173,7 +173,6 @@ public class AuthControllerTest {
                     .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
 
-
         @Test
         void shouldReturnResponseIncludingAllFieldErrors() throws Exception {
             // Given
@@ -209,7 +208,6 @@ public class AuthControllerTest {
                     .andExpect(jsonPath("$.birthDate").isArray())
                     .andExpect(jsonPath("$.birthDate", hasSize(1)));
         }
-
 
         @Test
         void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {
