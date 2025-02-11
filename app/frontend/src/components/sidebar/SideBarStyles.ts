@@ -16,7 +16,6 @@ export const styles = {
     justifyContent: "flex-start",
     pr:0,
     height: 48,
-    overflow: "hidden"
   },
 
 };

@@ -27,7 +27,9 @@ export const SideSection: React.FC<SidebarProps> = ({ items, title }) => {
 
   const toggleClass = (isActive : boolean): string => {
     if (isActive) {
-      return isOpen ? "link-active link-open" : "link-active link-closed";
+      return isOpen ? 
+      "link-active link-open" : 
+      "link-active link-closed";
     } 
 
     return "link-styles";
