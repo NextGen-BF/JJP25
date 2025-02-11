@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Button, Stack, Chip } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
+import { MultiDatePickerConstants } from "../../constants/MultiDatePickerConstants";
+import { MultiDatePickerStyles } from "./MultiDatePickerStyles";
+import Box from "@mui/material/Box";
+import { DeleteOutline, DeleteOutlineRounded } from "@mui/icons-material";
 
 interface MultiDatePickerProps {
   selectedDates: Dayjs[];
@@ -23,26 +27,37 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({ selectedDates, setSel
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Stack spacing={2}>
-        {/* Date Picker */}
-        <DatePicker label="Select a date" onChange={handleAddDate} />
+      <Box sx={{ ...MultiDatePickerStyles.boxWrapper }}>
+        <Stack spacing={2}>
+          <DatePicker 
+            label={MultiDatePickerConstants.SELECT_DATES}
+            onChange={handleAddDate}
+            minDate={dayjs()}
+            maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, 'year')}
+            sx={{ ...MultiDatePickerStyles.calendarIcon, ...MultiDatePickerStyles.calendarPicker }} 
+          />
 
-        {/* Display Selected Dates as Chips */}
-        <Stack direction="row" spacing={1} flexWrap="wrap">
-          {selectedDates.map((date, index) => (
-            <Chip
-              key={index}
-              label={date.format("YYYY-MM-DD")}
-              onDelete={() => handleRemoveDate(date)}
-            />
-          ))}
+          <Stack direction="row" spacing={1} flexWrap="wrap"
+          sx = {MultiDatePickerStyles.stackWrapper}>
+            {selectedDates
+              .sort((a, b) => a.isBefore(b) ? -1 : 1)
+              .map((date, index) => (
+                <Chip
+                  key={index}
+                  label={date.format("YYYY-MM-DD")}
+                  onDelete={() => handleRemoveDate(date)}
+                  style={{
+                    ...MultiDatePickerStyles.chip,
+                  }}
+                />
+              ))}
+          </Stack>
+
+          <Button variant="outlined" onClick={() => setSelectedDates([])}>
+            Reset
+          </Button>
         </Stack>
-
-        {/* Reset Button */}
-        <Button variant="outlined" onClick={() => setSelectedDates([])}>
-          Reset
-        </Button>
-      </Stack>
+      </Box>
     </LocalizationProvider>
   );
 };
