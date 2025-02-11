@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = {AuthController.class})
-public class AuthControllerTest {
+public class AuthControllerUT {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
@@ -58,8 +58,7 @@ public class AuthControllerTest {
         * 3.Username already in use
         * 4.Passwords do not match
         * 5.Blank values (ex. "email": "")
-        * 6.Plain object (ex. {})
-        * */
+        * 6.Plain object (ex. {}) */
 
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponse() throws Exception {
@@ -384,7 +383,7 @@ public class AuthControllerTest {
             String to = "?email=example@email.com";
 
             // When
-            when(authService.resendVerificationCode(any(String.class))).thenReturn(code);
+            when(authService.resend(any(String.class))).thenReturn(code);
             mockMvc.perform(post(RESEND_ENDPOINT + to))
 
                     // Then
@@ -399,7 +398,7 @@ public class AuthControllerTest {
             String to = "?email=example@email.com";
 
             // When
-            when(authService.resendVerificationCode(any(String.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
+            when(authService.resend(any(String.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
             mockMvc.perform(post(RESEND_ENDPOINT + to))
 
                     // Then
@@ -414,7 +413,7 @@ public class AuthControllerTest {
             String to = "?email=example@email.com";
 
             // When
-            when(authService.resendVerificationCode(any(String.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
+            when(authService.resend(any(String.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
             mockMvc.perform(post(RESEND_ENDPOINT + to))
 
                     // Then

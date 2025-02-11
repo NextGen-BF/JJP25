@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceUT {
 
     @Mock
     private UserRepository userRepository;

@@ -30,7 +30,7 @@ public class RegisterResponse implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime birthDate;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     private String verificationCode;
 

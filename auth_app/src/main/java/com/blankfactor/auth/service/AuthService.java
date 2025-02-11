@@ -100,7 +100,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String resendVerificationCode(String email) {
+    public String resend(String email) {
         log.debug("Resending verification code to email: {}", email);
         Optional<User> optionalUser = this.userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {

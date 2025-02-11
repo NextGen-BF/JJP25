@@ -16,7 +16,7 @@ public class VerifyResponse implements Serializable {
 
     private String email;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     private String verificationCode;
 

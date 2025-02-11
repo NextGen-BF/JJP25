@@ -1,16 +1,6 @@
 package com.blankfactor.auth.controller;
 
-import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
-import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
-import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.repository.UserRepository;
-import com.blankfactor.auth.service.AuthService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -54,7 +44,7 @@ public class AuthControllerIT {
     }
 
     @Nested
-    class RegisterIT {
+    class RegisterTests {
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponse() throws Exception {
             // Given
@@ -181,7 +171,7 @@ public class AuthControllerIT {
     }
 
     @Nested
-    class VerifyIT {
+    class VerifyTests {
         @Test
         void shouldSuccessfullyVerifyUser() throws Exception {
             // Given
@@ -304,7 +294,7 @@ public class AuthControllerIT {
     }
 
     @Nested
-    class ResendIT {
+    class ResendTests {
         @Test
         void shouldSuccessfullyResendVerificationEmail() throws Exception {
             // Given

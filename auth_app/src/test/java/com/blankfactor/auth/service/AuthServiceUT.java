@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+public class AuthServiceUT {
 
     @Mock
     private UserRepository userRepository;
@@ -57,7 +57,7 @@ public class AuthServiceTest {
     @Nested
     class ValidateCredentialsTests {
         @Test
-        public void shouldThrowUserFoundExceptionWhenUserWithSuchEmailExists() {
+        void shouldThrowUserFoundExceptionWhenUserWithSuchEmailExists() {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail(TEST_EMAIL);
@@ -74,7 +74,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowUserFoundExceptionWhenUserWithSuchUsernameExists() {
+        void shouldThrowUserFoundExceptionWhenUserWithSuchUsernameExists() {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail(TEST_EMAIL);
@@ -92,7 +92,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowPasswordsDoNotMatchExceptionWhenThePasswordsDoNotMatch() {
+        void shouldThrowPasswordsDoNotMatchExceptionWhenThePasswordsDoNotMatch() {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail(TEST_EMAIL);
@@ -113,7 +113,7 @@ public class AuthServiceTest {
     @Nested
     class RegisterTests {
         @Test
-        public void shouldSuccessfullyRegisterUser() throws MessagingException {
+        void shouldSuccessfullyRegisterUser() throws MessagingException {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail(TEST_EMAIL);
@@ -140,7 +140,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
+        void shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail(TEST_EMAIL);
@@ -167,7 +167,7 @@ public class AuthServiceTest {
     @Nested
     class VerifyTests {
         @Test
-        public void shouldThrowUserNotFoundExceptionWhenUserWithSuchEmailDoesNotExits() {
+        void shouldThrowUserNotFoundExceptionWhenUserWithSuchEmailDoesNotExits() {
             // Given
             VerifyRequest verifyRequest = new VerifyRequest();
             verifyRequest.setEmail(TEST_EMAIL);
@@ -182,7 +182,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowUserVerifiedExceptionWhenTheUserIsVerified() {
+        void shouldThrowUserVerifiedExceptionWhenTheUserIsVerified() {
             // Given
             VerifyRequest verifyRequest = new VerifyRequest();
             verifyRequest.setEmail(TEST_EMAIL);
@@ -199,7 +199,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowIncorrectVerificationCodeExceptionWhenTheCodeIsIncorrect() {
+        void shouldThrowIncorrectVerificationCodeExceptionWhenTheCodeIsIncorrect() {
             // Given
             VerifyRequest verifyRequest = new VerifyRequest();
             verifyRequest.setEmail(TEST_EMAIL);
@@ -217,7 +217,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldThrowExpiredVerificationCodeExceptionWhenTheCodeHasExpired() {
+        void shouldThrowExpiredVerificationCodeExceptionWhenTheCodeHasExpired() {
             // Given
             VerifyRequest verifyRequest = new VerifyRequest();
             verifyRequest.setEmail(TEST_EMAIL);
@@ -237,7 +237,7 @@ public class AuthServiceTest {
         }
 
         @Test
-        public void shouldSuccessfullyVerifyUser() {
+        void shouldSuccessfullyVerifyUser() {
             // Given
             VerifyRequest verifyRequest = new VerifyRequest();
             verifyRequest.setEmail(TEST_EMAIL);
@@ -263,19 +263,19 @@ public class AuthServiceTest {
     }
 
     @Nested
-    class resendVerificationCodeTests {
+    class ResendTests {
         @Test
-        public void shouldThrowUserNotFoundExceptionWhenUserWithEmailDoesNotExist() {
+        void shouldThrowUserNotFoundExceptionWhenUserWithEmailDoesNotExist() {
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
 
             // Then
-            UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> authService.resendVerificationCode(TEST_EMAIL));
+            UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> authService.resend(TEST_EMAIL));
             assertEquals(TEST_EMAIL + " is not found", exception.getMessage());
         }
 
         @Test
-        public void shouldThrowUserVerifiedExceptionWhenUserIsAlreadyVerified() {
+        void shouldThrowUserVerifiedExceptionWhenUserIsAlreadyVerified() {
             // Given
             User user = new User();
             user.setEmail(TEST_EMAIL);
@@ -285,12 +285,12 @@ public class AuthServiceTest {
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // Then
-            UserVerifiedException exception = assertThrows(UserVerifiedException.class, () -> authService.resendVerificationCode(TEST_EMAIL));
+            UserVerifiedException exception = assertThrows(UserVerifiedException.class, () -> authService.resend(TEST_EMAIL));
             assertEquals(TEST_EMAIL + " is already verified", exception.getMessage());
         }
 
         @Test
-        public void shouldSuccessfullyResendVerificationCode() throws MessagingException {
+        void shouldSuccessfullyResendVerificationCode() throws MessagingException {
             // Given
             User user = new User();
             user.setEmail(TEST_EMAIL);
@@ -299,7 +299,7 @@ public class AuthServiceTest {
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
             when(templateEngine.process(anyString(), any())).thenReturn("Mocked Email Content");
-            authService.resendVerificationCode(TEST_EMAIL);
+            authService.resend(TEST_EMAIL);
 
             // Then
             assertNotNull(user.getVerificationCode());
