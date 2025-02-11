@@ -10,7 +10,7 @@ import { FC } from "react";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebarOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { toggleSidebar } from "../../redux/slices/sidebarSlice";
+import { toggleSidebarStatus } from "../../redux/slices/sidebarSlice";
 import { SidebarItem, SideSection } from "./SideSection";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
@@ -23,11 +23,13 @@ export const SideBar: FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const expandedWidth = isMobile ? "100%" : 240;
+  const expandedPCWidth = 240;
   const collapsedWidth = 80;
 
+  const expandedWidth = isMobile ? "100%" : expandedPCWidth;
+  
   const toggleDrawer = () => {
-    dispatch(toggleSidebar());
+    dispatch(toggleSidebarStatus());
   };
 
   const sidebarItemsEvents: SidebarItem[] = [
