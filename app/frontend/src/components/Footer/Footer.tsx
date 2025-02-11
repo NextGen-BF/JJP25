@@ -24,27 +24,47 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="footer-container">
-      <div className="footer-logo-container">
-        <a href={FooterConstants.HOME_LINK} className="footer-logo-link" target="_blank" rel="noopener noreferrer">
-          <img src={logo} alt="Logo" className="footer-logo" />
+  <div className="footer-logo-container">
+    <a href={FooterConstants.HOME_LINK} className="footer-logo-link" target="_blank" rel="noopener noreferrer">
+      <img src={logo} alt="Logo" className="footer-logo" />
+    </a>
+  </div>
+
+  <nav className="footer-nav">
+    <div className="footer-nav-group">
+      {footerLinks.slice(0, 3).map((link, index) => (
+        <a
+          key={index}
+          href={link.href}
+          className={`footer-link ${hoveredIndex === index ? "footer-link-hover" : ""}`}
+          onMouseEnter={() => handleMouseEnter(index)}
+          onMouseLeave={handleMouseLeave}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {link.label}
         </a>
-      </div>
-      <nav className="footer-nav">
-        {footerLinks.map((link, index) => (
-          <a
-            key={index}
-            href={link.href}
-            className={`footer-link ${hoveredIndex === index ? "footer-link-hover" : ""}`}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {link.label}
-          </a>
-        ))}
-      </nav>
-    </footer>
+      ))}
+    </div>
+
+    <div className="footer-nav-group">
+      {footerLinks.slice(3).map((link, index) => (
+        <a
+          key={index + 3} // Offset index to keep unique keys
+          href={link.href}
+          className={`footer-link ${hoveredIndex === index + 3 ? "footer-link-hover" : ""}`}
+          onMouseEnter={() => handleMouseEnter(index + 3)}
+          onMouseLeave={handleMouseLeave}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+</footer>
+
   );
 };
 
