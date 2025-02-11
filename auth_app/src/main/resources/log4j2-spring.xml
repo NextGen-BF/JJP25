@@ -8,8 +8,8 @@
                 </Pattern>
             </PatternLayout>
         </Console>
-        <RollingFile name="RollingFile" fileName="./logs/spring-boot-logger-log4j2.log"
-                     filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
+        <RollingFile name="RollingFile" fileName="./logs/ems-auth-app.log"
+                     filePattern="./logs/$${date:yyyy-MM}/ems-auth-app-%d{-dd-MMMM-yyyy}-%i.log.gz">
             <PatternLayout>
                 <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
             </PatternLayout>
