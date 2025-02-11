@@ -5,17 +5,14 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import { FC } from "react";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebarOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toggleSidebarStatus } from "../../redux/slices/sidebarSlice";
-import { SidebarItem, SideSection } from "./SideSection";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { SideSection } from "./SideSection";
+import { SideBarStyles } from "./SideBarStyles";
+import { sidebarItemsAccount, sidebarItemsEvents, sidebarItemsRSVPs } from "../../constants/SidebarConstants";
 
 export const SideBar: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,43 +29,11 @@ export const SideBar: FC = () => {
     dispatch(toggleSidebarStatus());
   };
 
-  const sidebarItemsEvents: SidebarItem[] = [
-    { 
-      icon: AddBoxIcon, 
-      message: "Create Event", 
-      linkTo: "/create-event" 
-    },
-    {
-      icon: CalendarTodayOutlinedIcon,
-      message: "Check Your Events",
-      linkTo: "/check-events",
-    },
-    {
-      icon: SignalCellularAltIcon,
-      message: "Event Statistics",
-      linkTo: "/statistics",
-    },
-  ];
-
-  const sidebarItemsRSVPs: SidebarItem[] = [
-    { icon: MailOutlineIcon, message: "Send RSVP", linkTo: "/rsvp" },
-  ];
-
-  const sidebarItemsAccount: SidebarItem[] = [
-    { icon: AttachMoneyIcon, message: "Check Account", linkTo: "/account" },
-  ];
-
   const DrawerContent = (
     <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "110vh",
-        bgcolor: "#D2D2DA",
-        overflow: "hidden",
-      }}
+      sx={SideBarStyles.drawerContentBoxStyles}
     >
-      <Box sx={{ display: "flex", justifyContent: "flex-start", p: 1.5 }}>
+      <Box sx={SideBarStyles.drawerContentInnerBoxStyles}>
         <IconButton onClick={toggleDrawer} sx={{ mr: 100 }}>
           <ViewSidebarIcon />
         </IconButton>
@@ -84,14 +49,9 @@ export const SideBar: FC = () => {
       variant="permanent"
       open={isOpen}
       sx={{
-        width: isOpen ? expandedWidth : collapsedWidth,
-        flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: isOpen ? expandedWidth : collapsedWidth,
-          boxSizing: "border-box",
-          transition: "width 0.3s",
-          top: 64,
-          height: `calc(100vh - ${64}px)`,
+          ...SideBarStyles.drawerStyles
         },
       }}
     >
