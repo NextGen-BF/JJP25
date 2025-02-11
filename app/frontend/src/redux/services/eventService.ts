@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
+import dayjs, { Dayjs } from "dayjs";
 
 export enum EventCategory {
     NOT_SELECTED = "Not Selected",
@@ -14,7 +15,7 @@ export enum EventCategory {
 export interface Event {
     title: string;
     description: string;
-    dates: string[];
+    dates: Dayjs[];
     venue?: string;
     category: EventCategory;
     ageRestriction?: number | null;
@@ -49,7 +50,12 @@ export const fetchVenues = createAsyncThunk("event/fetchVenues", async () => {
 });
 
 // TODO:
-export const submitEvent = createAsyncThunk("event/submitEvent", async () => {
+export const submitEvent = createAsyncThunk("event/submitEvent", async (event: Event) => {
+    const formattedEvent = {
+        ...event,
+        dates: event.dates.map(date => date.toISOString()), // Convert Dayjs to string
+    };
+
     try {
         const response = await fetch("");
     } catch (error: unknown) {

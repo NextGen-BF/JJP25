@@ -15,7 +15,7 @@ const eventSlice = createSlice({
             state.error = null;
         }
     },
-    
+
     // TODO:
     extraReducers: (builder) => {
         // Fetch venues logic
@@ -31,3 +31,6 @@ const eventSlice = createSlice({
             });
     },
 })
+
+export const { updateEvent, resetEvent } = eventSlice.actions;
+export default eventSlice.reducer;
