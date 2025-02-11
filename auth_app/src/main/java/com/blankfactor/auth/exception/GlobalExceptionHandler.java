@@ -6,7 +6,7 @@ import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeExcep
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-@Slf4j
+@Log4j2
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({IncorrectVerificationCodeException.class, PasswordsDoNotMatchException.class})

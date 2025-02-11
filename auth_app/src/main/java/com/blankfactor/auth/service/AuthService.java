@@ -14,7 +14,7 @@ import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class AuthService {
 
     private static final String USER_NOT_FOUND = "%s is not found";

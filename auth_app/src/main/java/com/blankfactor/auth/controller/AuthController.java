@@ -7,14 +7,14 @@ import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class AuthController {
 
     private final AuthService authService;
