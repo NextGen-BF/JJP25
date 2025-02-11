@@ -1,4 +1,4 @@
-package com.backend.repository;
+package com.backend.repository.feedback;
 
 import com.backend.entity.feedback.Feedback;
 import org.springframework.data.jpa.repository.JpaRepository;

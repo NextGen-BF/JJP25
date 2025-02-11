@@ -1,4 +1,4 @@
-package com.backend.repository;
+package com.backend.repository.event;
 
 import com.backend.entity.event.Venue;
 import org.springframework.data.jpa.repository.JpaRepository;

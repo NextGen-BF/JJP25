@@ -1,20 +1,26 @@
 version: '3.8'
 
 services:
-  mysql:
-    build:
-      context: ./database
+  ems_db:
+    image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    env_file:
-      - .env.${ENVIRONMENT}
+  ems_auth_db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_AUTH_NAME}
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql_auth_data:/var/lib/mysql
+    
 
 volumes:
   mysql_data:
+  mysql_auth_data:

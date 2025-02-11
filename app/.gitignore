@@ -1,6 +1,11 @@
+.env
 .env.dev
+.env.prod
+
 
 #VSCode gitignore
+
+package-lock.json
 
 # Logs
 logs
