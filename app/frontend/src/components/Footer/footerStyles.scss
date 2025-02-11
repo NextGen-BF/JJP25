@@ -39,4 +39,14 @@
   .footer-link-hover {
     color: var(--blankfactor-sky-color);
   }
+
+  @media (max-width: 880px) {
+    .footer-nav {
+      display: none;
+    }
+  
+    .footer-container {
+      justify-content: center; /* Center the logo */
+    }
+  }
   
