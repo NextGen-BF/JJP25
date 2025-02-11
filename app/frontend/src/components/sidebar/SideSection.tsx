@@ -1,4 +1,4 @@
-import React from "react";
+import { ElementType, FC } from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -7,12 +7,12 @@ import ListItemText from "@mui/material/ListItemText";
 import { Box, ListSubheader, SvgIconProps } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { styles } from "./SideBarStyles";
+import { SideBarStyles } from "./SideBarStyles";
 import { NavLink } from "react-router-dom";
 import "./SideBar.scss"
 
 export interface SidebarItem {
-  icon: React.ElementType<SvgIconProps>;
+  icon: ElementType<SvgIconProps>;
   message: string;
   linkTo: string;
 }
@@ -22,7 +22,7 @@ interface SidebarProps {
   title: string;
 }
 
-export const SideSection: React.FC<SidebarProps> = ({ items, title }) => {
+export const SideSection: FC<SidebarProps> = ({ items, title }) => {
   const isOpen = useSelector((state: RootState) => state.sidebar.isOpen);
 
   const toggleClass = (isActive : boolean): string => {
@@ -39,7 +39,7 @@ export const SideSection: React.FC<SidebarProps> = ({ items, title }) => {
     <Box>
       <ListSubheader
 
-        sx={{...styles.listSubheaderStyles, fontSize: isOpen ? 25 : 16, paddingLeft: 1}}
+        sx={{...SideBarStyles.listSubheaderStyles, fontSize: isOpen ? 25 : 16, paddingLeft: 1}}
       >
         {title}
       </ListSubheader>
@@ -54,7 +54,7 @@ export const SideSection: React.FC<SidebarProps> = ({ items, title }) => {
                 {isOpen && (
                   <ListItemText
                     primary={item.message}
-                    sx={styles.listItemTextStyles}
+                    sx={SideBarStyles.listItemTextStyles}
                   />
                 )}
               </ListItemButton>
