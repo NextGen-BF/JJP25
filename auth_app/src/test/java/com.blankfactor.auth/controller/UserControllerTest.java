@@ -38,7 +38,7 @@ public class UserControllerTest {
 
     private User dummyUser;
 
-    private static final String USER_ENDPOINT = "/api/v1/users/my-profile";
+    private static final String USER_ENDPOINT = "/api/v1/users/user-profile";
 
     @BeforeEach
     void setUp() {
