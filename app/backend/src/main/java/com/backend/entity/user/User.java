@@ -36,9 +36,13 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 public class User extends BaseEntity {
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Payment> payments = new ArrayList<>();
+    private List<Payment> senderPayments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Payment> receiverPayments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -71,11 +75,8 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 15)
     private String phone;
 
-    @Column(nullable = false, unique = true, length = 255)
-    private String username;
-
     @Column(length = 255)
-    private String profilePic;
+    private String profilePicture;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -99,20 +100,18 @@ public class User extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return getId() != null && getId().equals(user.getId()) &&
-                Objects.equals(username, user.username) &&
                 Objects.equals(phone, user.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), username, phone);
+        return Objects.hash(getId(), phone);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + getId() +
-                ", username='" + username + '\'' +
                 ", phone='" + phone + '\'' +
                 ", type=" + type +
                 ", createdAt=" + createdAt +
