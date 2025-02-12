@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Stepper, Step, StepLabel, Button, Typography, Box } from '@mui/material';
-import { Event, LocationOn, ConfirmationNumber } from '@mui/icons-material';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from './EventStepperStyles';
+import { EventStepperConstants } from '../../constants/EventStepperConstants';
 
-const steps = ['Event Creation', 'Venue Creation', 'Ticket Creation'];
+const steps = [EventStepperConstants.EVENT_CREATION, EventStepperConstants.VENUE_CREATION, EventStepperConstants.TICKET_CREATION];
 
 const EventStepper: React.FC = () => {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -28,18 +30,18 @@ const EventStepper: React.FC = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      throw new Error("You can't skip a step that isn't optional.");
-    }
+  // const handleSkip = () => {
+  //   if (!isStepOptional(activeStep)) {
+  //     throw new Error("You can't skip a step that isn't optional.");
+  //   }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
+  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  //   setSkipped((prevSkipped) => {
+  //     const newSkipped = new Set(prevSkipped.values());
+  //     newSkipped.add(activeStep);
+  //     return newSkipped;
+  //   });
+  // };
 
   const handleReset = () => {
     setActiveStep(0);
@@ -53,7 +55,7 @@ const EventStepper: React.FC = () => {
           const labelProps: { optional?: React.ReactNode; } = {};
 
           if (isStepOptional(index)) {
-            labelProps.optional = <Typography variant="caption">Optional</Typography>;
+            labelProps.optional = <Typography variant="caption">{EventStepperConstants.OPTIONAL_STEP}</Typography>;
           }
           if (isStepSkipped(index)) {
             stepProps.completed = false;
@@ -85,27 +87,32 @@ const EventStepper: React.FC = () => {
       </Stepper>
       {activeStep === steps.length ? (
         <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>All steps completed - you're finished</Typography>
+          <Typography sx={{ mt: 2, mb: 1 }}>{EventStepperConstants.ALL_STEPS_COMPLETED}</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Reset</Button>
+            <Button sx={EventStepperStyles.stepButton} onClick={handleReset}>{EventStepperConstants.RESET_STEPS}</Button>
           </Box>
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
+          <Typography sx={{ mt: 2, mb: 1 }}>{EventStepperConstants.CURR_STEP} {activeStep + 1}</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
-              Back
+            <Button
+              color="inherit"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{ mr: 1, display: 'flex', alignItems: 'center' }}
+            >
+              <ArrowBackIosIcon sx={EventStepperStyles.arrowBackIos(activeStep === 0)} fontSize="small" />
             </Button>
             <Box sx={{ flex: '1 1 auto' }} />
-            {isStepOptional(activeStep) && (
+            {/* {isStepOptional(activeStep) && (
               <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                 Skip
               </Button>
-            )}
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            )} */}
+            <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
+              {activeStep === steps.length - 1 ? EventStepperConstants.FINISH_STEP : <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />}
             </Button>
           </Box>
         </React.Fragment>
