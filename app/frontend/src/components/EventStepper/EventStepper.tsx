@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stepper, Step, StepLabel, Button, Typography, Box } from '@mui/material';
+import { Stepper, Step, StepLabel, Button, Typography, Box, TextField } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from './EventStepperStyles';
@@ -47,6 +47,34 @@ const EventStepper: React.FC = () => {
     setActiveStep(0);
   };
 
+  const renderStepForm = () => {
+    switch (activeStep) {
+      case 0:
+        return (
+          <Box sx={{ mt: 2 }}>
+            <TextField label="Event Name" fullWidth sx={{ mb: 2 }} />
+            <TextField label="Event Description" fullWidth sx={{ mb: 2 }} />
+          </Box>
+        );
+      case 1:
+        return (
+          <Box sx={{ mt: 2 }}>
+            <TextField label="Venue Name" fullWidth sx={{ mb: 2 }} />
+            <TextField label="Venue Address" fullWidth sx={{ mb: 2 }} />
+          </Box>
+        );
+      case 2:
+        return (
+          <Box sx={{ mt: 2 }}>
+            <TextField label="Ticket Type" fullWidth sx={{ mb: 2 }} />
+            <TextField label="Ticket Price" fullWidth sx={{ mb: 2 }} />
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Box sx={EventStepperStyles.stepperContainer}>
       <Stepper activeStep={activeStep} sx={EventStepperStyles.stepper}>
@@ -88,6 +116,9 @@ const EventStepper: React.FC = () => {
       ) : (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>{EventStepperConstants.CURR_STEP} {activeStep + 1}</Typography>
+          {/* Box for form and buttons for navigation of the stepper */}
+          <Box sx={{ mt: 2 }}>
+          {renderStepForm()}
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"
@@ -106,6 +137,7 @@ const EventStepper: React.FC = () => {
             <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
               {activeStep === steps.length - 1 ? EventStepperConstants.FINISH_STEP : <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />}
             </Button>
+            </Box>
           </Box>
         </React.Fragment>
       )}
