@@ -1,6 +1,6 @@
 package com.blankfactor.auth.exception;
 
-import com.blankfactor.auth.exception.custom.InvalidPasswordException;
+import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
 import com.blankfactor.auth.exception.custom.VerificationEmailNotSentException;
 import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
@@ -28,8 +28,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidPasswordException(InvalidPasswordException ex) {
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }

@@ -4,7 +4,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.InvalidPasswordException;
+import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,7 +116,7 @@ public class AuthServiceTest {
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenThrow(new BadCredentialsException("Bad credentials"));
 
-            assertThrows(InvalidPasswordException.class, () -> authService.login(loginRequest));
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(loginRequest));
         }
 
         @Test

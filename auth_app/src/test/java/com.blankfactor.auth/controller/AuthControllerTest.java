@@ -2,7 +2,7 @@ package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
-import com.blankfactor.auth.exception.custom.InvalidPasswordException;
+import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
 import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.service.JwtService;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -77,7 +77,7 @@ public class AuthControllerTest {
                     """;
             String errorMessage = "Incorrect password.";
 
-            when(authService.login(any(LoginRequest.class))).thenThrow(new InvalidPasswordException(errorMessage));
+            when(authService.login(any(LoginRequest.class))).thenThrow(new InvalidCredentialsException(errorMessage));
 
             mockMvc.perform(post(LOGIN_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
