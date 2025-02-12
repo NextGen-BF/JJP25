@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,5 +37,7 @@ public class RegisterResponse implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime verificationCodeExpiresAt;
+
+    private Set<String> roles;
 
 }

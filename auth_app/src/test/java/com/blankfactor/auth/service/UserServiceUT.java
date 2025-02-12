@@ -3,6 +3,7 @@ package com.blankfactor.auth.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceUT {
@@ -28,8 +30,8 @@ class UserServiceUT {
     @Test
     void shouldSuccessfullyReturnTheExistingUsers() {
         // Given
-        User user1 = new User(1L, "example1@email.com", "Pass_123", "UserName", "User", "Name", LocalDateTime.now(), false, null, null);
-        User user2 = new User(2L, "example2@email.com", "456_Pass", "NameUser", "Name", "User", LocalDateTime.now(), true, null, null);
+        User user1 = new User(1L, "example1@email.com", "Pass_123", "UserName", "User", "Name", LocalDateTime.now(), false, null, null, Set.of(Role.ROLE_USER));
+        User user2 = new User(2L, "example2@email.com", "456_Pass", "NameUser", "Name", "User", LocalDateTime.now(), true, null, null, Set.of(Role.ROLE_ADMIN));
         List<User> mockUsers = Arrays.asList(user1, user2);
 
         // When

@@ -1,5 +1,6 @@
 package com.blankfactor.auth.service;
 
+import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
@@ -25,6 +26,7 @@ import org.thymeleaf.context.Context;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +62,7 @@ public class AuthService {
                 .verificationCode(generateVerificationCode())
                 .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
                 .enabled(false)
+                .roles(registerRequest.getRole().equals("attendee") ? Set.of(Role.ROLE_USER) : Set.of(Role.ROLE_USER, Role.ROLE_ADMIN))
                 .build();
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());

@@ -23,9 +23,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -61,13 +61,13 @@ public class AuthControllerUT {
         * 6.Plain object (ex. {}) */
 
         @Test
-        void shouldSuccessfullySendRequestAndReceiveResponse() throws Exception {
+        void shouldSuccessfullySendRequestAndReceiveResponseForUser() throws Exception {
             // Given
             RegisterResponse registerResponse = new RegisterResponse(
                     1L, "example@email.com", "hashed-password",
                     "username", "firstName", "lastName", LocalDateTime.parse("2000-01-01T01:01:01"),
-                    false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"));
-            String requestBody = """
+                    false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"), Set.of("ROLE_USER"));
+            String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
@@ -75,13 +75,14 @@ public class AuthControllerUT {
                                 "username": "username",
                                 "firstName": "firstName",
                                 "lastName": "lastName",
-                                "birthDate": "2000-01-01T01:01:01"
+                                "birthDate": "2000-01-01T01:01:01",
+                                "role": "attendee"
                             }
                     """;
 
             // When
             doReturn(registerResponse).when(authService).register(any(RegisterRequest.class));
-            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
 
                     // Then
                     .andExpect(status().isOk())
@@ -94,13 +95,20 @@ public class AuthControllerUT {
                     .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
                     .andExpect(jsonPath("$.enabled").value(false))
                     .andExpect(jsonPath("$.verificationCode").value("123123"))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value("2000-01-01T01:15:01"));
+                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value("2000-01-01T01:15:01"))
+                    .andExpect(jsonPath("$.roles").isArray())
+                    .andExpect(jsonPath("$.roles", hasSize(1)))
+                    .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
         }
 
         @Test
-        void shouldReturnResponseWithEmailIsAlreadyInUse() throws Exception {
+        void shouldSuccessfullySendRequestAndReceiveResponseForAdmin() throws Exception {
             // Given
-            String requestBody = """
+            RegisterResponse registerResponse = new RegisterResponse(
+                    1L, "example@email.com", "hashed-password",
+                    "username", "firstName", "lastName", LocalDateTime.parse("2000-01-01T01:01:01"),
+                    false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"), Set.of("ROLE_USER", "ROLE_ADMIN"));
+            String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
@@ -108,14 +116,52 @@ public class AuthControllerUT {
                                 "username": "username",
                                 "firstName": "firstName",
                                 "lastName": "lastName",
-                                "birthDate": "2000-01-01T01:01:01"
+                                "birthDate": "2000-01-01T01:01:01",
+                                "role": "organiser"
+                            }
+                    """;
+
+            // When
+            doReturn(registerResponse).when(authService).register(any(RegisterRequest.class));
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
+
+                    // Then
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(1L))
+                    .andExpect(jsonPath("$.email").value("example@email.com"))
+                    .andExpect(jsonPath("$.password").value("hashed-password"))
+                    .andExpect(jsonPath("$.username").value("username"))
+                    .andExpect(jsonPath("$.firstName").value("firstName"))
+                    .andExpect(jsonPath("$.lastName").value("lastName"))
+                    .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
+                    .andExpect(jsonPath("$.enabled").value(false))
+                    .andExpect(jsonPath("$.verificationCode").value("123123"))
+                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value("2000-01-01T01:15:01"))
+                    .andExpect(jsonPath("$.roles").isArray())
+                    .andExpect(jsonPath("$.roles", hasSize(2)))
+                    .andExpect(jsonPath("$.roles", containsInAnyOrder("ROLE_USER", "ROLE_ADMIN")));
+        }
+
+        @Test
+        void shouldReturnResponseWithEmailIsAlreadyInUse() throws Exception {
+            // Given
+            String registerRequest = """
+                            {
+                                "email": "example@email.com",
+                                "password": "Password1!",
+                                "confirmPassword": "Password1!",
+                                "username": "username",
+                                "firstName": "firstName",
+                                "lastName": "lastName",
+                                "birthDate": "2000-01-01T01:01:01",
+                                "role": "attendee"
                             }
                     """;
             String ERROR_MESSAGE = "example@email.com is already in use";
 
             // When
             when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
-            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
 
                     // Then
                     .andExpect(status().isConflict())
@@ -125,7 +171,7 @@ public class AuthControllerUT {
         @Test
         void shouldReturnResponseWithUsernameIsAlreadyInUse() throws Exception {
             // Given
-            String requestBody = """
+            String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
@@ -133,14 +179,15 @@ public class AuthControllerUT {
                                 "username": "username__",
                                 "firstName": "firstName",
                                 "lastName": "lastName",
-                                "birthDate": "2000-01-01T01:01:01"
+                                "birthDate": "2000-01-01T01:01:01",
+                                "role": "attendee"
                             }
                     """;
             String ERROR_MESSAGE = "username__ is already in use";
 
             // When
             when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
-            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
 
                     // Then
                     .andExpect(status().isConflict())
@@ -150,7 +197,7 @@ public class AuthControllerUT {
         @Test
         void shouldReturnResponseWithPasswordsDoNotMatchError() throws Exception {
             // Given
-            String requestBody = """
+            String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
@@ -158,14 +205,15 @@ public class AuthControllerUT {
                                 "username": "username__",
                                 "firstName": "firstName",
                                 "lastName": "lastName",
-                                "birthDate": "2000-01-01T01:01:01"
+                                "birthDate": "2000-01-01T01:01:01",
+                                "role": "attendee"
                             }
                     """;
             String ERROR_MESSAGE = "Passwords do not match. Please try again.";
 
             // When
             when(authService.register(any(RegisterRequest.class))).thenThrow(new PasswordsDoNotMatchException(ERROR_MESSAGE));
-            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
 
                     // Then
                     .andExpect(status().isBadRequest())
@@ -175,7 +223,7 @@ public class AuthControllerUT {
         @Test
         void shouldReturnResponseIncludingAllFieldErrors() throws Exception {
             // Given
-            String requestBody = """
+            String registerRequest = """
                             {
                               "email": "",
                               "password": "",
@@ -183,29 +231,32 @@ public class AuthControllerUT {
                               "username": "",
                               "firstName": "",
                               "lastName": "",
-                              "birthDate": ""
+                              "birthDate": "",
+                              "role": ""
                             }
                     """;
 
             // When
-            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
 
                     // Then
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.email").isArray())
-                    .andExpect(jsonPath("$.email", hasSize(2)))
+                    .andExpect(jsonPath("$.email", hasSize(1)))
                     .andExpect(jsonPath("$.password").isArray())
-                    .andExpect(jsonPath("$.password", hasSize(2)))
+                    .andExpect(jsonPath("$.password", hasSize(1)))
                     .andExpect(jsonPath("$.confirmPassword").isArray())
-                    .andExpect(jsonPath("$.confirmPassword", hasSize(2)))
+                    .andExpect(jsonPath("$.confirmPassword", hasSize(1)))
                     .andExpect(jsonPath("$.username").isArray())
-                    .andExpect(jsonPath("$.username", hasSize(2)))
+                    .andExpect(jsonPath("$.username", hasSize(1)))
                     .andExpect(jsonPath("$.firstName").isArray())
-                    .andExpect(jsonPath("$.firstName", hasSize(2)))
+                    .andExpect(jsonPath("$.firstName", hasSize(1)))
                     .andExpect(jsonPath("$.lastName").isArray())
-                    .andExpect(jsonPath("$.lastName", hasSize(2)))
+                    .andExpect(jsonPath("$.lastName", hasSize(1)))
                     .andExpect(jsonPath("$.birthDate").isArray())
-                    .andExpect(jsonPath("$.birthDate", hasSize(1)));
+                    .andExpect(jsonPath("$.birthDate", hasSize(1)))
+                    .andExpect(jsonPath("$.role").isArray())
+                    .andExpect(jsonPath("$.role", hasSize(1)));
         }
 
         @Test
@@ -228,7 +279,9 @@ public class AuthControllerUT {
                     .andExpect(jsonPath("$.lastName").isArray())
                     .andExpect(jsonPath("$.lastName", hasSize(1)))
                     .andExpect(jsonPath("$.birthDate").isArray())
-                    .andExpect(jsonPath("$.birthDate", hasSize(1)));
+                    .andExpect(jsonPath("$.birthDate", hasSize(1)))
+                    .andExpect(jsonPath("$.role").isArray())
+                    .andExpect(jsonPath("$.role", hasSize(1)));
         }
     }
 
@@ -346,9 +399,9 @@ public class AuthControllerUT {
                     // Then
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.email").isArray())
-                    .andExpect(jsonPath("$.email", hasSize(2)))
+                    .andExpect(jsonPath("$.email", hasSize(1)))
                     .andExpect(jsonPath("$.verificationCode").isArray())
-                    .andExpect(jsonPath("$.verificationCode", hasSize(2)));
+                    .andExpect(jsonPath("$.verificationCode", hasSize(1)));
         }
 
         @Test

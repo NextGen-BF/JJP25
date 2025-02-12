@@ -54,26 +54,30 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
 
             // When
             RegisterResponse registerResponse = authService.register(registerRequest);
 
             // Then
             assertTrue(userRepository.findByEmail(registerRequest.getEmail()).isPresent());
-            assertTrue(registerRequest.getEmail().equals(registerResponse.getEmail()));
+            assertTrue(registerResponse.getEmail().equals(registerRequest.getEmail()));
             assertTrue(registerResponse.getPassword().matches("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$"));
-            assertTrue(registerRequest.getUsername().equals(registerResponse.getUsername()));
-            assertTrue(registerRequest.getFirstName().equals(registerResponse.getFirstName()));
-            assertTrue(registerRequest.getLastName().equals(registerResponse.getLastName()));
-            assertTrue(registerRequest.getBirthDate().isEqual(registerResponse.getBirthDate()));
+            assertTrue(registerResponse.getUsername().equals(registerRequest.getUsername()));
+            assertTrue(registerResponse.getFirstName().equals(registerRequest.getFirstName()));
+            assertTrue(registerResponse.getLastName().equals(registerRequest.getLastName()));
+            assertTrue(registerResponse.getBirthDate().isEqual(registerRequest.getBirthDate()));
             assertFalse(registerResponse.getEnabled());
             assertNotNull(registerResponse.getVerificationCode());
             assertNotNull(registerResponse.getVerificationCodeExpiresAt());
+            assertNotNull(registerResponse.getRoles());
+            assertTrue(registerResponse.getRoles().size() == 1);
+            assertTrue(registerResponse.getRoles().contains("ROLE_USER"));
         }
 
         @Test
-        void shouldThrowUseFoundExceptionWhenEmailIsAlreadyInUse() {
+        void shouldSuccessfullyRegisterAdmin() {
             // Given
             RegisterRequest registerRequest = new RegisterRequest(
                     "example@email.com",
@@ -82,7 +86,41 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "organiser");
+
+            // When
+            RegisterResponse registerResponse = authService.register(registerRequest);
+
+            // Then
+            assertTrue(userRepository.findByEmail(registerRequest.getEmail()).isPresent());
+            assertTrue(registerResponse.getEmail().equals(registerRequest.getEmail()));
+            assertTrue(registerResponse.getPassword().matches("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$"));
+            assertTrue(registerResponse.getUsername().equals(registerRequest.getUsername()));
+            assertTrue(registerResponse.getFirstName().equals(registerRequest.getFirstName()));
+            assertTrue(registerResponse.getLastName().equals(registerRequest.getLastName()));
+            assertTrue(registerResponse.getBirthDate().isEqual(registerRequest.getBirthDate()));
+            assertFalse(registerResponse.getEnabled());
+            assertNotNull(registerResponse.getVerificationCode());
+            assertNotNull(registerResponse.getVerificationCodeExpiresAt());
+            assertNotNull(registerResponse.getRoles());
+            assertTrue(registerResponse.getRoles().size() == 2);
+            assertTrue(registerResponse.getRoles().contains("ROLE_USER"));
+            assertTrue(registerResponse.getRoles().contains("ROLE_ADMIN"));
+        }
+
+        @Test
+        void shouldThrowUserFoundExceptionWhenEmailIsAlreadyInUse() {
+            // Given
+            RegisterRequest registerRequest = new RegisterRequest(
+                    "example@email.com",
+                    "Password1!",
+                    "Password1!",
+                    "john_doe",
+                    "John",
+                    "Doe",
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
 
             // When
             authService.register(registerRequest);
@@ -95,7 +133,7 @@ public class AuthServiceIT {
         }
 
         @Test
-        void shouldThrowUseFoundExceptionWhenUsernameIsAlreadyInUse() {
+        void shouldThrowUserFoundExceptionWhenUsernameIsAlreadyInUse() {
             // Given
             RegisterRequest registerRequest = new RegisterRequest(
                     "example@email.com",
@@ -104,7 +142,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
 
             // When
             authService.register(registerRequest);
@@ -127,7 +166,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
 
             // When & Then
             PasswordsDoNotMatchException exception = assertThrows(PasswordsDoNotMatchException.class,
@@ -149,7 +189,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),
@@ -188,7 +229,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),
@@ -210,7 +252,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),
@@ -231,7 +274,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),
@@ -258,7 +302,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
 
             // When
@@ -290,7 +335,8 @@ public class AuthServiceIT {
                     "john_doe",
                     "John",
                     "Doe",
-                    LocalDateTime.parse("2000-01-01T01:01:01"));
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),

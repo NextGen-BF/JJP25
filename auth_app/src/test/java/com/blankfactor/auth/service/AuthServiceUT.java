@@ -115,14 +115,16 @@ public class AuthServiceUT {
         @Test
         void shouldSuccessfullyRegisterUser() throws MessagingException {
             // Given
-            RegisterRequest request = new RegisterRequest();
-            request.setEmail(TEST_EMAIL);
-            request.setPassword("password");
-            request.setConfirmPassword("password");
-            request.setUsername(TEST_USERNAME);
-            request.setFirstName("Test");
-            request.setLastName("User");
-            request.setBirthDate(LocalDateTime.parse("2000-01-01T01:01:01"));
+            RegisterRequest request = new RegisterRequest(
+                    TEST_EMAIL,
+                    "password",
+                    "password",
+                    TEST_USERNAME,
+                    "Test",
+                    "User",
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee"
+            );
 
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
             when(userRepository.findByUsername(request.getUsername())).thenReturn(Optional.empty());
@@ -142,14 +144,16 @@ public class AuthServiceUT {
         @Test
         void shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
             // Given
-            RegisterRequest request = new RegisterRequest();
-            request.setEmail(TEST_EMAIL);
-            request.setUsername(TEST_USERNAME);
-            request.setPassword("password");
-            request.setConfirmPassword("password");
-            request.setFirstName("Test");
-            request.setLastName("User");
-            request.setBirthDate(LocalDateTime.parse("2000-01-01T01:01:01"));
+            RegisterRequest request = new RegisterRequest(
+                    TEST_EMAIL,
+                    "password",
+                    "password",
+                    TEST_USERNAME,
+                    "Test",
+                    "User",
+                    LocalDateTime.parse("2000-01-01T01:01:01"),
+                    "attendee"
+            );
 
             // When
             when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());

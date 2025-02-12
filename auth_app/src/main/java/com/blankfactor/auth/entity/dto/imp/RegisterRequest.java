@@ -18,32 +18,36 @@ public class RegisterRequest {
     private static final String USERNAME_REGEX = "^(?=[a-zA-Z]*[a-zA-Z]{4,})[a-zA-Z0-9_-]{4,25}$";
     private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,25}$";
 
-    @NotBlank(message = "{email.required}")
+    @NotNull(message = "{email.required}")
     @Pattern(regexp = EMAIL_REGEX, message = "{email.invalidFormat}")
     private String email;
 
-    @NotBlank(message = "{password.required}")
+    @NotNull(message = "{password.required}")
     @Pattern(regexp = PASSWORD_REGEX, message = "{password.pattern}")
     private String password;
 
-    @NotBlank(message = "{confirmPassword.required}")
+    @NotNull(message = "{confirmPassword.required}")
     @Size(min = 8, max = 25, message = "{confirmPassword.length}")
     private String confirmPassword;
 
-    @NotBlank(message = "{username.required}")
+    @NotNull(message = "{username.required}")
     @Size(max = 25, message = "{username.length}")
     @Pattern(regexp = USERNAME_REGEX, message = "{username.pattern}")
     private String username;
 
-    @NotBlank(message = "{firstName.required}")
+    @NotNull(message = "{firstName.required}")
     @Size(min = 2, message = "{firstName.minLength}")
     private String firstName;
 
-    @NotBlank(message = "{lastName.required}")
+    @NotNull(message = "{lastName.required}")
     @Size(min = 2, message = "{lastName.minLength}")
     private String lastName;
 
     @NotNull(message = "{birthDate.required}")
     private LocalDateTime birthDate;
+
+    @NotNull(message = "{role.required}")
+    @Pattern(regexp = "^(attendee|organiser)$", message = "{role.invalidFormat}")
+    private String role;
 
 }
