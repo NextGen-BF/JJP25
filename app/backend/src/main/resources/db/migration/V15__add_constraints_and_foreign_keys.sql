@@ -1,4 +1,5 @@
 alter table event_statistics add constraint UKj4v94ymapgf9d18jy1vl0rxre unique (event_id);
+alter table payment_executions add constraint UK5lhi08k1ssj2qk5505gl3w8c7 unique (user_ticket_id);
 alter table users add constraint UKdu5v5sr43g5bfnji4vb8hg5s3 unique (phone);
 
 alter table event_dates
@@ -23,7 +24,8 @@ references events (id);
 
 alter table feedbacks
 add constraint FK312drfl5lquu37mu4trk8jkwx
-foreign key (user_id) references users (id);
+foreign key (user_id)
+references users (id);
 
 alter table notifications
 add constraint FK9y21adhxn0ayjhfocscqox7bh
@@ -41,8 +43,13 @@ foreign key (user_ticket_id)
 references user_tickets (id);
 
 alter table payments
-add constraint FKj94hgy9v5fw1munb90tar2eje
-foreign key (user_id)
+add constraint FKs3ufuyecnucmu8dbeodxq7l80
+foreign key (receiver_id)
+references users (id);
+
+alter table payments
+add constraint FK6i0puhywkb4x91syggfrdegev
+foreign key (sender_id)
 references users (id);
 
 alter table rsvp_invitations
