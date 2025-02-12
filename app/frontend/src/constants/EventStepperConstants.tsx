@@ -10,4 +10,8 @@ export const EventStepperConstants = {
     FINISH_STEP: 'Finish',
     OPTIONAL_STEP: 'Optional',
     RESET_STEPS: 'Reset',
+
+    Errors: {
+        SKIP_ERROR: "You can't skip a step that isn't optional.",
+    }
 }

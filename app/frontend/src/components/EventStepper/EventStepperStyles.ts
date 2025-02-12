@@ -1,6 +1,19 @@
 import { EventStepperConstants } from "../../constants/EventStepperConstants";
 
 export const EventStepperStyles = {
+    stepper: {
+      "& .MuiStepConnector-line": {
+        borderTopWidth: "2px",
+        transition: "border-color 0.3s ease-in-out", // Smooth transition for color change
+      },
+      "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
+        borderColor: "#2b6aff",
+      },
+      "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
+        borderColor: "#2b6aff",
+      },
+    },
+
     stepperContainer: {
       width: '100%',
       maxWidth: '1000px',
@@ -8,14 +21,21 @@ export const EventStepperStyles = {
       padding: '16px',
     },
 
-    stepLabel: {
-        active: EventStepperConstants.ACTIVE_COLOR, 
-        future: EventStepperConstants.INACTIVE_COLOR, 
-    },
-    stepIcon: {
-        active: EventStepperConstants.ACTIVE_COLOR, 
-        future: EventStepperConstants.INACTIVE_COLOR, 
-    },
+    stepLabel: (activeStep: number, index: number) => ({
+      "& .MuiStepLabel-label": {
+        color: index <= activeStep 
+          ? EventStepperConstants.ACTIVE_COLOR 
+          : EventStepperConstants.INACTIVE_COLOR,
+      },
+    }),
+  
+    stepIcon: (activeStep: number, index: number) => ({
+      "& .MuiStepIcon-root": {
+        color: index <= activeStep 
+          ? EventStepperConstants.ACTIVE_COLOR 
+          : EventStepperConstants.INACTIVE_COLOR,
+      },
+    }),
 
     arrowBackIos: (disabled: boolean) => ({
       color: disabled ? '#666' : EventStepperConstants.SECONDARY_COLOR,  // Gray if disabled
