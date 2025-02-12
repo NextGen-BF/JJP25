@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Stepper, Step, StepLabel, StepConnector, Button, Typography, Box } from '@mui/material';
+import React from 'react';
+import { Stepper, Step, StepLabel, Button, Typography, Box } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from './EventStepperStyles';
@@ -30,18 +30,18 @@ const EventStepper: React.FC = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  // const handleSkip = () => {
-  //   if (!isStepOptional(activeStep)) {
-  //     throw new Error("You can't skip a step that isn't optional.");
-  //   }
+  const handleSkip = () => {
+    if (!isStepOptional(activeStep)) {
+      throw new Error(EventStepperConstants.Errors.SKIP_ERROR);
+    }
 
-  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  //   setSkipped((prevSkipped) => {
-  //     const newSkipped = new Set(prevSkipped.values());
-  //     newSkipped.add(activeStep);
-  //     return newSkipped;
-  //   });
-  // };
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped((prevSkipped) => {
+      const newSkipped = new Set(prevSkipped.values());
+      newSkipped.add(activeStep);
+      return newSkipped;
+    });
+  };
 
   const handleReset = () => {
     setActiveStep(0);
@@ -49,17 +49,8 @@ const EventStepper: React.FC = () => {
 
   return (
     <Box sx={EventStepperStyles.stepperContainer}>
-      <Stepper activeStep={activeStep} sx={{
-        "& .MuiStepConnector-line": {
-          borderTopWidth: "2px",
-        },
-        "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
-          borderColor: "#2b6aff",
-        },
-        "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
-          borderColor: "#2b6aff",
-        },
-      }}>
+      <Stepper activeStep={activeStep} sx={EventStepperStyles.stepper}>
+
         {steps.map((label, index) => {
           const stepProps: { completed?: boolean } = {};
           const labelProps: { optional?: React.ReactNode; } = {};
@@ -71,22 +62,13 @@ const EventStepper: React.FC = () => {
             stepProps.completed = false;
           }
 
-          const stepLabelColor =
-            index <= activeStep ? EventStepperStyles.stepLabel.active : EventStepperStyles.stepLabel.future;
-          const stepIconColor =
-            index <= activeStep ? EventStepperStyles.stepIcon.active : EventStepperStyles.stepIcon.future;
-
           return (
             <Step key={label} {...stepProps}>
               <StepLabel
                 {...labelProps}
                 sx={{
-                  '& .MuiStepLabel-label': {
-                    color: stepLabelColor,
-                  },
-                  '& .MuiStepIcon-root': {
-                    color: stepIconColor, 
-                  },
+                  ...EventStepperStyles.stepLabel(activeStep, index),
+                  ...EventStepperStyles.stepIcon(activeStep, index),
                 }}
               >
                 {label}
@@ -116,11 +98,11 @@ const EventStepper: React.FC = () => {
               <ArrowBackIosIcon sx={EventStepperStyles.arrowBackIos(activeStep === 0)} fontSize="small" />
             </Button>
             <Box sx={{ flex: '1 1 auto' }} />
-            {/* {isStepOptional(activeStep) && (
+            {isStepOptional(activeStep) && (
               <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                 Skip
               </Button>
-            )} */}
+            )}
             <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
               {activeStep === steps.length - 1 ? EventStepperConstants.FINISH_STEP : <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />}
             </Button>
