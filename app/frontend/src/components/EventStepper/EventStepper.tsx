@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stepper, Step, StepLabel, Button, Typography, Box } from '@mui/material';
+import { Stepper, Step, StepLabel, StepConnector, Button, Typography, Box } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from './EventStepperStyles';
@@ -49,7 +49,17 @@ const EventStepper: React.FC = () => {
 
   return (
     <Box sx={EventStepperStyles.stepperContainer}>
-      <Stepper activeStep={activeStep}>
+      <Stepper activeStep={activeStep} sx={{
+        "& .MuiStepConnector-line": {
+          borderTopWidth: "2px",
+        },
+        "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
+          borderColor: "#2b6aff",
+        },
+        "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
+          borderColor: "#2b6aff",
+        },
+      }}>
         {steps.map((label, index) => {
           const stepProps: { completed?: boolean } = {};
           const labelProps: { optional?: React.ReactNode; } = {};
