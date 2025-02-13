@@ -5,6 +5,7 @@ import { Autocomplete, TextField, FormControl } from "@mui/material";
 interface FormAutoCompleteProps {
   name: string;
   control: any;
+  rules?: object;
   label: string;
   options: string[];
   required?: boolean;
@@ -15,6 +16,7 @@ interface FormAutoCompleteProps {
 const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
   name,
   control,
+  rules,
   label,
   options,
   required = false,
@@ -27,7 +29,7 @@ const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
         name={name}
         control={control}
         defaultValue=""
-        rules={required ? { required: `${label} is required` } : {}}
+        rules={required ? { ...rules, required: `${label} is required` } : {}}
         render={({ field }) => (
           <Autocomplete
             {...field}
