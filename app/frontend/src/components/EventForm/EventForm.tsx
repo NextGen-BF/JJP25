@@ -7,16 +7,36 @@ import FormSelect from "../FormSelect/FormSelect";
 import FormInput from "../FormInput/FormInput";
 import { EventFormConstants } from "../../constants/EventFormConstants";
 import FormAutoComplete from "../FormAutoComplete/FormAutoComplete";
+// This will be moved in the Stepper/Page in final functionality
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for toast
 
 const EventForm: React.FC = () => {
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    mode: "onChange",
+  });
 
   const onSubmit = (data: any) => {
     console.log(data);
+    toast.success("Event Created Successfully!"); // Trigger success toast
+  };
+
+  const venueValidation = {
+    validate: (value: string) =>
+      [
+        "Stadium A",
+        "Stadium B",
+        "Stadium D",
+        "Stadium G",
+        "Conference Hall",
+        "Theater XYZ",
+      ].includes(value)
+        ? true
+        : "Choose a valid venue",
   };
 
   return (
@@ -32,6 +52,17 @@ const EventForm: React.FC = () => {
             control={control}
             label={EventFormConstants.LABELS.EVENT_TITLE}
             required
+            rules={{
+              minLength: {
+                value: 5,
+                message: "Event title must be at least 5 characters",
+              },
+
+              pattern: {
+                value: /^[A-Z]/,
+                message: "Event title must start with a capital letter",
+              },
+            }}
             error={
               typeof errors.eventTitle?.message === "string"
                 ? errors.eventTitle.message
@@ -45,6 +76,12 @@ const EventForm: React.FC = () => {
             control={control}
             label={EventFormConstants.LABELS.EVENT_DESCRIPTION}
             required
+            rules={{
+              minLength: {
+                value: 24,
+                message: "Event description must be at least 24 characters",
+              },
+            }}
             multiline
             rows={8}
             error={
@@ -63,9 +100,10 @@ const EventForm: React.FC = () => {
 
           <Box sx={EventFormStyles.selectorsBox}>
             <FormAutoComplete
-              name="venue"
+              name={EventFormConstants.NAMES.VENUE}
               control={control}
-              label="Venue"
+              rules={venueValidation}
+              label={EventFormConstants.LABELS.VENUE}
               options={[
                 "Stadium A",
                 "Stadium B",

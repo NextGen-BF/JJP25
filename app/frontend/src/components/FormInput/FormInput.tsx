@@ -5,6 +5,7 @@ import { TextField, Typography } from "@mui/material";
 interface FormInputProps {
   name: string;
   control: any;
+  rules?: object;
   label: string;
   multiline?: boolean;
   rows?: number;
@@ -16,6 +17,7 @@ interface FormInputProps {
 const FormInput: React.FC<FormInputProps> = ({
   name,
   control,
+  rules,
   label,
   multiline = false,
   rows = 1,
@@ -30,7 +32,10 @@ const FormInput: React.FC<FormInputProps> = ({
         name={name}
         control={control}
         defaultValue=""
-        rules={required ? { required: `${label} is required` } : {}}
+        rules={{
+          ...rules,
+          required: required ? `${label} is required` : false,
+        }}
         render={({ field }) => (
           <TextField
             {...field}
