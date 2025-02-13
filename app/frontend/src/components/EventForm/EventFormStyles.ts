@@ -43,10 +43,10 @@ export const EventFormStyles = {
   },
 
   backButton: {
-    flex: "0 1 5%", // Takes 5% of space
+    flex: "0 1 5%",
   },
 
   nextButton: {
-    flex: "0 1 5%", // Takes 5% of space
+    flex: "0 1 5%",
   },
 };

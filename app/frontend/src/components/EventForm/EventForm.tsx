@@ -1,17 +1,12 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import {
-  Box,
-  TextField,
-  Typography,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { EventFormStyles } from "./EventFormStyles";
 import "./EventFormStyles.scss";
+import FormSelect from "../FormSelect/FormSelect";
+import FormInput from "../FormInput/FormInput";
+import { EventFormConstants } from "../../constants/EventFormConstants";
+import FormAutoComplete from "../FormAutoComplete/FormAutoComplete";
 
 const EventForm: React.FC = () => {
   const {
@@ -32,113 +27,92 @@ const EventForm: React.FC = () => {
         </Box>
 
         <Box sx={EventFormStyles.leftBox}>
-          <Typography variant="h6">Event Title:</Typography>
-          <Controller
-            name="eventTitle"
+          <FormInput
+            name={EventFormConstants.NAMES.EVENT_TITLE}
             control={control}
-            defaultValue=""
-            rules={{ required: "Event Title is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Event Title"
-                fullWidth
-                required
-                error={!!errors.eventTitle}
-                sx={{ mb: 2 }}
-              />
-            )}
+            label={EventFormConstants.LABELS.EVENT_TITLE}
+            required
+            error={
+              typeof errors.eventTitle?.message === "string"
+                ? errors.eventTitle.message
+                : undefined
+            }
+            sx={EventFormStyles.backButton}
           />
 
-          <Typography variant="h6">Description:</Typography>
-          <Controller
-            name="eventDescription"
+          <FormInput
+            name={EventFormConstants.NAMES.EVENT_DESCRIPTION}
             control={control}
-            defaultValue=""
-            rules={{ required: "Description is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Description"
-                fullWidth
-                required
-                multiline
-                rows={4}
-                error={!!errors.eventDescription}
-                sx={{ mb: 4 }}
-              />
-            )}
+            label={EventFormConstants.LABELS.EVENT_DESCRIPTION}
+            required
+            multiline
+            rows={8}
+            error={
+              typeof errors.eventDescription?.message === "string"
+                ? errors.eventDescription.message
+                : undefined
+            }
           />
         </Box>
 
         <Box sx={EventFormStyles.rightBox}>
           <Box sx={{ mb: 4 }}>
-            <Typography variant="h6">Event Dates:</Typography>
+            <Typography variant="h6">Event Dates</Typography>
             {/* <MultiDateCalendar /> */}
           </Box>
 
-          {/* Selectors Box (Venue, Category, Age Restriction) */}
           <Box sx={EventFormStyles.selectorsBox}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Venue</InputLabel>
-              <Controller
-                name="venue"
-                control={control}
-                defaultValue=""
-                rules={{ required: "Venue is required" }}
-                render={({ field }) => (
-                  <Select {...field} required>
-                    {["Venue 1", "Venue 2", "Venue 3"].map((venue) => (
-                      <MenuItem key={venue} value={venue}>
-                        {venue}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <FormAutoComplete
+              name="venue"
+              control={control}
+              label="Venue"
+              options={[
+                "Stadium A",
+                "Stadium B",
+                "Stadium D",
+                "Stadium G",
+                "Conference Hall",
+                "Theater XYZ",
+              ]} // Example venues
+              required
+              error={
+                typeof errors.venue?.message === "string"
+                  ? errors.venue.message
+                  : undefined
+              }
+            />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Category</InputLabel>
-              <Controller
-                name="category"
-                control={control}
-                defaultValue=""
-                rules={{ required: "Category is required" }}
-                render={({ field }) => (
-                  <Select {...field} required>
-                    {["Music", "Conference", "Sports"].map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <FormSelect
+              name={EventFormConstants.NAMES.CATEGORY}
+              control={control}
+              label={EventFormConstants.LABELS.CATEGORY}
+              options={["Music", "Conference", "Sports"]}
+              required
+              error={
+                typeof errors.category?.message === "string"
+                  ? errors.category.message
+                  : undefined
+              }
+            />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Age Restriction</InputLabel>
-              <Controller
-                name="ageRestriction"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <Select {...field}>
-                    {["All Ages", "18+", "21+"].map((age) => (
-                      <MenuItem key={age} value={age}>
-                        {age}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
+            <FormSelect
+              name={EventFormConstants.NAMES.AGE_RESTRICTION}
+              control={control}
+              label={EventFormConstants.LABELS.AGE_RESTRICTION}
+              options={["All Ages", "18+", "21+"]}
+              error={
+                typeof errors.ageRestriction?.message === "string"
+                  ? errors.ageRestriction.message
+                  : undefined
+              }
+            />
           </Box>
         </Box>
 
         <Box sx={EventFormStyles.nextButton}>
-          <Button variant="contained">Next</Button>
+          <Button type="submit" variant="contained">
+            Next
+          </Button>
         </Box>
       </form>
     </Box>
