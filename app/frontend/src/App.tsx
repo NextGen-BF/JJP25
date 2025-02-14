@@ -42,6 +42,7 @@ export default function App() {
           minHeight: "100vh", 
           overflowY: "hidden" }}
       >
+
         <Box
           sx={{
             flexGrow: 1,
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/dashboard/your-events-statistics" />
             <Route path="/dashboard/rsvp-creation" />
             <Route path="/dashboard/account" element={<AccountPage />} />
+          
           </Routes>
         </Box>
 

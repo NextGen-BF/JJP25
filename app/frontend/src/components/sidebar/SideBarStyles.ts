@@ -18,7 +18,6 @@ export const SideBarStyles = {
       transition: "width 0.3s",
       top: 64,
       height: `calc(100vh - ${64}px - ${80}px)`,
-  },
 
   listSubheaderStyles: {
     backgroundColor: "#D2D2DA",
