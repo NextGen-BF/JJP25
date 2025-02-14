@@ -8,6 +8,7 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Typography,
 } from "@mui/material";
 import { FC } from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -16,7 +17,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
-
+import googleLogo from "../../assets/google-color.png";
+import { Link } from "react-router-dom";
 type FormFields = {
   email: string;
   password: string;
@@ -72,9 +74,14 @@ const RegisterPage: FC = () => {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Box>
+          <Box sx={{ color: "#080731" }}>
             <Box sx={{ fontSize: "2em" }}>Sign up</Box>
-            <a href="#">Already have an account? Sign in!</a>
+            <Box>
+              Already have an account?{" "}
+              <Link to="/login">
+                <strong>Sign up!</strong>
+              </Link>
+            </Box>
           </Box>
           <Box
             sx={{
@@ -262,10 +269,49 @@ const RegisterPage: FC = () => {
               </LocalizationProvider>
             </Box>
           </Box>
-          <Button variant="contained" type="submit" disabled={isSubmitting}>
+          <Button
+            sx={{
+              bgcolor: "#080731",
+            }}
+            variant="contained"
+            type="submit"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Loading..." : "Sign up"}
           </Button>
-          <Button variant="contained" type="submit" disabled={isSubmitting}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              width: "100%",
+            }}
+          >
+            <Box sx={{ flex: 1, height: 0.1, bgcolor: "gray" }} />
+            <Typography variant="body2" color="textSecondary">
+              or
+            </Typography>
+            <Box sx={{ flex: 1, height: 0.1, bgcolor: "gray" }} />
+          </Box>
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={isSubmitting}
+            startIcon={
+              <img
+                src={googleLogo}
+                alt="Google"
+                style={{ width: 20, height: 20 }}
+              />
+            }
+            sx={{
+              backgroundColor: "white",
+              color: "black",
+              "&:hover": {
+                backgroundColor: "#f5f5f5",
+              },
+            }}
+          >
             {isSubmitting ? "Loading..." : "Sign up with Google"}
           </Button>
         </Box>
