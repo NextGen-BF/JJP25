@@ -1,4 +1,5 @@
 export const SideBarStyles = {
+
   drawerContentBoxStyles: {
     display: "flex",
     flexDirection: "column",
@@ -17,7 +18,8 @@ export const SideBarStyles = {
       boxSizing: "border-box",
       transition: "width 0.3s",
       top: 64,
-      height: `calc(100vh - ${64}px - ${80}px)`,
+      height: `calc(100vh - ${64}px - ${80}px)`
+  },
 
   listSubheaderStyles: {
     backgroundColor: "#D2D2DA",
@@ -35,7 +37,6 @@ export const SideBarStyles = {
     justifyContent: "flex-start",
     pr:0,
     height: 48,
-  },
+  }
 
-
-};
+}

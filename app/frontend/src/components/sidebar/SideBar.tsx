@@ -20,9 +20,9 @@ export const SideBar: FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const expandedPCWidth = 240;
   const collapsedWidth = 80;
-
+  const expandedPCWidth = 240;
+  
   const expandedWidth = isMobile ? "100%" : expandedPCWidth;
   
   const toggleDrawer = () => {

@@ -36,6 +36,7 @@ export const SideSection: FC<SidebarProps> = ({ items, title }) => {
   }
 
   return (
+
     <Box>
       <ListSubheader
 
@@ -63,5 +64,6 @@ export const SideSection: FC<SidebarProps> = ({ items, title }) => {
         ))}
       </List>
     </Box>
+  
   );
 };

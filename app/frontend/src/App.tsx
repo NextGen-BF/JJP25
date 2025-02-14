@@ -42,7 +42,6 @@ export default function App() {
           minHeight: "100vh", 
           overflowY: "hidden" }}
       >
-
         <Box
           sx={{
             flexGrow: 1,
@@ -89,7 +88,6 @@ export default function App() {
           
           </Routes>
         </Box>
-
         <Footer />
       </Box>
     </Router>

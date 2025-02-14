@@ -7,7 +7,6 @@ export const store = configureStore({
   
   reducer: {
     sidebar: sidebarReducer,
-    sidebar: sidebarReducer,
     users: usersReducer,
     event: eventReducer
   },
