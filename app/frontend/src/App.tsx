@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar  from './components/Navbar';
+import Navbar  from './components/navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Login from './pages/LoginPage/LoginPage';
 import HomePage from './pages/HomePage/HomePage';
@@ -18,6 +18,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import './App.scss'
 import MockUserList from './pages/MockUserList/MockUserList';
 import { Box } from '@mui/material';
+import RSVPCreatePage from './pages/RSVPCreatePage/RSVPCreatePage';
 
 export default function App() {
   return (
@@ -47,7 +48,7 @@ export default function App() {
           <Route path="/dashboard/event-creation/success" element={<CreateEventSucessPage />}/>
           <Route path="/dashboard/your-events"/>
           <Route path="/dashboard/your-events-statistics"/>
-          <Route path="/dashboard/rsvp-creation"/>
+          <Route path="/dashboard/rsvp-creation" element={<RSVPCreatePage />} />
           <Route path="/dashboard/account" element={<AccountPage />}/>
         </Routes>
         </Box>
