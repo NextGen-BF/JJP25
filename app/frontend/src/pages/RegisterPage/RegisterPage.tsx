@@ -42,14 +42,40 @@ const RegisterPage: FC = () => {
   };
 
   return (
-    <Container>
-      <Box>
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "97vh",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+        }}
+      >
         {/* left side */}
-        {/* <Box>
-          <img src={registerImage} alt="register-image" />
-        </Box> */}
+        <Box></Box>
         {/* right side */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Box
+          sx={{
+            flex: "1",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "1em",
+            padding: "1em",
+            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+            borderRadius: "5px",
+          }}
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Box>
+            <Box sx={{ fontSize: "2em" }}>Sign up</Box>
+            <a href="#">Already have an account? Sign in!</a>
+          </Box>
           <Box
             sx={{
               display: "flex",
@@ -80,7 +106,9 @@ const RegisterPage: FC = () => {
                 })}
               />
               {errors.email && (
-                <Box sx={{ color: "#e53935", fontSize: ".9em"}}>{errors.email.message}</Box>
+                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>
+                  {errors.email.message}
+                </Box>
               )}
               <TextField
                 label="Password"
@@ -95,7 +123,9 @@ const RegisterPage: FC = () => {
                 })}
               />
               {errors.password && (
-                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>{errors.password.message}</Box>
+                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>
+                  {errors.password.message}
+                </Box>
               )}
               <TextField
                 label="Confirm password"
@@ -152,7 +182,9 @@ const RegisterPage: FC = () => {
                 })}
               />
               {errors.username && (
-                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>{errors.username.message}</Box>
+                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>
+                  {errors.username.message}
+                </Box>
               )}
               <TextField
                 label="First name"
@@ -171,7 +203,9 @@ const RegisterPage: FC = () => {
                 })}
               />
               {errors.firstName && (
-                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>{errors.firstName.message}</Box>
+                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>
+                  {errors.firstName.message}
+                </Box>
               )}
               <TextField
                 label="Last name"
@@ -190,23 +224,38 @@ const RegisterPage: FC = () => {
                 })}
               />
               {errors.lastName && (
-                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>{errors.lastName.message}</Box>
+                <Box sx={{ color: "#e53935", fontSize: ".9em" }}>
+                  {errors.lastName.message}
+                </Box>
               )}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
                   <Controller
                     name="birthdate"
                     control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                      <DatePicker
-                        label="Birthdate"
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={(date) =>
-                          field.onChange(date ? date.toISOString() : "")
-                        }
-                        slotProps={{ textField: { variant: "outlined" } }}
-                      />
+                    rules={{ required: "Birthdate is required." }} // Validation rule
+                    render={({ field, fieldState: { error } }) => (
+                      <Box display="flex" flexDirection="column">
+                        <DatePicker
+                          label="Birthdate"
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={(date) =>
+                            field.onChange(date ? date.toISOString() : "")
+                          }
+                          slotProps={{ textField: { variant: "outlined" } }}
+                        />
+                        {error && (
+                          <Box
+                            sx={{
+                              color: "#e53935",
+                              fontSize: ".9em",
+                              mt: "1em",
+                            }}
+                          >
+                            {error.message}
+                          </Box>
+                        )}
+                      </Box>
                     )}
                   />
                 </DemoContainer>
@@ -216,7 +265,10 @@ const RegisterPage: FC = () => {
           <Button variant="contained" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Loading..." : "Sign up"}
           </Button>
-        </form>
+          <Button variant="contained" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Loading..." : "Sign up with Google"}
+          </Button>
+        </Box>
       </Box>
     </Container>
   );
