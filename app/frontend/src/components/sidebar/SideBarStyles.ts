@@ -1,4 +1,5 @@
 export const SideBarStyles = {
+
   drawerContentBoxStyles: {
     display: "flex",
     flexDirection: "column",
@@ -36,7 +37,6 @@ export const SideBarStyles = {
     justifyContent: "flex-start",
     pr:0,
     height: 48,
-  },
+  }
 
-
-};
+}

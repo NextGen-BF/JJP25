@@ -88,7 +88,6 @@ export default function App() {
             <Route path="/dashboard/account" element={<AccountPage />} />
           </Routes>
         </Box>
-
         <Footer />
       </Box>
     </Router>
