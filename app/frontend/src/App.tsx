@@ -26,6 +26,7 @@ import { Box } from "@mui/material";
 import SideBar from "./components/sidebar/SideBar";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
+import { AppStyles } from "./AppStyles";
 
 export default function App() {
   const isSideBarOpen = useSelector((state: RootState) => state.sidebar.isOpen);
@@ -35,22 +36,11 @@ export default function App() {
       <CssBaseline />
       <Navbar />
       <SideBar />
-      <Box
-        sx={{ 
-          display: "flex", 
-          flexDirection: "column", 
-          minHeight: "100vh", 
-          overflowY: "hidden" }}
-      >
+      <Box sx={AppStyles.outerBoxStyles}>
         <Box
           sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            paddingTop: "60px",
+            ...AppStyles.routesBoxStyles,
             marginLeft: isSideBarOpen ? "260px" : "80px",
-            transition: "0.3s all",
-            zIndex: -1
           }}
         >
           <Routes>
@@ -85,7 +75,6 @@ export default function App() {
             <Route path="/dashboard/your-events-statistics" />
             <Route path="/dashboard/rsvp-creation" />
             <Route path="/dashboard/account" element={<AccountPage />} />
-          
           </Routes>
         </Box>
         <Footer />
