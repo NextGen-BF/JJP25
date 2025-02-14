@@ -34,9 +34,41 @@
     font-size: 20px;
     font-weight: 500;
     transition: color 0.3s ease;
+    padding: 5px;
   }
   
   .footer-link-hover {
     color: var(--blankfactor-sky-color);
+  }
+
+  .footer-nav-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  @media (max-width: 880px) {
+    .footer-container {
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .footer-logo {
+      height: 20px;
+    }
+  
+    .footer-nav {
+      display: flex;
+      flex-direction: row; 
+      align-items: center; 
+      gap: 15px; 
+      margin-top: 10px;
+    }
+
+    .footer-nav-group {
+      flex-direction: column;
+      align-items: center;
+    }
   }
   
