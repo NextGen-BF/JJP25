@@ -17,23 +17,43 @@ import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
 import CreateEventPage from "./pages/adminPages/CreateEventPage/CreateEventPage";
 import CreateEventSucessPage from "./pages/adminPages/CreateEventSucessPage/CreateEventSucessPage";
 import AccountPage from "./pages/adminPages/AccountPage/AccountPage";
+import CreateVenuePage from "./pages/adminPages/CreateVenuePage/CreateVenuePage";
+import CreateTicketPage from "./pages/adminPages/CreateTicketPage/CreateTicketPage";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.scss";
 import MockUserList from "./pages/MockUserList/MockUserList";
 import { Box } from "@mui/material";
-import RSVPCreatePage from "./pages/RSVPCreatePage/RSVPCreatePage";
-import { ToastContainer } from "react-toastify";
-import { AppStyles } from "./AppStyles";
+import SideBar from "./components/sidebar/SideBar";
+import { useSelector } from "react-redux";
+import { RootState } from "./redux/store";
+import RSVPCreatePage from './pages/RSVPCreatePage/RSVPCreatePage';
 
 export default function App() {
+  const isSideBarOpen = useSelector((state: RootState) => state.sidebar.isOpen);
+
   return (
     <Router>
       <CssBaseline />
-      <ToastContainer />
-      <Box sx={AppStyles.outerBoxStyles}>
-        <Navbar />
-
-        <Box sx={AppStyles.routesBoxStyles}>
+      <Navbar />
+      <SideBar />
+      <Box
+        sx={{ 
+          display: "flex", 
+          flexDirection: "column", 
+          minHeight: "100vh", 
+          overflowY: "hidden" }}
+      >
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            paddingTop: "60px",
+            marginLeft: isSideBarOpen ? "260px" : "80px",
+            transition: "0.3s all",
+            zIndex: -1
+          }}
+        >
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -47,8 +67,16 @@ export default function App() {
             <Route path="*" element={<Navigate to="/not-found" replace />} />
             // Admin routes
             <Route
-              path="/dashboard/event-creation"
+              path="/dashboard/event-creation/event"
               element={<CreateEventPage />}
+            />
+            <Route
+              path="/dashboard/event-creation/venue"
+              element={<CreateVenuePage />}
+            />
+            <Route
+              path="/dashboard/event-creation/ticket"
+              element={<CreateTicketPage />}
             />
             <Route
               path="/dashboard/event-creation/success"
@@ -56,7 +84,7 @@ export default function App() {
             />
             <Route path="/dashboard/your-events" />
             <Route path="/dashboard/your-events-statistics" />
-            <Route path="/dashboard/rsvp-creation" />
+            <Route path="/dashboard/rsvp-creation"  element={<RSVPCreatePage />} />
             <Route path="/dashboard/account" element={<AccountPage />} />
           </Routes>
         </Box>
