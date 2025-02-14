@@ -1,15 +1,27 @@
-import React from 'react';
-import { Stepper, Step, StepLabel, Button, Typography, Box, TextField } from '@mui/material';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useState, FC, Fragment } from "react";
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  Typography,
+  Box,
+  TextField,
+} from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { EventStepperStyles } from './EventStepperStyles';
-import { EventStepperConstants } from '../../constants/EventStepperConstants';
+import { EventStepperStyles } from "./EventStepperStyles";
+import { EventStepperConstants } from "../../constants/EventStepperConstants";
 
-const steps = [EventStepperConstants.EVENT_CREATION, EventStepperConstants.VENUE_CREATION, EventStepperConstants.TICKET_CREATION];
+const steps = [
+  EventStepperConstants.EVENT_CREATION,
+  EventStepperConstants.VENUE_CREATION,
+  EventStepperConstants.TICKET_CREATION,
+];
 
-const EventStepper: React.FC = () => {
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set<number>());
+const EventStepper: FC = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set<number>());
 
   const isStepOptional = (step: number) => step === 1;
 
@@ -78,13 +90,16 @@ const EventStepper: React.FC = () => {
   return (
     <Box sx={EventStepperStyles.stepperContainer}>
       <Stepper activeStep={activeStep} sx={EventStepperStyles.stepper}>
-
         {steps.map((label, index) => {
           const stepProps: { completed?: boolean } = {};
-          const labelProps: { optional?: React.ReactNode; } = {};
+          const labelProps: { optional?: React.ReactNode } = {};
 
           if (isStepOptional(index)) {
-            labelProps.optional = <Typography variant="caption">{EventStepperConstants.OPTIONAL_STEP}</Typography>;
+            labelProps.optional = (
+              <Typography variant="caption">
+                {EventStepperConstants.OPTIONAL_STEP}
+              </Typography>
+            );
           }
           if (isStepSkipped(index)) {
             stepProps.completed = false;
@@ -106,40 +121,54 @@ const EventStepper: React.FC = () => {
         })}
       </Stepper>
       {activeStep === steps.length ? (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>{EventStepperConstants.ALL_STEPS_COMPLETED}</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button sx={EventStepperStyles.stepButton} onClick={handleReset}>{EventStepperConstants.RESET_STEPS}</Button>
+        <>
+          <Typography sx={{ mt: 2, mb: 1 }}>
+            {EventStepperConstants.ALL_STEPS_COMPLETED}
+          </Typography>
+          <Box sx={EventStepperStyles.defaultBoxStyling}>
+            <Box sx={{ flex: "1 1 auto" }} />
+            <Button sx={EventStepperStyles.stepButton} onClick={handleReset}>
+              {EventStepperConstants.RESET_STEPS}
+            </Button>
           </Box>
-        </React.Fragment>
+        </>
       ) : (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>{EventStepperConstants.CURR_STEP} {activeStep + 1}</Typography>
+        <>
+          <Typography sx={{ mt: 2, mb: 1 }}>
+            {EventStepperConstants.CURR_STEP} {activeStep + 1}
+          </Typography>
           {/* Box for form and buttons for navigation of the stepper */}
           <Box sx={{ mt: 2 }}>
-          {renderStepForm()}
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1, display: 'flex', alignItems: 'center' }}
-            >
-              <ArrowBackIosIcon sx={EventStepperStyles.arrowBackIos(activeStep === 0)} fontSize="small" />
-            </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            {isStepOptional(activeStep) && (
-              <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                Skip
+            {renderStepForm()}
+            <Box sx={EventStepperStyles.defaultBoxStyling}>
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+              >
+                <ArrowBackIosIcon
+                  sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
+                  fontSize="small"
+                />
               </Button>
-            )}
-            <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
-              {activeStep === steps.length - 1 ? EventStepperConstants.FINISH_STEP : <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />}
-            </Button>
+              <Box sx={{ flex: "1 1 auto" }} />
+              {isStepOptional(activeStep) && (
+                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+                  Skip
+                </Button>
+              )}
+              <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
+                {activeStep === steps.length - 1 ? (
+                  EventStepperConstants.FINISH_STEP
+                ) : (
+                  <ArrowForwardIosIcon
+                    sx={EventStepperStyles.arrowForwardIos}
+                  />
+                )}
+              </Button>
             </Box>
           </Box>
-        </React.Fragment>
+        </>
       )}
     </Box>
   );
