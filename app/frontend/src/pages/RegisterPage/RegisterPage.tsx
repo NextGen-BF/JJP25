@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   FormControl,
   FormControlLabel,
@@ -13,8 +14,27 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { SubmitHandler, useForm, Controller } from "react-hook-form";
+import dayjs from "dayjs";
+
+type FormFields = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  birthdate: string;
+};
 
 const RegisterPage: FC = () => {
+  const { register, handleSubmit, control } = useForm<FormFields>();
+
+  const onSubmit: SubmitHandler<FormFields> = (data) => {
+    console.log(data);
+  };
+
   return (
     <Container>
       <Box>
@@ -23,72 +43,104 @@ const RegisterPage: FC = () => {
           <img src={registerImage} alt="register-image" />
         </Box> */}
         {/* right side */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "1em",
-          }}
-        >
-          {/* left side */}
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              gap: "1em",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: "2em",
             }}
           >
-            <TextField label="Email" variant="outlined" />
-            <TextField label="Password" variant="outlined" />
-            <TextField label="Confirm password" variant="outlined" />
-            <FormControl>
-              <FormLabel>Role</FormLabel>
-              <RadioGroup defaultValue="attendee" name="radio-buttons-group">
-                <FormControlLabel
-                  value="organiser"
-                  control={<Radio />}
-                  label="Organiser"
-                />
-                <FormControlLabel
-                  value="attendee"
-                  control={<Radio />}
-                  label="Attendee"
-                />
-              </RadioGroup>
-            </FormControl>
+            {/* left side */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1em",
+              }}
+            >
+              <TextField
+                label="Email"
+                variant="outlined"
+                {...register("email")}
+              />
+              <TextField
+                label="Password"
+                variant="outlined"
+                {...register("password")}
+              />
+              <TextField
+                label="Confirm password"
+                variant="outlined"
+                {...register("confirmPassword")}
+              />
+              <FormControl>
+                <FormLabel>Role</FormLabel>
+                <RadioGroup defaultValue="attendee" name="radio-buttons-group">
+                  <FormControlLabel
+                    value="organiser"
+                    control={<Radio />}
+                    label="Organiser"
+                    {...register("role")}
+                  />
+                  <FormControlLabel
+                    value="attendee"
+                    control={<Radio />}
+                    label="Attendee"
+                    {...register("role")}
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Box>
+            {/* right side */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1em",
+              }}
+            >
+              <TextField
+                label="Username"
+                variant="outlined"
+                {...register("username")}
+              />
+              <TextField
+                label="First name"
+                variant="outlined"
+                {...register("firstName")}
+              />
+              <TextField
+                label="Last name"
+                variant="outlined"
+                {...register("lastName")}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={["DatePicker"]}>
+                  <Controller
+                    name="birthdate"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <DatePicker
+                        label="Birthdate"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(date) =>
+                          field.onChange(date ? date.toISOString() : "")
+                        }
+                        slotProps={{ textField: { variant: "outlined" } }}
+                      />
+                    )}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            </Box>
           </Box>
-          {/* right side */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1em",
-            }}
-          >
-            <TextField
-              id="outlined-basic"
-              label="Username"
-              variant="outlined"
-            />
-            <TextField
-              id="outlined-basic"
-              label="First name"
-              variant="outlined"
-            />
-            <TextField
-              id="outlined-basic"
-              label="Last name"
-              variant="outlined"
-            />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker label="Birthdate" />
-              </DemoContainer>
-            </LocalizationProvider>
-          </Box>
-        </Box>
+          <Button variant="contained" type="submit">
+            Sign up
+          </Button>
+        </form>
       </Box>
     </Container>
   );
