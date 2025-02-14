@@ -14,7 +14,10 @@ interface MultiDatePickerProps {
   setSelectedDates: (dates: Dayjs[]) => void;
 }
 
-const MultiDatePicker: React.FC<MultiDatePickerProps> = ({ selectedDates, setSelectedDates }) => {
+const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
+  selectedDates,
+  setSelectedDates,
+}) => {
   const handleAddDate = (newDate: Dayjs | null) => {
     if (newDate && !selectedDates.some((date) => date.isSame(newDate, "day"))) {
       setSelectedDates([...selectedDates, newDate]);
@@ -22,25 +25,34 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({ selectedDates, setSel
   };
 
   const handleRemoveDate = (dateToRemove: Dayjs) => {
-    setSelectedDates(selectedDates.filter((date) => !date.isSame(dateToRemove, "day")));
+    setSelectedDates(
+      selectedDates.filter((date) => !date.isSame(dateToRemove, "day"))
+    );
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ ...MultiDatePickerStyles.boxWrapper }}>
         <Stack spacing={2}>
-          <DatePicker 
+          <DatePicker
             label={MultiDatePickerConstants.SELECT_DATES}
             onChange={handleAddDate}
             minDate={dayjs()}
-            maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, 'year')}
-            sx={{ ...MultiDatePickerStyles.calendarIcon, ...MultiDatePickerStyles.calendarPicker }} 
+            maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, "year")}
+            sx={{
+              ...MultiDatePickerStyles.calendarIcon,
+              ...MultiDatePickerStyles.calendarPicker,
+            }}
           />
 
-          <Stack direction="row" spacing={1} flexWrap="wrap"
-          sx = {MultiDatePickerStyles.stackWrapper}>
+          <Stack
+            direction="row"
+            spacing={1}
+            flexWrap="wrap"
+            sx={MultiDatePickerStyles.stackWrapper}
+          >
             {selectedDates
-              .sort((a, b) => a.isBefore(b) ? -1 : 1)
+              .sort((a, b) => (a.isBefore(b) ? -1 : 1))
               .map((date, index) => (
                 <Chip
                   key={index}

@@ -19,7 +19,7 @@ export const EventFormStyles = {
       display: "flex",
       flexDirection: "row",
       maxWidth: "80%",
-      maxHeight: "75%",
+      maxHeight: "80%",
     },
   },
 
@@ -34,46 +34,47 @@ export const EventFormStyles = {
   },
 
   leftBox: {
-    flex: "0 1 50%",
+    flex: "0 1 45%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    maxWidth: "50%",
+    maxWidth: "45%",
     maxHeight: "100%",
     margin: "20px",
     gap: "16px",
     height: "100%",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 50%",
-      maxHeight: "50%",
-      margin: "10px",
+      flex: "0 1 45%",
+      maxHeight: "45%",
+      margin: "16px",
       maxWidth: "100%",
-      padding: "10px",
       width: "100%",
       gap: "10px",
     },
   },
 
   rightBox: {
-    flex: "0 1 30%",
+    flex: "0 1 35%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    maxWidth: "30%",
+    maxWidth: "35%",
     maxHeight: "100%",
     margin: "20px",
     gap: "24px",
     height: "100%",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 40%",
-      maxHeight: "40%",
+      flex: "0 1 45%",
+      maxHeight: "45%",
       gap: "10px",
       maxWidth: "100%",
       width: "100%",
     },
   },
+
+  eventDatesBox: {},
 
   selectorsBox: {
     display: "flex",

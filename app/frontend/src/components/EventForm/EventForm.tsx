@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Box, Typography, Button, Grid, useMediaQuery } from "@mui/material";
+import { Box, Typography, Button, useMediaQuery } from "@mui/material";
 import { EventFormStyles } from "./EventFormStyles";
 import "./EventFormStyles.scss";
 import FormSelect from "../FormSelect/FormSelect";
 import FormInput from "../FormInput/FormInput";
 import { EventFormConstants } from "../../constants/EventFormConstants";
 import FormAutoComplete from "../FormAutoComplete/FormAutoComplete";
+import { Dayjs } from "dayjs";
+import MultiDatePicker from "../MultiDatePicker/MultiDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // This will be moved in the Stepper/Page in final functionality
-import { toast } from "react-toastify"; // Import toast
-import "react-toastify/dist/ReactToastify.css"; // Import the CSS for toast
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const EventForm: React.FC = () => {
   const {
     control,
@@ -19,6 +22,8 @@ const EventForm: React.FC = () => {
   } = useForm({
     mode: "onChange",
   });
+
+  const [selectedDates, setSelectedDates] = useState<Dayjs[]>([]);
 
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -105,9 +110,14 @@ const EventForm: React.FC = () => {
             </Box>
 
             <Box sx={EventFormStyles.rightBox}>
-              <Box sx={{ mb: 4 }}>
+              <Box sx={EventFormStyles.eventDatesBox}>
                 <Typography variant="h6">Event Dates</Typography>
-                {/* <MultiDateCalendar /> */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <MultiDatePicker
+                    selectedDates={selectedDates}
+                    setSelectedDates={setSelectedDates}
+                  />
+                </LocalizationProvider>
               </Box>
 
               <Box sx={EventFormStyles.selectorsBox}>
@@ -212,9 +222,14 @@ const EventForm: React.FC = () => {
             </Box>
 
             <Box sx={EventFormStyles.rightBox}>
-              <Box sx={{ mb: 4 }}>
+              <Box sx={EventFormStyles.eventDatesBox}>
                 <Typography variant="h6">Event Dates</Typography>
-                {/* <MultiDateCalendar /> */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <MultiDatePicker
+                    selectedDates={selectedDates}
+                    setSelectedDates={setSelectedDates}
+                  />
+                </LocalizationProvider>
               </Box>
 
               <Box sx={EventFormStyles.selectorsBox}>
