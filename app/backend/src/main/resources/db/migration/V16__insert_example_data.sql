@@ -1,9 +1,9 @@
-INSERT INTO users (created_at, phone, profile_pic, type, updated_at, username) VALUES
-(NOW(), '1234567890', 'pic1.jpg', 'ATTENDEE', NOW(), 'john_doe'),
-(NOW(), '9876543210', 'pic2.jpg', 'ORGANISER', NOW(), 'jane_smith'),
-(NOW(), '5551234567', NULL, 'ATTENDEE', NOW(), 'michael_lee'),
-(NOW(), '4449871234', 'pic4.png', 'ORGANISER', NOW(), 'sarah_wilson'),
-(NOW(), '3332221111', NULL, 'ATTENDEE', NOW(), 'david_clark');
+INSERT INTO users (created_at, phone, profile_picture, type, updated_at) VALUES
+(NOW(), '1234567890', 'pic1.jpg', 'ATTENDEE', NOW()),
+(NOW(), '9876543210', 'pic2.jpg', 'ORGANISER', NOW()),
+(NOW(), '5551234567', NULL, 'ATTENDEE', NOW()),
+(NOW(), '4449871234', 'pic4.png', 'ORGANISER', NOW()),
+(NOW(), '3332221111', NULL, 'ATTENDEE', NOW());
 
 INSERT INTO events (age_restriction, category, charity_iban, created_at, description, status, title, updated_at, admin_id) VALUES
 (18, 'CONCERT', 'GB33BUKB20201555555555', NOW(), 'An electrifying rock concert.', 'INCOMING', 'Rock Fest 2025', NOW(), 1),
@@ -12,12 +12,12 @@ INSERT INTO events (age_restriction, category, charity_iban, created_at, descrip
 (21, 'COMEDY_SHOW', 'DE89370400440532013000', NOW(), 'Stand-up comedy night featuring top comedians.', 'INCOMING', 'Laugh Out Loud', NOW(), 4),
 (NULL, 'WORKSHOP', NULL, NOW(), 'Hands-on digital marketing workshop.', 'CANCELLED', 'Marketing Mastery', NOW(), 5);
 
-INSERT INTO venues (country, city, address, name) VALUES
-('USA', 'New York', '123 Broadway Ave', 'Madison Square Garden'),
-('UK', 'London', '50 Oxford St', 'O2 Arena'),
-('Germany', 'Berlin', '12 Alexanderplatz', 'Mercedes-Benz Arena'),
-('France', 'Paris', '5 Champs-Élysées', 'Accor Arena'),
-('Australia', 'Sydney', '1 Harbour St', 'Sydney Opera House');
+INSERT INTO venues (country, city, address, name, phone, website) VALUES
+('USA', 'New York', '123 Broadway Ave', 'Madison Square Garden', '0482847593', 'https://website5.com'),
+('UK', 'London', '50 Oxford St', 'O2 Arena', '8593018593', 'https://website4.com'),
+('Germany', 'Berlin', '12 Alexanderplatz', 'Mercedes-Benz Arena', '8502948173', 'https://website3.com'),
+('France', 'Paris', '5 Champs-Élysées', 'Accor Arena', '3758371649', 'https://website2.com'),
+('Australia', 'Sydney', '1 Harbour St', 'Sydney Opera House', '4716285031', 'https://website1.com');
 
 INSERT INTO ticket_templates (available_quantity, description, event_date, price, ticket_type, total_quantity, venue_type, event_id) VALUES
 (200, 'General admission ticket for Rock Fest 2025.', '2025-06-15 18:00:00.000000', 49.99, 'GENERAL_ADMISSION', 500, 'STADIUM', 1),
@@ -47,12 +47,12 @@ INSERT INTO rsvp_invitations (expiration_date, sent_at, status, event_id, receiv
 (DATE_ADD(NOW(), INTERVAL 3 DAY), NOW(), 'SENT', 4, 5, 4),
 (DATE_ADD(NOW(), INTERVAL 14 DAY), NOW(), 'ACCEPTED', 5, 1, 5);
 
-INSERT INTO payments (amount, created_at, currency, external_id, is_disputed, payment_processor, payment_provider, payment_status, updated_at, user_id) VALUES
-(49.99, NOW(), 'USD', 'txn_001', 0, 'STRIPE', 'APPLE_PAY', 'COMPLETED', NOW(), 1),
-(19.99, NOW(), 'EUR', 'txn_002', 0, 'STRIPE', 'GOOGLE_PAY', 'PENDING', NULL, 2),
-(99.99, NOW(), 'GBP', 'txn_003', 1, 'STRIPE', 'REVOLUT', 'COMPLETED', NOW(), 3),
-(14.99, NOW(), 'USD', 'txn_004', 0, 'STRIPE', 'APPLE_PAY', 'FAILED', NOW(), 4),
-(19.99, NOW(), 'EUR', 'txn_005', 0, 'STRIPE', 'GOOGLE_PAY', 'CANCELLED', NOW(), 5);
+INSERT INTO payments (amount, created_at, currency, external_id, is_disputed, payment_processor, payment_provider, payment_status, updated_at, receiver_id, sender_id) VALUES
+(49.99, NOW(), 'USD', 'txn_001', 0, 'STRIPE', 'APPLE_PAY', 'COMPLETED', NOW(), 1, 2),
+(19.99, NOW(), 'EUR', 'txn_002', 0, 'STRIPE', 'GOOGLE_PAY', 'PENDING', NULL, 2, 1),
+(99.99, NOW(), 'GBP', 'txn_003', 1, 'STRIPE', 'REVOLUT', 'COMPLETED', NOW(), 3, 4),
+(14.99, NOW(), 'USD', 'txn_004', 0, 'STRIPE', 'APPLE_PAY', 'FAILED', NOW(), 4, 3),
+(19.99, NOW(), 'EUR', 'txn_005', 0, 'STRIPE', 'GOOGLE_PAY', 'CANCELLED', NOW(), 5, 3);
 
 INSERT INTO payment_executions (action_type, created_at, description, error_code, external_payment_status, refund_expiration_date, refund_reason, refunded_amount, updated_at, payment_id, user_ticket_id) VALUES
 ('PAYMENT', NOW(), 'Initial ticket purchase.', NULL, 'SUCCESS', DATE_ADD(NOW(), INTERVAL 30 DAY), NULL, NULL, NOW(), 1, 1),
