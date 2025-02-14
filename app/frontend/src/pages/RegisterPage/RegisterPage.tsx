@@ -29,9 +29,15 @@ type FormFields = {
 };
 
 const RegisterPage: FC = () => {
-  const { register, handleSubmit, control } = useForm<FormFields>();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>();
 
-  const onSubmit: SubmitHandler<FormFields> = (data) => {
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log(data);
   };
 
@@ -63,17 +69,26 @@ const RegisterPage: FC = () => {
               <TextField
                 label="Email"
                 variant="outlined"
-                {...register("email")}
+                {...register("email", {
+                  required: true,
+                  pattern: /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)])/i
+                })}
               />
               <TextField
                 label="Password"
                 variant="outlined"
-                {...register("password")}
+                {...register("password", {
+                  required: true,
+                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/
+                })}
               />
               <TextField
                 label="Confirm password"
                 variant="outlined"
-                {...register("confirmPassword")}
+                {...register("confirmPassword", {
+                  required: true,
+                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/
+                })}
               />
               <FormControl>
                 <FormLabel>Role</FormLabel>
@@ -104,17 +119,28 @@ const RegisterPage: FC = () => {
               <TextField
                 label="Username"
                 variant="outlined"
-                {...register("username")}
+                {...register("username", {
+                  required: true,
+                  pattern: /^(?=[a-zA-Z]*[a-zA-Z]{4,})[a-zA-Z0-9_-]{4,25}$/
+                })}
               />
               <TextField
                 label="First name"
                 variant="outlined"
-                {...register("firstName")}
+                {...register("firstName", {
+                  required: true,
+                  minLength: 2,
+                  maxLength: 20
+                })}
               />
               <TextField
                 label="Last name"
                 variant="outlined"
-                {...register("lastName")}
+                {...register("lastName", {
+                  required: true,
+                  minLength: 2,
+                  maxLength: 20
+                })}
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
@@ -137,8 +163,8 @@ const RegisterPage: FC = () => {
               </LocalizationProvider>
             </Box>
           </Box>
-          <Button variant="contained" type="submit">
-            Sign up
+          <Button variant="contained" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Loading..." : "Sign up"}
           </Button>
         </form>
       </Box>
