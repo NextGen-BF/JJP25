@@ -23,8 +23,10 @@ export default function App() {
   return (
     <Router>
       <CssBaseline />
-    <Navbar />
-      <Box height={"100vh"}>
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh"}}>
+        <Navbar />
+
+        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" , paddingTop: "60px"}}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -48,8 +50,10 @@ export default function App() {
           <Route path="/dashboard/rsvp-creation"/>
           <Route path="/dashboard/account" element={<AccountPage />}/>
         </Routes>
-      </Box>
+        </Box>
+
       <Footer/>
+      </Box>
     </Router>
   );
 }
