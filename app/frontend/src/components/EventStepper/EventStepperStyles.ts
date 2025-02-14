@@ -4,13 +4,13 @@ export const EventStepperStyles = {
   stepper: {
     "& .MuiStepConnector-line": {
       borderTopWidth: "2px",
-      transition: "border-color 0.3s ease-in-out", // Smooth transition for color change
+      transition: "border-color 0.3s ease-in-out",
     },
     "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
-      borderColor: "#2b6aff",
+      borderColor: EventStepperConstants.ACTIVE_COLOR,
     },
     "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
-      borderColor: "#2b6aff",
+      borderColor: EventStepperConstants.ACTIVE_COLOR,
     },
   },
 
@@ -40,7 +40,9 @@ export const EventStepperStyles = {
   }),
 
   arrowBackIos: (disabled: boolean) => ({
-    color: disabled ? "#666" : EventStepperConstants.SECONDARY_COLOR, // Gray if disabled
+    color: disabled
+      ? EventStepperConstants.INACTIVE_COLOR
+      : EventStepperConstants.SECONDARY_COLOR,
     cursor: disabled ? "not-allowed" : "pointer",
     transition: "color 0.3s ease-in-out",
     fontSize: "2rem",
