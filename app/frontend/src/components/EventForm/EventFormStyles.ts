@@ -19,7 +19,7 @@ export const EventFormStyles = {
       display: "flex",
       flexDirection: "row",
       maxWidth: "80%",
-      maxHeight: "80%",
+      maxHeight: "90%",
     },
   },
 
@@ -68,7 +68,7 @@ export const EventFormStyles = {
     "@media (max-width: 768px)": {
       flex: "0 1 45%",
       maxHeight: "45%",
-      gap: "10px",
+      gap: "32px",
       maxWidth: "100%",
       width: "100%",
     },
