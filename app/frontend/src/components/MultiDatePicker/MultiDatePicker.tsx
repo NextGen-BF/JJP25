@@ -45,6 +45,7 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
             }}
           />
 
+          {/* Should think about displaying of chips in the future */}
           <Stack
             direction="row"
             spacing={1}
