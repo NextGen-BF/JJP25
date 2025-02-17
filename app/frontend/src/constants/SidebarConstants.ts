@@ -30,7 +30,7 @@ export const sidebarItemsRSVPs: SidebarItem[] = [
   {
     icon: MailOutlineIcon,
     message: "Send RSVP",
-    linkTo: "/rsvp",
+    linkTo: "/dashboard/rsvp-creation",
   },
 ];
 
