@@ -36,7 +36,7 @@ export default function App() {
   return (
     <Router>
       <CssBaseline />
-      <Box sx={{ display: "flex", flexDirection: "column"}}>
+      <Box>
         <Box sx={AppStyles.outerBoxStyles}>
         <Navbar />
         <SideBar />
