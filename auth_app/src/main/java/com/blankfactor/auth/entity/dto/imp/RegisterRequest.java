@@ -36,11 +36,11 @@ public class RegisterRequest {
     private String username;
 
     @NotNull(message = "{firstName.required}")
-    @Size(min = 2, message = "{firstName.minLength}")
+    @Size(min = 2, max = 20, message = "{firstName.length}")
     private String firstName;
 
     @NotNull(message = "{lastName.required}")
-    @Size(min = 2, message = "{lastName.minLength}")
+    @Size(min = 2, max = 20, message = "{lastName.length}")
     private String lastName;
 
     @NotNull(message = "{birthDate.required}")
