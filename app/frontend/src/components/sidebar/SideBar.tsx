@@ -1,7 +1,6 @@
 import {
   Box,
   Drawer,
-  IconButton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -12,7 +11,12 @@ import { AppDispatch, RootState } from "../../redux/store";
 import { toggleSidebarStatus } from "../../redux/slices/sidebarSlice";
 import { SideSection } from "./SideSection";
 import { SideBarStyles } from "./SideBarStyles";
-import { sidebarItemsAccount, sidebarItemsEvents, sidebarItemsRSVPs } from "../../constants/SidebarConstants";
+import {
+  sidebarItemsAccount,
+  sidebarItemsEvents,
+  sidebarItemsRSVPs,
+} from "../../constants/SidebarConstants";
+import IconButtonComponent from "../IconButtonComponent/IconButtonComponent";
 
 export const SideBar: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,23 +24,22 @@ export const SideBar: FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const collapsedWidth = 80;
+  const collapsedWidth = isMobile ? 0 : 80;
   const expandedPCWidth = 240;
-  
+
   const expandedWidth = isMobile ? "100%" : expandedPCWidth;
-  
+
   const toggleDrawer = () => {
     dispatch(toggleSidebarStatus());
   };
 
   const DrawerContent = (
-    <Box
-      sx={SideBarStyles.drawerContentBoxStyles}
-    >
+    <Box sx={SideBarStyles.drawerContentBoxStyles}>
       <Box sx={SideBarStyles.drawerContentInnerBoxStyles}>
-        <IconButton onClick={toggleDrawer} sx={{ mr: 100 }}>
-          <ViewSidebarIcon />
-        </IconButton>
+        <IconButtonComponent
+          onClick={toggleDrawer}
+          icon={<ViewSidebarIcon />}
+        />
       </Box>
       <SideSection items={sidebarItemsEvents} title="Event" />
       <SideSection items={sidebarItemsRSVPs} title="RSVPs" />
@@ -45,18 +48,27 @@ export const SideBar: FC = () => {
   );
 
   return (
-    <Drawer
-      variant="permanent"
-      open={isOpen}
-      sx={{
-        "& .MuiDrawer-paper": {
-          width: isOpen ? expandedWidth : collapsedWidth,
-          ...SideBarStyles.drawerStyles
-        },
-      }}
-    >
-      {DrawerContent}
-    </Drawer>
+    <>
+      {isMobile && (
+        <IconButtonComponent
+          sx={SideBarStyles.iconButtonStyles}
+          onClick={toggleDrawer}
+          icon={<ViewSidebarIcon />}
+        />
+      )}
+      <Drawer
+        variant="permanent"
+        open={isOpen}
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: isOpen ? expandedWidth : collapsedWidth,
+            ...SideBarStyles.drawerStyles,
+          },
+        }}
+      >
+        {DrawerContent}
+      </Drawer>
+    </>
   );
 };
 

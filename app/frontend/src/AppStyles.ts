@@ -10,8 +10,8 @@ export const AppStyles = {
     flexGrow: 1,
     display: "flex",
     flexDirection: "column",
-    paddingTop: "60px",
+    justifyContent: "center",
+    paddingTop: "80px",
     transition: "0.3s all",
-    zIndex: -1
   }
 };
