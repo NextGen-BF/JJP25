@@ -22,7 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -53,20 +52,23 @@ public class AuthControllerUT {
     class RegisterTests {
 
         /* ---> TEST CASES <---
-        * 1.Successful registration
-        * 2.Email already in use
-        * 3.Username already in use
-        * 4.Passwords do not match
-        * 5.Blank values (ex. "email": "")
-        * 6.Plain object (ex. {}) */
+         * 1.Successful registration
+         * 2.Email already in use
+         * 3.Username already in use
+         * 4.Passwords do not match
+         * 5.Blank values (ex. "email": "")
+         * 6.Plain object (ex. {}) */
 
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponseForUser() throws Exception {
             // Given
             RegisterResponse registerResponse = new RegisterResponse(
-                    1L, "example@email.com", "hashed-password",
-                    "username", "firstName", "lastName", LocalDateTime.parse("2000-01-01T01:01:01"),
-                    false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"), Set.of("ROLE_USER"));
+                    "example@email.com",
+                    "username",
+                    "firstName",
+                    "lastName",
+                    false,
+                    Set.of("ROLE_USER"));
             String registerRequest = """
                             {
                                 "email": "example@email.com",
@@ -86,16 +88,11 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(1L))
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.password").value("hashed-password"))
                     .andExpect(jsonPath("$.username").value("username"))
                     .andExpect(jsonPath("$.firstName").value("firstName"))
                     .andExpect(jsonPath("$.lastName").value("lastName"))
-                    .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
                     .andExpect(jsonPath("$.enabled").value(false))
-                    .andExpect(jsonPath("$.verificationCode").value("123123"))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value("2000-01-01T01:15:01"))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(1)))
                     .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
@@ -105,9 +102,12 @@ public class AuthControllerUT {
         void shouldSuccessfullySendRequestAndReceiveResponseForAdmin() throws Exception {
             // Given
             RegisterResponse registerResponse = new RegisterResponse(
-                    1L, "example@email.com", "hashed-password",
-                    "username", "firstName", "lastName", LocalDateTime.parse("2000-01-01T01:01:01"),
-                    false, "123123", LocalDateTime.parse("2000-01-01T01:15:01"), Set.of("ROLE_USER", "ROLE_ADMIN"));
+                    "example@email.com",
+                    "username",
+                    "firstName",
+                    "lastName",
+                    false,
+                    Set.of("ROLE_USER", "ROLE_ADMIN"));
             String registerRequest = """
                             {
                                 "email": "example@email.com",
@@ -127,16 +127,11 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(1L))
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.password").value("hashed-password"))
                     .andExpect(jsonPath("$.username").value("username"))
                     .andExpect(jsonPath("$.firstName").value("firstName"))
                     .andExpect(jsonPath("$.lastName").value("lastName"))
-                    .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
                     .andExpect(jsonPath("$.enabled").value(false))
-                    .andExpect(jsonPath("$.verificationCode").value("123123"))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value("2000-01-01T01:15:01"))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(2)))
                     .andExpect(jsonPath("$.roles", containsInAnyOrder("ROLE_USER", "ROLE_ADMIN")));
@@ -305,11 +300,7 @@ public class AuthControllerUT {
                             "verificationCode": "123123"
                         }
                     """;
-            VerifyResponse verifyResponse = new VerifyResponse(
-                    "example@email.com",
-                    true,
-                    null,
-                    null);
+            VerifyResponse verifyResponse = new VerifyResponse("example@email.com", true);
 
             // When
             when(authService.verify(any(VerifyRequest.class))).thenReturn(verifyResponse);
@@ -318,9 +309,7 @@ public class AuthControllerUT {
                     // Then
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.enabled").value(true))
-                    .andExpect(jsonPath("$.verificationCode").value(nullValue()))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(nullValue()));
+                    .andExpect(jsonPath("$.enabled").value(true));
         }
 
         @Test
@@ -432,7 +421,7 @@ public class AuthControllerUT {
         void shouldSuccessfullyResendVerificationEmail() throws Exception {
             // Given
             String code = "123123";
-            String RESPONSE_TEXT = "Verification code resent successfully! New code: ";
+            String RESPONSE_TEXT = "Verification code resent successfully!";
             String to = "?email=example@email.com";
 
             // When
@@ -441,7 +430,7 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(content().string(RESPONSE_TEXT + code));
+                    .andExpect(content().string(RESPONSE_TEXT));
         }
 
         @Test

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,9 +16,5 @@ public class VerifyResponse implements Serializable {
     private String email;
 
     private Boolean enabled;
-
-    private String verificationCode;
-
-    private LocalDateTime verificationCodeExpiresAt;
 
 }

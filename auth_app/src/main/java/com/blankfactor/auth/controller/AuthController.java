@@ -40,7 +40,7 @@ public class AuthController {
         log.info("Resend verification code request received for email: {}", email);
         String newCode = this.authService.resend(email);
         log.info("Verification code {} resent successfully to email: {}", newCode, email);
-        return ResponseEntity.ok(String.format("Verification code resent successfully! New code: %s", newCode));
+        return ResponseEntity.ok("Verification code resent successfully!");
     }
 
 }

@@ -63,14 +63,10 @@ public class AuthServiceIT {
             // Then
             assertTrue(userRepository.findByEmail(registerRequest.getEmail()).isPresent());
             assertTrue(registerResponse.getEmail().equals(registerRequest.getEmail()));
-            assertTrue(registerResponse.getPassword().matches("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$"));
             assertTrue(registerResponse.getUsername().equals(registerRequest.getUsername()));
             assertTrue(registerResponse.getFirstName().equals(registerRequest.getFirstName()));
             assertTrue(registerResponse.getLastName().equals(registerRequest.getLastName()));
-            assertTrue(registerResponse.getBirthDate().isEqual(registerRequest.getBirthDate()));
             assertFalse(registerResponse.getEnabled());
-            assertNotNull(registerResponse.getVerificationCode());
-            assertNotNull(registerResponse.getVerificationCodeExpiresAt());
             assertNotNull(registerResponse.getRoles());
             assertTrue(registerResponse.getRoles().size() == 1);
             assertTrue(registerResponse.getRoles().contains("ROLE_USER"));
@@ -95,14 +91,10 @@ public class AuthServiceIT {
             // Then
             assertTrue(userRepository.findByEmail(registerRequest.getEmail()).isPresent());
             assertTrue(registerResponse.getEmail().equals(registerRequest.getEmail()));
-            assertTrue(registerResponse.getPassword().matches("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$"));
             assertTrue(registerResponse.getUsername().equals(registerRequest.getUsername()));
             assertTrue(registerResponse.getFirstName().equals(registerRequest.getFirstName()));
             assertTrue(registerResponse.getLastName().equals(registerRequest.getLastName()));
-            assertTrue(registerResponse.getBirthDate().isEqual(registerRequest.getBirthDate()));
             assertFalse(registerResponse.getEnabled());
-            assertNotNull(registerResponse.getVerificationCode());
-            assertNotNull(registerResponse.getVerificationCodeExpiresAt());
             assertNotNull(registerResponse.getRoles());
             assertTrue(registerResponse.getRoles().size() == 2);
             assertTrue(registerResponse.getRoles().contains("ROLE_USER"));
@@ -191,10 +183,9 @@ public class AuthServiceIT {
                     "Doe",
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
-            RegisterResponse registerResponse = authService.register(registerRequest);
-            VerifyRequest verifyRequest = new VerifyRequest(
-                    registerRequest.getEmail(),
-                    registerResponse.getVerificationCode());
+            authService.register(registerRequest);
+            String code = userRepository.findByEmail(registerRequest.getEmail()).get().getVerificationCode();
+            VerifyRequest verifyRequest = new VerifyRequest(registerRequest.getEmail(), code);
 
             // When
             VerifyResponse verifyResponse = authService.verify(verifyRequest);
@@ -202,17 +193,12 @@ public class AuthServiceIT {
             // Then
             assertTrue(verifyRequest.getEmail().equals(verifyResponse.getEmail()));
             assertTrue(verifyResponse.getEnabled());
-            assertNull(verifyResponse.getVerificationCode());
-            assertNull(verifyResponse.getVerificationCodeExpiresAt());
         }
 
         @Test
         void shouldThrowUserNotFoundExceptionWhenEmailIsNotFound() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest(
-                    "not_found@email.com",
-                    "000000"
-            );
+            VerifyRequest verifyRequest = new VerifyRequest("not_found@email.com", "000000");
 
             // When & Then
             UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () -> authService.verify(verifyRequest));
@@ -231,10 +217,9 @@ public class AuthServiceIT {
                     "Doe",
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
-            RegisterResponse registerResponse = authService.register(registerRequest);
-            VerifyRequest verifyRequest = new VerifyRequest(
-                    registerRequest.getEmail(),
-                    registerResponse.getVerificationCode());
+            authService.register(registerRequest);
+            String code = userRepository.findByEmail(registerRequest.getEmail()).get().getVerificationCode();
+            VerifyRequest verifyRequest = new VerifyRequest(registerRequest.getEmail(), code);
             authService.verify(verifyRequest);
 
             // When & Then
@@ -254,10 +239,8 @@ public class AuthServiceIT {
                     "Doe",
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
-            RegisterResponse registerResponse = authService.register(registerRequest);
-            VerifyRequest verifyRequest = new VerifyRequest(
-                    registerRequest.getEmail(),
-                    "000000");
+            authService.register(registerRequest);
+            VerifyRequest verifyRequest = new VerifyRequest(registerRequest.getEmail(), "000000");
 
             // When & Then
             IncorrectVerificationCodeException incorrectVerificationCodeException = assertThrows(IncorrectVerificationCodeException.class, () -> authService.verify(verifyRequest));
@@ -276,12 +259,11 @@ public class AuthServiceIT {
                     "Doe",
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
-            RegisterResponse registerResponse = authService.register(registerRequest);
-            VerifyRequest verifyRequest = new VerifyRequest(
-                    registerRequest.getEmail(),
-                    registerResponse.getVerificationCode());
+            authService.register(registerRequest);
             User user = userRepository.findByEmail(registerRequest.getEmail()).get();
-            user.setVerificationCodeExpiresAt(registerResponse.getVerificationCodeExpiresAt().minusMinutes(120));
+            String code = user.getVerificationCode();
+            VerifyRequest verifyRequest = new VerifyRequest(registerRequest.getEmail(), code);
+            user.setVerificationCodeExpiresAt(user.getVerificationCodeExpiresAt().minusMinutes(120));
             userRepository.saveAndFlush(user);
 
             // When & Then
@@ -305,12 +287,13 @@ public class AuthServiceIT {
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
             RegisterResponse registerResponse = authService.register(registerRequest);
+            String code = userRepository.findByEmail(registerRequest.getEmail()).get().getVerificationCode();
 
             // When
             String newCode = authService.resend(registerResponse.getEmail());
 
             // Then
-            assertFalse(registerResponse.getVerificationCode().equals(newCode));
+            assertFalse(code.equals(newCode));
             assertTrue(userRepository.findByEmail(registerRequest.getEmail()).get()
                     .getVerificationCode().equals(newCode));
         }
@@ -337,10 +320,11 @@ public class AuthServiceIT {
                     "Doe",
                     LocalDateTime.parse("2000-01-01T01:01:01"),
                     "attendee");
-            RegisterResponse registerResponse = authService.register(registerRequest);
+            authService.register(registerRequest);
+            String code = userRepository.findByEmail(registerRequest.getEmail()).get().getVerificationCode();
             VerifyRequest verifyRequest = new VerifyRequest(
                     registerRequest.getEmail(),
-                    registerResponse.getVerificationCode());
+                    code);
             authService.verify(verifyRequest);
 
             // When & Then
