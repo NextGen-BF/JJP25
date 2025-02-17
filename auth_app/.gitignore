@@ -33,3 +33,9 @@ build/
 .vscode/
 
 .env
+.mvn
+mvnw
+mvnw.cmd
+.gitattributes
+/logs
+*.log
