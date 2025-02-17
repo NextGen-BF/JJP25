@@ -12,17 +12,17 @@ export const sidebarItemsEvents: SidebarItem[] = [
   {
     icon: AddBoxIcon,
     message: "Create Event",
-    linkTo: "/create-event",
+    linkTo: "/dashboard/event-creation/event",
   },
   {
     icon: CalendarTodayOutlinedIcon,
     message: "Check Your Events",
-    linkTo: "/check-events",
+    linkTo: "/dashboard/your-events",
   },
   {
     icon: SignalCellularAltIcon,
     message: "Event Statistics",
-    linkTo: "/statistics",
+    linkTo: "/dashboard/your-events-statistics",
   },
 ];
 
@@ -38,6 +38,6 @@ export const sidebarItemsAccount: SidebarItem[] = [
   {
     icon: AttachMoneyIcon,
     message: "Check Account",
-    linkTo: "/account",
+    linkTo: "/dashboard/account",
   },
 ];
