@@ -1,11 +1,13 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
+import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
@@ -17,6 +19,9 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +46,15 @@ public class AuthService {
     private static final String EMAIL_SUBJECT = "Account Verification";
     private static final String EMAIL_NOT_SENT = "Failed to send verification email to %s";
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
+    private static final String USER_NOT_VERIFIED = "Account is not verified!";
+    private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
     private final ModelMapper modelMapper;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -68,6 +76,43 @@ public class AuthService {
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
         sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
+    }
+
+    public User login(LoginRequest input) {
+        if (input.getLoginIdentifier() == null || input.getLoginIdentifier().trim().isEmpty()) {
+            log.warn("Login identifier is null or empty");
+            throw new IllegalArgumentException("Login identifier cannot be null or empty");
+        }
+
+        log.debug("Attempting to log in user with identifier: {}", input.getLoginIdentifier());
+
+        User user = userRepository.findByEmailOrUsername(input.getLoginIdentifier())
+                .orElseThrow(() -> {
+                    log.warn("User not found with identifier: {}", input.getLoginIdentifier());
+                    return new InvalidCredentialsException(INVALID_CREDENTIALS);
+                });
+
+        if (!user.isEnabled()) {
+            log.warn("User account is not verified: {}", input.getLoginIdentifier());
+            throw new UserNotVerifiedException(USER_NOT_VERIFIED);
+        }
+
+        try {
+            log.debug("Authenticating user credentials for: {}", input.getLoginIdentifier());
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            input.getPassword()
+                    )
+            );
+            log.info("User authenticated successfully: {}", input.getLoginIdentifier());
+        } catch (BadCredentialsException e) {
+            log.warn("Invalid password for user: {}", input.getLoginIdentifier());
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
+        }
+
+        log.debug("Returning user details for: {}", input.getLoginIdentifier());
+        return user;
     }
 
     @Transactional

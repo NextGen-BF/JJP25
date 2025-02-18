@@ -1,5 +1,6 @@
-package com.blankfactor.auth.service;
+package com.blankfactor.auth.controller;
 
+import com.blankfactor.auth.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class JwtServiceTest {
+class JwtServiceUT {
 
     private JwtService jwtService;
     private SecretKey secretKey;

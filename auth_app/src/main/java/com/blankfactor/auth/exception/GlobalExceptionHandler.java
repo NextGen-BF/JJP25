@@ -5,7 +5,10 @@ import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeExcepti
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +28,12 @@ import java.util.stream.Collectors;
 @Log4j2
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({IncorrectVerificationCodeException.class, PasswordsDoNotMatchException.class})
+    @ExceptionHandler({
+            IncorrectVerificationCodeException.class,
+            PasswordsDoNotMatchException.class,
+            JwtException.class,
+            ExpiredJwtException.class,
+            IllegalArgumentException.class})
     public ResponseEntity<Map<String, String>> handleCustomExceptions(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -64,6 +72,18 @@ public class GlobalExceptionHandler {
                 ));
         log.error("Validation errors: {}", fieldErrorsMap);
         return new ResponseEntity<>(fieldErrorsMap, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotVerifiedException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotVerifiedException(UserNotVerifiedException ex){
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     private Map<String, String> getErrorsMap(String code, String title, String message) {
