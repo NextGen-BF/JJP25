@@ -1,10 +1,14 @@
 package com.blankfactor.auth.controller;
 
+import com.blankfactor.auth.entity.User;
+import com.blankfactor.auth.entity.dto.exp.LoginResponse;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
+import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.service.AuthService;
+import com.blankfactor.auth.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
@@ -41,6 +47,16 @@ public class AuthController {
         String newCode = this.authService.resend(email);
         log.info("Verification code {} resent successfully to email: {}", newCode, email);
         return ResponseEntity.ok("Verification code resent successfully!");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginRequest){
+        log.info("Authenticating user: {}", loginRequest.getLoginIdentifier());
+        User authenticatedUser = authService.login(loginRequest);
+        String jwtToken = jwtService.generateToken(authenticatedUser);
+        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        log.debug("Generated JWT token for user: {}", loginRequest.getLoginIdentifier());
+        return ResponseEntity.ok(loginResponse);
     }
 
 }
