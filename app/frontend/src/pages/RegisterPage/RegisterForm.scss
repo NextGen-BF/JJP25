@@ -1,0 +1,41 @@
+.form-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+.form-content-box {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2em;
+  padding: 1em;
+}
+
+.form-content-item-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.error-box {
+  color: var(--error-color);
+  font-size: 0.9em;
+}
+
+.or-box {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: 100%;
+}
+
+.or-hr {
+  flex: 1;
+  height: 0.1em;
+  background-color: var(--border-color);
+}
