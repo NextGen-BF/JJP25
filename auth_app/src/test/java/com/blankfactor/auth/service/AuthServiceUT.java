@@ -2,14 +2,17 @@ package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
+import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
 import com.blankfactor.auth.exception.custom.VerificationEmailNotSentException;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
+import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -20,6 +23,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thymeleaf.TemplateEngine;
 
@@ -47,6 +53,9 @@ public class AuthServiceUT {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     @InjectMocks
     private AuthService authService;
@@ -310,6 +319,140 @@ public class AuthServiceUT {
             assertTrue(user.getVerificationCodeExpiresAt().isAfter(LocalDateTime.now()));
             verify(userRepository).saveAndFlush(user);
             verify(emailService).sendVerificationEmail(eq(TEST_EMAIL), eq("Account Verification"), eq("Mocked Email Content"));
+        }
+    }
+
+    @Nested
+    class LoginTests {
+        @Test
+        void loginWithValidEmailReturnsUser() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier(TEST_EMAIL);
+            loginRequest.setPassword("password");
+
+            User user = User.builder()
+                    .id(1L)
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .password("encodedPassword")
+                    .enabled(true)
+                    .build();
+
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
+                    .thenReturn(Optional.of(user));
+
+            User result = authService.login(loginRequest);
+
+            assertNotNull(result);
+            assertEquals(user.getId(), result.getId());
+            assertEquals(user.getEmail(), result.getEmail());
+        }
+
+        @Test
+        void loginWithValidUsernameReturnsUser() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier(TEST_USERNAME);
+            loginRequest.setPassword("password");
+
+            User user = User.builder()
+                    .id(1L)
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .password("encodedPassword")
+                    .enabled(true)
+                    .build();
+
+            when(userRepository.findByEmailOrUsername(TEST_USERNAME))
+                    .thenReturn(Optional.of(user));
+
+            User result = authService.login(loginRequest);
+
+            assertNotNull(result);
+            assertEquals(user.getId(), result.getId());
+            assertEquals(user.getEmail(), result.getEmail());
+        }
+
+        @Test
+        void loginWithNonExistentUserThrowsInvalidCredentialsException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier("nonexistent@example.com");
+            loginRequest.setPassword("password");
+
+            when(userRepository.findByEmailOrUsername("nonexistent@example.com"))
+                    .thenReturn(Optional.empty());
+
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(loginRequest));
+        }
+
+        @Test
+        void loginWithUnverifiedUserThrowsUserNotVerifiedException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier(TEST_EMAIL);
+            loginRequest.setPassword("password");
+
+            User user = User.builder()
+                    .id(2L)
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .password("encodedPassword")
+                    .enabled(false)
+                    .build();
+
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
+                    .thenReturn(Optional.of(user));
+
+            Exception exception = assertThrows(UserNotVerifiedException.class, () -> authService.login(loginRequest));
+            assertTrue(exception.getMessage().contains("Account is not verified"));
+        }
+
+        @Test
+        void loginWithInvalidCredentialsThrowsInvalidPasswordException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier(TEST_EMAIL);
+            loginRequest.setPassword("wrongPassword");
+
+            User user = User.builder()
+                    .id(3L)
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .password("encodedPassword")
+                    .enabled(true)
+                    .build();
+
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
+                    .thenReturn(Optional.of(user));
+
+            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                    .thenThrow(new BadCredentialsException("Bad credentials"));
+
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(loginRequest));
+        }
+
+        @Test
+        void loginWithNullIdentifierThrowsIllegalArgumentException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier(null);
+            loginRequest.setPassword("password");
+
+            assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
+        }
+
+        @Test
+        void loginWithEmptyIdentifierThrowsIllegalArgumentException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier("");
+            loginRequest.setPassword("password");
+
+            assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
+        }
+
+        @Test
+        void loginWithBlankIdentifierThrowsIllegalArgumentException() {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setLoginIdentifier("   ");
+            loginRequest.setPassword("password");
+
+            assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
         }
     }
 

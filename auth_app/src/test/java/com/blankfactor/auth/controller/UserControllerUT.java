@@ -1,8 +1,8 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.service.UserService;
 import com.blankfactor.auth.service.JwtService;
+import com.blankfactor.auth.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @WebMvcTest(controllers = UserController.class)
-public class UserControllerTest {
+public class UserControllerUT {
 
     @Autowired
     private MockMvc mockMvc;
