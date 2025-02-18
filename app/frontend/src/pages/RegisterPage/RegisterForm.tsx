@@ -40,6 +40,7 @@ const RegisterForm: FC = () => {
     control,
     formState: { errors, isSubmitting },
     watch,
+    setError
   } = useForm<FormFields>();
 
   const password = watch("password");
@@ -56,13 +57,28 @@ const RegisterForm: FC = () => {
       const response = await axios.post(url, data);
       console.log(response.data);
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error:", error.response?.data || error.message);
+      if (axios.isAxiosError(error) && error.response) {
+        const responseData = error.response.data;
+        if (error.response.status === 400 && typeof responseData === "object") {
+          Object.keys(responseData).forEach((field) => {
+            setError(field as keyof FormFields, {
+              type: "server",
+              message: responseData[field][0]
+            });
+          });
+        } else if (error.response.status === 409 && responseData?.message) {
+          if (responseData.message.includes("@")) {
+            setError("email", { type: "server", message: responseData.message });
+          } else {
+            setError("username", { type: "server", message: responseData.message });
+          } 
+        }
       } else {
         console.error("Unexpected error:", error);
       }
     }
   };
+  
 
   return (
     <Box
