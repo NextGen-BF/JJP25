@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
+import Navbar from "./components/Navbar";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/LoginPage/LoginPage";
 import HomePage from "./pages/HomePage/HomePage";
@@ -17,34 +17,23 @@ import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
 import CreateEventPage from "./pages/adminPages/CreateEventPage/CreateEventPage";
 import CreateEventSucessPage from "./pages/adminPages/CreateEventSucessPage/CreateEventSucessPage";
 import AccountPage from "./pages/adminPages/AccountPage/AccountPage";
-import CreateVenuePage from "./pages/adminPages/CreateVenuePage/CreateVenuePage";
-import CreateTicketPage from "./pages/adminPages/CreateTicketPage/CreateTicketPage";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.scss";
 import MockUserList from "./pages/MockUserList/MockUserList";
 import { Box } from "@mui/material";
 import RSVPCreatePage from "./pages/RSVPCreatePage/RSVPCreatePage";
-import EventForm from "./components/EventForm/EventForm";
 import { ToastContainer } from "react-toastify";
+import { AppStyles } from "./AppStyles";
 
 export default function App() {
   return (
     <Router>
       <CssBaseline />
       <ToastContainer />
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
+      <Box sx={AppStyles.outerBoxStyles}>
         <Navbar />
 
-        <Box
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            paddingTop: "60px",
-          }}
-        >
+        <Box sx={AppStyles.routesBoxStyles}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -58,16 +47,8 @@ export default function App() {
             <Route path="*" element={<Navigate to="/not-found" replace />} />
             // Admin routes
             <Route
-              path="/dashboard/event-creation/event"
+              path="/dashboard/event-creation"
               element={<CreateEventPage />}
-            />
-            <Route
-              path="/dashboard/event-creation/venue"
-              element={<CreateVenuePage />}
-            />
-            <Route
-              path="/dashboard/event-creation/ticket"
-              element={<CreateTicketPage />}
             />
             <Route
               path="/dashboard/event-creation/success"
@@ -79,7 +60,6 @@ export default function App() {
             <Route path="/dashboard/account" element={<AccountPage />} />
           </Routes>
         </Box>
-
         <Footer />
       </Box>
     </Router>

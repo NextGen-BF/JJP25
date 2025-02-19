@@ -77,14 +77,14 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
   };
 
   // Will be used when all the steps are created
-  const submitEventToBackend = async () => {
-    try {
-      console.log("Submitting event to backend:", event);
-      toast.success("Event submitted successfully!");
-    } catch (error) {
-      toast.error("Failed to submit event.");
-    }
-  };
+  // const submitEventToBackend = async () => {
+  //   try {
+  //     console.log("Submitting event to backend:", event);
+  //     toast.success("Event submitted successfully!");
+  //   } catch (error) {
+  //     toast.error("Failed to submit event.");
+  //   }
+  // };
 
   useImperativeHandle(ref, () => ({
     submitForm: async () => {
