@@ -15,6 +15,7 @@ import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +32,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +47,8 @@ public class AuthControllerUT {
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
     private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+    private static final String RESET_PASSWORD_ENDPOINT = "/api/v1/auth/reset-password";
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -589,6 +591,89 @@ public class AuthControllerUT {
                             .content(loginRequestJson))
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string(org.hamcrest.Matchers.containsString(errorMessage)));
+        }
+    }
+
+    @Nested
+    class ResetPasswordTests {
+
+        @Test
+        void shouldSuccessfullyResetPassword() throws Exception {
+            String requestBody = """
+                {
+                    "token": "validToken",
+                    "newPassword": "newPassword1!",
+                    "confirmPassword": "newPassword1!"
+                }
+                """;
+
+            doNothing().when(authService).resetPassword("validToken", "newPassword1!", "newPassword1!");
+            mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestBody))
+
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("Password has been reset successfully"));
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenPasswordsDoNotMatch() throws Exception {
+            String requestBody = """
+                {
+                    "token": "validToken",
+                    "newPassword": "newPassword1!",
+                    "confirmPassword": "differentPassword"
+                }
+                """;
+            String ERROR_MESSAGE = "Passwords do not match. Please try again.";
+
+            doThrow(new PasswordsDoNotMatchException(ERROR_MESSAGE)).when(authService).resetPassword("validToken", "newPassword1!", "differentPassword");
+            mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestBody))
+
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
+            String requestBody = """
+                {
+                    "token": "invalidToken",
+                    "newPassword": "newPassword1!",
+                    "confirmPassword": "newPassword1!"
+                }
+                """;
+            String ERROR_MESSAGE = "JWT token is expired or invalid";
+
+            doThrow(new ExpiredJwtException(null, null, ERROR_MESSAGE)).when(authService).resetPassword("invalidToken", "newPassword1!", "newPassword1!");
+            mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestBody))
+
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenUserIsNotFound() throws Exception {
+            String requestBody = """
+                {
+                    "token": "validToken",
+                    "newPassword": "newPassword1!",
+                    "confirmPassword": "newPassword1!"
+                }
+                """;
+            String ERROR_MESSAGE = "testuser is not found";
+
+            doThrow(new UserNotFoundException(ERROR_MESSAGE)).when(authService).resetPassword("validToken", "newPassword1!", "newPassword1!");
+            mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestBody))
+
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
     }
 

@@ -57,11 +57,17 @@ public class AuthServiceUT {
     @Mock
     private AuthenticationManager authenticationManager;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private AuthService authService;
 
     private static final String TEST_EMAIL = "test@example.com";
     private static final String TEST_USERNAME = "testuser";
+    private static final String VALID_TOKEN = "validToken";
+    private static final String NEW_PASSWORD = "newPassword1!";
+    private static final String DIFFERENT_PASSWORD = "differentPassword";
 
     @Nested
     class ValidateCredentialsTests {
@@ -454,6 +460,48 @@ public class AuthServiceUT {
 
             assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
         }
+    }
+
+    @Nested
+    class ResetPasswordTests {
+
+        @Test
+        void shouldSuccessfullyResetPassword() {
+            String token = VALID_TOKEN;
+            String newPassword = NEW_PASSWORD;
+            String username = TEST_USERNAME;
+            User user = new User();
+            user.setUsername(username);
+
+            when(jwtService.extractUsername(token)).thenReturn(username);
+            when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+            authService.resetPassword(token, newPassword, NEW_PASSWORD);
+
+            verify(passwordEncoder).encode(newPassword);
+            verify(userRepository).saveAndFlush(user);
+            assertEquals(passwordEncoder.encode(newPassword), user.getPassword());
+        }
+
+        @Test
+        void shouldThrowPasswordsDoNotMatchExceptionWhenPasswordsDoNotMatch() {
+
+            assertThrows(PasswordsDoNotMatchException.class,
+                    () -> authService.resetPassword(VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD));
+        }
+
+        @Test
+        void shouldThrowUserNotFoundExceptionWhenUserIsNotFound() {
+            String token = VALID_TOKEN;
+            String username = TEST_USERNAME;
+
+            when(jwtService.extractUsername(token)).thenReturn(username);
+            when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+            assertThrows(UserNotFoundException.class,
+                    () -> authService.resetPassword(token, NEW_PASSWORD, NEW_PASSWORD));
+        }
+
     }
 
 }
