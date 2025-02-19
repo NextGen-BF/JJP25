@@ -1,65 +1,30 @@
-import { createAsyncThunk } from "@reduxjs/toolkit"
-import dayjs, { Dayjs } from "dayjs";
-
-export enum EventCategory {
-    NOT_SELECTED = "Not Selected",
-    CONCERT = "Concert",
-    SPORT = "Sport",
-    SEMINAR = "Seminar",
-    THEATER = "Theater",
-    COMEDY_SHOW = "Comedy Show",
-    FILM_SCREENING = "Film Screening",
-    WORKSHOP = "Workshop",
-}
-
-export interface Event {
-    title: string;
-    description: string;
-    dates: Dayjs[];
-    venue?: string;
-    category: EventCategory;
-    ageRestriction?: number | null;
-}
-
-export interface EventState {
-    event: Event;
-    status: "idle" | "loading" | "succeeded" | "failed";
-    error: string | null;
-}
-
-export const initialState: EventState = {
-    event: {
-        title: "",
-        description: "",
-        dates: [],
-        venue: "",
-        category: EventCategory.NOT_SELECTED,
-        ageRestriction: null,
-      },
-      status: "idle",
-      error: null,
-}
+import axiosInstance from "../../api/axiosInstance";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { Event } from "../slices/eventSlice";
 
 // TODO:
-export const fetchVenues = createAsyncThunk("event/fetchVenues", async () => {
-    const response = await fetch("");
-
-    if(!response.ok) {
-
-    }
-});
-
-// TODO:
-export const submitEvent = createAsyncThunk("event/submitEvent", async (event: Event) => {
+export const submitEvent = createAsyncThunk(
+  "event/submitEvent",
+  async (event: Event, { rejectWithValue }) => {
     const formattedEvent = {
-        ...event,
-        dates: event.dates.map(date => date.toISOString()), // Convert Dayjs to string
+      ...event,
+      dates: event.dates.map((date) => date.toISOString()),
     };
 
     try {
-        const response = await fetch("");
-    } catch (error: unknown) {
+      const response = await axiosInstance.post("/events", formattedEvent, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+      return response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong";
+      return rejectWithValue(errorMessage);
     }
-}
-)
+  }
+);

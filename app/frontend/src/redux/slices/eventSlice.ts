@@ -1,36 +1,89 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { initialState, fetchVenues , submitEvent , Event } from "../services/eventService";
+import { Dayjs } from "dayjs";
+import { submitEvent } from "../services/eventService";
+
+export enum EventCategory {
+  CONCERT = "Concert",
+  SPORT = "Sport",
+  SEMINAR = "Seminar",
+  THEATER = "Theater",
+  COMEDY_SHOW = "Comedy Show",
+  FILM_SCREENING = "Film Screening",
+  WORKSHOP = "Workshop",
+}
+
+export enum AgeRestriction {
+  ALL_AGES = "All Ages",
+  EIGHTEEN_PLUS = "18+",
+  TWENTY_ONE_PLUS = "21+",
+}
+
+export interface Event {
+  title: string;
+  description: string;
+  dates: Dayjs[];
+  venueTitle?: string;
+  category?: EventCategory;
+  ageRestriction?: AgeRestriction;
+}
+
+export interface EventState {
+  event: Event;
+  isNewEvent: boolean;
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+export const initialState: EventState = {
+  event: {
+    title: "",
+    description: "",
+    dates: [],
+    venueTitle: "",
+    category: undefined,
+    ageRestriction: AgeRestriction.ALL_AGES,
+  },
+  isNewEvent: true,
+  status: "idle",
+  error: null,
+};
 
 const eventSlice = createSlice({
-    name: "event",
-    initialState,
-    reducers: {
-        updateEvent: (state, action: PayloadAction<Partial<Event>>) => {
-            state.event = { ...state.event, ...action.payload };
-        },
-
-        resetEvent: (state) => {
-            state.event = initialState.event;
-            state.status = "idle";
-            state.error = null;
-        }
+  name: "event",
+  initialState,
+  reducers: {
+    updateEvent: (state, action: PayloadAction<Partial<Event>>) => {
+      state.event = Object.assign({}, state.event, action.payload);
     },
 
-    // TODO:
-    extraReducers: (builder) => {
-        // Fetch venues logic
-        builder
-            .addCase(fetchVenues.pending, (state) => {
-                state.status = "loading";
-            });
-
-        // Submit event logic
-        builder
-            .addCase(submitEvent.pending, (state) => {
-                state.status = "loading";
-            });
+    createEvent: (state, action: PayloadAction<Event>) => {
+      state.event = action.payload;
+      state.isNewEvent = false;
     },
-})
 
-export const { updateEvent, resetEvent } = eventSlice.actions;
+    resetEvent: (state) => {
+      state.event = initialState.event;
+      state.isNewEvent = true;
+      state.status = "idle";
+      state.error = null;
+    },
+  },
+
+  // TODO:
+  extraReducers: (builder) => {
+    builder
+      .addCase(submitEvent.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(submitEvent.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(submitEvent.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      });
+  },
+});
+
+export const { updateEvent, createEvent, resetEvent } = eventSlice.actions;
 export default eventSlice.reducer;
