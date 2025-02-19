@@ -8,24 +8,20 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import googleLogo from "../../assets/google-color.png";
 import { Link, useNavigate } from "react-router-dom";
 import "./RegisterForm.scss";
 import { validationErrors } from "./ValidationErrors";
 import { regex } from "./Regex";
-import { label } from "./Labels";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../redux/store";
-import { RootState } from "../../redux/store";
-import { registerUser } from "../../redux/services/authService";
-import { resetState } from "../../redux/slices/authSlice";
+import { label } from "./Labels"
+import axios from "axios";
 
 type FormFields = {
   email: string;
@@ -43,27 +39,49 @@ const RegisterForm: FC = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+    setError,
     getValues,
   } = useForm<FormFields>();
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, success } = useSelector(
-    (state: RootState) => state.auth
-  );
-
+  // TODO
+  const url = import.meta.env.VITE_SIGN_UP_URL;
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    dispatch(registerUser(data));
-  };
-
-  useEffect(() => {
-    if (success) {
-      navigate("/verify");
-      dispatch(resetState());
+    try {
+      const response = await axios.post(url, data);
+      if (response.status === 200) {
+        navigate("/verify");
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        const responseData = error.response.data;
+        if (error.response.status === 400 && typeof responseData === "object") {
+          Object.keys(responseData).forEach((field) => {
+            setError(field as keyof FormFields, {
+              type: "server",
+              message: responseData[field][0],
+            });
+          });
+        } else if (error.response.status === 409 && responseData?.message) {
+          if (responseData.message.includes("@")) {
+            setError("email", {
+              type: "server",
+              message: responseData.message,
+            });
+          } else {
+            setError("username", {
+              type: "server",
+              message: responseData.message,
+            });
+          }
+        }
+      } else {
+        console.error("Unexpected error:", error);
+      }
     }
-  }, [success, navigate, dispatch]);
+  };
 
   return (
     <Box
@@ -231,9 +249,9 @@ const RegisterForm: FC = () => {
         }}
         variant="contained"
         type="submit"
-        disabled={loading}
+        disabled={isSubmitting}
       >
-        {loading ? label.loading : label.singUp}
+        {isSubmitting ? label.loading : label.singUp}
       </Button>
       <Box className="or-box">
         <Box className="or-hr" />
