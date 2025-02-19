@@ -1,9 +1,17 @@
-import { FC } from 'react'
+import { Box, Container } from "@mui/material";
+import { FC } from "react";
+import "./RegisterPage.scss";
+import RegisterForm from "./RegisterForm";
 
-const RegisterPage : FC = () => {
+const RegisterPage: FC = () => {
   return (
-    <div>RegisterPage</div>
-  )
-}
+    <Container className="register-container">
+      <Box className="register-box">
+        <Box className="image-box" />
+        <RegisterForm />
+      </Box>
+    </Container>
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;
