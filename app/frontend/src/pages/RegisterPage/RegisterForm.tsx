@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  FormControl,
   FormControlLabel,
   FormLabel,
   Radio,
@@ -17,7 +16,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import googleLogo from "../../assets/google-color.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./RegisterForm.scss";
 import { validationErrors } from "./ValidationErrors";
 import axios from "axios";
@@ -39,11 +38,11 @@ const RegisterForm: FC = () => {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-    watch,
-    setError
+    setError,
+    getValues,
   } = useForm<FormFields>();
 
-  const password = watch("password");
+  const navigate = useNavigate();
 
   const emailRegex =
     /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)])/i;
@@ -55,7 +54,9 @@ const RegisterForm: FC = () => {
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       const response = await axios.post(url, data);
-      console.log(response.data);
+      if (response.status === 200) {
+        navigate("/verify");
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         const responseData = error.response.data;
@@ -63,22 +64,27 @@ const RegisterForm: FC = () => {
           Object.keys(responseData).forEach((field) => {
             setError(field as keyof FormFields, {
               type: "server",
-              message: responseData[field][0]
+              message: responseData[field][0],
             });
           });
         } else if (error.response.status === 409 && responseData?.message) {
           if (responseData.message.includes("@")) {
-            setError("email", { type: "server", message: responseData.message });
+            setError("email", {
+              type: "server",
+              message: responseData.message,
+            });
           } else {
-            setError("username", { type: "server", message: responseData.message });
-          } 
+            setError("username", {
+              type: "server",
+              message: responseData.message,
+            });
+          }
         }
       } else {
         console.error("Unexpected error:", error);
       }
     }
   };
-  
 
   return (
     <Box
@@ -131,29 +137,33 @@ const RegisterForm: FC = () => {
             {...register("confirmPassword", {
               required: validationErrors.confirmPassword.required,
               validate: (value) =>
-                value == password || validationErrors.confirmPassword.mismatch,
+                value == getValues("password") ||
+                validationErrors.confirmPassword.mismatch,
             })}
           />
           {errors.confirmPassword && (
             <Box className="error-box">{errors.confirmPassword.message}</Box>
           )}
-          <FormControl>
-            <FormLabel>Role</FormLabel>
-            <RadioGroup defaultValue="attendee" name="radio-buttons-group">
-              <FormControlLabel
-                value="organiser"
-                control={<Radio />}
-                label="Organiser"
-                {...register("role")}
-              />
-              <FormControlLabel
-                value="attendee"
-                control={<Radio />}
-                label="Attendee"
-                {...register("role")}
-              />
-            </RadioGroup>
-          </FormControl>
+          <FormLabel>Role</FormLabel>
+          <Controller
+            name="role"
+            control={control}
+            defaultValue="attendee"
+            render={({ field }) => (
+              <RadioGroup {...field}>
+                <FormControlLabel
+                  value="organiser"
+                  control={<Radio />}
+                  label="Organiser"
+                />
+                <FormControlLabel
+                  value="attendee"
+                  control={<Radio />}
+                  label="Attendee"
+                />
+              </RadioGroup>
+            )}
+          />
         </Box>
         <Box className="form-content-item-box">
           <TextField
