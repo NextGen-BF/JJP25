@@ -20,6 +20,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./RegisterForm.scss";
 import { validationErrors } from "./ValidationErrors";
 import { regex } from "./Regex";
+import { label } from "./Labels"
 import axios from "axios";
 
 type FormFields = {
@@ -88,11 +89,11 @@ const RegisterForm: FC = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <Box sx={{ color: "var(--blankfactor-oxford-color)" }}>
-        <Box sx={{ fontSize: "2em" }}>Sign up</Box>
+        <Box sx={{ fontSize: "2em" }}>{label.singUp}</Box>
         <Box>
-          Already have an account?{" "}
+          {label.alreadyHaveAnAccount}
           <Link to="/login">
-            <strong>Sign in!</strong>
+            <strong>{label.signIn}</strong>
           </Link>
         </Box>
       </Box>
@@ -241,13 +242,13 @@ const RegisterForm: FC = () => {
       </Box>
       <Button
         sx={{
-          bgcolor: "#080731",
+          bgcolor: "var(--blankfactor-oxford-color)",
         }}
         variant="contained"
         type="submit"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Loading..." : "Sign up"}
+        {isSubmitting ? label.loading : label.singUp}
       </Button>
       <Box className="or-box">
         <Box className="or-hr" />
@@ -266,14 +267,14 @@ const RegisterForm: FC = () => {
           />
         }
         sx={{
-          backgroundColor: "white",
-          color: "black",
+          backgroundColor: "var(--white-color)",
+          color: "var(--black-color)",
           "&:hover": {
-            backgroundColor: "#f5f5f5",
+            backgroundColor: "var(--blankfactor-gray-3-color)",
           },
         }}
       >
-        Sign up with Google
+        {label.signUpWithGoogle}
       </Button>
     </Box>
   );
