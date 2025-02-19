@@ -1,8 +1,9 @@
-import { FC, useState, FormEvent, ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
-import './LoginPage.scss';
-import sideImage from '../../assets/side-image.png';     
-import gmailLogo from '../../assets/google-color.png';         
+import { FC, useState, FormEvent, ChangeEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import "./LoginPage.scss";
+import sideImage from "../../assets/side-image.png";
+import gmailLogo from "../../assets/google-color.png";
 
 interface FormValues {
   username: string;
@@ -21,11 +22,10 @@ const LoginPage: FC = () => {
     password: '',
     rememberMe: false,
   });
-
-  const [errors, setErrors] = useState<Errors>({
-    username: '',
-    password: '',
-  });
+  const [errors, setErrors] = useState<Errors>({ username: '', password: '' });
+  const [loginError, setLoginError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -35,7 +35,7 @@ const LoginPage: FC = () => {
     });
   };
 
-  const handleInputValidation = () => {
+  const validateForm = (): boolean => {
     let valid = true;
     const newErrors: Errors = { username: '', password: '' };
     if (!formValues.username) {
@@ -50,11 +50,30 @@ const LoginPage: FC = () => {
     return valid;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (handleInputValidation()) {
-      // Placeholder for login action
-      alert('Login successful (to be implemented)!');
+    setLoginError('');
+    if (!validateForm()) return;
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8081/api/v1/auth/login',
+        {
+          loginIdentifier: formValues.username,
+          password: formValues.password,
+        }
+      );
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+      navigate('/dashboard');
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err)
+        ? err.response?.data?.message
+        : null;
+    
+      setLoginError(errorMessage || 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,61 +90,70 @@ const LoginPage: FC = () => {
         </div>
 
         <div className="login-form-container">
-          <h1>Login</h1>
-          <form className="login-form" onSubmit={handleSubmit} noValidate>
-            <div className="form-group">
-              <label htmlFor="username">Email/Username</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formValues.username}
-                onChange={handleInputChange}
-                placeholder="Enter your email or username"
-              />
-              {errors.username && <span className="error">{errors.username}</span>}
+          <div className="login-form-top">
+            <h1>Login</h1>
+            <div className="error-container">
+              {loginError && <p className="error">{loginError}</p>}
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formValues.password}
-                onChange={handleInputChange}
-                placeholder="Enter your password"
-              />
-              {errors.password && <span className="error">{errors.password}</span>}
+            <form className="login-form" onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label htmlFor="username">Email/Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formValues.username}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email or username"
+                />
+                {errors.username && (
+                  <span className="error">{errors.username}</span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formValues.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter your password"
+                />
+                {errors.password && (
+                  <span className="error">{errors.password}</span>
+                )}
+              </div>
+              <div className="form-group remember-me">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  name="rememberMe"
+                  checked={formValues.rememberMe}
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="rememberMe">Remember Me</label>
+              </div>
+              <button type="submit" className="login-button" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+            <div className="or-separator">or</div>
+            <div className="gmail-login">
+              <button onClick={handleGmailLogin} className="gmail-button">
+                <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
+                <span>Login with Gmail</span>
+              </button>
             </div>
-            <div className="form-group remember-me">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                name="rememberMe"
-                checked={formValues.rememberMe}
-                onChange={handleInputChange}
-              />
-              <label htmlFor="rememberMe">Remember Me</label>
-            </div>
-            <button type="submit" className="login-button">
-              Login
-            </button>
-          </form>
-          <div className="or-separator">or</div>
-          <div className="gmail-login">
-            <button onClick={handleGmailLogin} className="gmail-button">
-              <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
-              <span>Login with Gmail</span>
-            </button>
           </div>
-
-          <p className="signup-prompt">
-            Don't have an account? <Link to="/register">Sign up!</Link>
-          </p>
+          <div className="login-form-bottom">
+            <p className="signup-prompt">
+              Don't have an account? <Link to="/register">Sign up!</Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
-
+  );  
+}  
 export default LoginPage;
