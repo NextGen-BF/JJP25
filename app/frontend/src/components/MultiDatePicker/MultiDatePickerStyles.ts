@@ -8,6 +8,18 @@ export const MultiDatePickerStyles = {
     margin: "0 auto",
   },
 
+  datePickerReset: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+
+  datePicker: {
+    width: "100%",
+    marginRight: "4px",
+  },
+
   calendarIcon: {
     "& .MuiSvgIcon-root": { color: "var(--blankfactor-ultramarine-color)" },
   },
@@ -30,8 +42,12 @@ export const MultiDatePickerStyles = {
     color: "white",
     fontWeight: "1000",
     marginBottom: "8px",
-    width: "calc(50% - 8px)",
+    width: "calc(33% - 8px)",
     marginRight: "8px",
-    marginLeft: "0",
+    marginLeft: "0px",
+
+    "@media (min-width: 768px) and (max-width:1150px)": {
+      width: "calc(50% - 8px)",
+    },
   },
 };

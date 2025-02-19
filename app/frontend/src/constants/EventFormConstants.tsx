@@ -1,9 +1,9 @@
 export const EventFormConstants = {
   NAMES: {
-    EVENT_TITLE: "eventTitle",
-    EVENT_DESCRIPTION: "eventDescription",
-    EVENT_DATES: "eventDates",
-    VENUE: "venue",
+    EVENT_TITLE: "title",
+    EVENT_DESCRIPTION: "description",
+    EVENT_DATES: "dates",
+    VENUE: "venueTitle",
     CATEGORY: "category",
     AGE_RESTRICTION: "ageRestriction",
   },
@@ -58,5 +58,6 @@ export const EventFormConstants = {
 
   TOAST_MESSAGES: {
     SUCCESS_EVENT_CREATION: "Event Created Successfully!",
+    SUCCESS_EVENT_UPDATE: "Event Updated Successfully!",
   },
 };

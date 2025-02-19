@@ -1,14 +1,12 @@
 export const EventFormStyles = {
   formContainer: {
     position: "relative",
-    top: "10vh",
     width: "90vw",
     height: "80vh",
     maxWidth: "1200px",
     maxHeight: "680px",
-    padding: "20px",
     backgroundColor: "#f5f5f7",
-    borderRadius: "10px",
+    borderRadius: "15px",
     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",
     display: "flex",
     flexDirection: "column",
@@ -18,8 +16,8 @@ export const EventFormStyles = {
       position: "absolute",
       display: "flex",
       flexDirection: "row",
-      maxWidth: "80%",
-      maxHeight: "90%",
+      maxWidth: "90%",
+      maxHeight: "77%",
     },
   },
 
@@ -48,7 +46,7 @@ export const EventFormStyles = {
       flex: "0 1 45%",
       maxHeight: "45%",
       margin: "16px",
-      maxWidth: "100%",
+      maxWidth: "90%",
       width: "100%",
       gap: "10px",
     },
@@ -69,7 +67,7 @@ export const EventFormStyles = {
       flex: "0 1 45%",
       maxHeight: "45%",
       gap: "32px",
-      maxWidth: "100%",
+      maxWidth: "90%",
       width: "100%",
     },
   },
@@ -85,14 +83,12 @@ export const EventFormStyles = {
   },
 
   backButton: {
-    flex: "0 1 10%",
+    flex: "0 1 5%",
     display: "flex",
-    justifyContent: "left",
   },
 
   nextButton: {
-    flex: "0 1 10%",
+    flex: "0 1 5%",
     display: "flex",
-    justifyContent: "right",
   },
 };

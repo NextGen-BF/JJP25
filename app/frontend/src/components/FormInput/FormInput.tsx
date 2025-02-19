@@ -3,6 +3,7 @@ import { Controller } from "react-hook-form";
 import { TextField, Typography } from "@mui/material";
 
 interface FormInputProps {
+  defaultValue: string;
   name: string;
   control: any;
   rules?: object;
@@ -12,9 +13,13 @@ interface FormInputProps {
   required?: boolean;
   error?: string;
   sx?: object;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
+  defaultValue,
   name,
   control,
   rules,
@@ -24,6 +29,7 @@ const FormInput: React.FC<FormInputProps> = ({
   required = false,
   error,
   sx,
+  onChange,
 }) => {
   return (
     <>
@@ -31,7 +37,7 @@ const FormInput: React.FC<FormInputProps> = ({
       <Controller
         name={name}
         control={control}
-        defaultValue=""
+        defaultValue={defaultValue}
         rules={{
           ...rules,
           required: required ? `${label} is required` : false,
@@ -47,6 +53,12 @@ const FormInput: React.FC<FormInputProps> = ({
             error={!!error}
             helperText={error}
             sx={{ mb: 2, ...sx }}
+            onChange={(e) => {
+              field.onChange(e);
+              if (onChange) {
+                onChange(e);
+              }
+            }}
           />
         )}
       />

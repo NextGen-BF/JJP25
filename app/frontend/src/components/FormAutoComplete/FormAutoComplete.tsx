@@ -3,6 +3,7 @@ import { Controller } from "react-hook-form";
 import { Autocomplete, TextField, FormControl } from "@mui/material";
 
 interface FormAutoCompleteProps {
+  defaultValue?: string;
   name: string;
   control: any;
   rules?: object;
@@ -11,9 +12,11 @@ interface FormAutoCompleteProps {
   required?: boolean;
   error?: string;
   sx?: object;
+  onChange?: (value: string) => void;
 }
 
 const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
+  defaultValue,
   name,
   control,
   rules,
@@ -22,6 +25,7 @@ const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
   required = false,
   error,
   sx,
+  onChange,
 }) => {
   return (
     <FormControl fullWidth sx={{ mb: 2 }} error={!!error}>
@@ -34,8 +38,14 @@ const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
           <Autocomplete
             {...field}
             freeSolo // Allows user to type custom values
+            defaultValue={defaultValue}
             options={options}
-            onChange={(_, newValue) => field.onChange(newValue)}
+            onChange={(_, newValue) => {
+              field.onChange(newValue);
+              if (onChange) {
+                onChange(newValue as string);
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}

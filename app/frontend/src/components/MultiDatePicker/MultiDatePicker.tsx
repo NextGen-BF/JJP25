@@ -34,16 +34,23 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ ...MultiDatePickerStyles.boxWrapper }}>
         <Stack spacing={2}>
-          <DatePicker
-            label={MultiDatePickerConstants.SELECT_DATES}
-            onChange={handleAddDate}
-            minDate={dayjs()}
-            maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, "year")}
-            sx={{
-              ...MultiDatePickerStyles.calendarIcon,
-              ...MultiDatePickerStyles.calendarPicker,
-            }}
-          />
+          <Box sx={MultiDatePickerStyles.datePickerReset}>
+            <DatePicker
+              label={MultiDatePickerConstants.SELECT_DATES}
+              onChange={handleAddDate}
+              minDate={dayjs()}
+              maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, "year")}
+              sx={{
+                ...MultiDatePickerStyles.calendarIcon,
+                ...MultiDatePickerStyles.calendarPicker,
+                ...MultiDatePickerStyles.datePicker,
+              }}
+            />
+
+            <Button variant="outlined" onClick={() => setSelectedDates([])}>
+              Reset
+            </Button>
+          </Box>
 
           {/* Should think about displaying of chips in the future */}
           <Stack
@@ -65,10 +72,6 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
                 />
               ))}
           </Stack>
-
-          <Button variant="outlined" onClick={() => setSelectedDates([])}>
-            Reset
-          </Button>
         </Stack>
       </Box>
     </LocalizationProvider>

@@ -5,8 +5,8 @@ import {
   FormHelperText,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Select,
+  SelectChangeEvent,
 } from "@mui/material";
 
 interface FormSelectProps {
@@ -17,6 +17,8 @@ interface FormSelectProps {
   required?: boolean;
   error?: string;
   sx?: object;
+  defaultValue?: string;
+  onChange?: (e: SelectChangeEvent<string | number | unknown>) => void;
 }
 
 const FormSelect: React.FC<FormSelectProps> = ({
@@ -27,6 +29,8 @@ const FormSelect: React.FC<FormSelectProps> = ({
   required = false,
   error,
   sx,
+  defaultValue,
+  onChange,
 }) => {
   return (
     <FormControl fullWidth sx={{ mb: 2 }}>
@@ -34,7 +38,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
       <Controller
         name={name}
         control={control}
-        defaultValue=""
+        defaultValue={defaultValue}
         rules={required ? { required: `${label} is required` } : {}}
         render={({ field }) => (
           <Select
@@ -43,6 +47,12 @@ const FormSelect: React.FC<FormSelectProps> = ({
             error={!!error}
             sx={{ ...sx }}
             label={label}
+            onChange={(e) => {
+              field.onChange(e);
+              if (onChange) {
+                onChange(e);
+              }
+            }}
           >
             {options.map((option) => (
               <MenuItem key={option} value={option}>
@@ -52,7 +62,9 @@ const FormSelect: React.FC<FormSelectProps> = ({
           </Select>
         )}
       />
-      {error && <FormHelperText>{error}</FormHelperText>}
+      {error && (
+        <FormHelperText sx={{ color: "error.main" }}>{error}</FormHelperText>
+      )}
     </FormControl>
   );
 };

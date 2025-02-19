@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { Box, Typography, Button, useMediaQuery } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { EventFormStyles } from "./EventFormStyles";
 import "./EventFormStyles.scss";
 import FormSelect from "../FormSelect/FormSelect";
@@ -10,22 +10,94 @@ import { Dayjs } from "dayjs";
 import MultiDatePicker from "../MultiDatePicker/MultiDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// This will be moved in the Stepper/Page in final functionality
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-const EventForm: React.FC = () => {
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  AgeRestriction,
+  createEvent,
+  EventCategory,
+  updateEvent,
+} from "../../redux/slices/eventSlice";
+import { Event } from "../../redux/slices/eventSlice";
+import { RootState } from "../../redux/store";
+
+const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
+  const dispatch = useDispatch();
+  const { event, isNewEvent } = useSelector((state: RootState) => state.event);
+  const categories = Object.values(EventCategory);
+  const ageRestrictions = Object.values(AgeRestriction);
+
+  // Will be added in the future when we have the venues slice and venues data
+
+  // const venues = useSelector((state: RootState) => state.venue.venues);
+  // useEffect(() => { dispatch(fetchVenues()); }, [dispatch]);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
+    trigger,
+    setValue,
   } = useForm({
+    defaultValues: event,
     mode: "onChange",
+    reValidateMode: "onSubmit",
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-    toast.success(EventFormConstants.TOAST_MESSAGES.SUCCESS_EVENT_CREATION);
+  const handleChange = (field: keyof Event, value: any) => {
+    dispatch(updateEvent({ [field]: value }));
+    setValue(field, value);
   };
+
+  const initialEventRef = useRef<Event>(event);
+  const isInitialRender = useRef(true);
+
+  useEffect(() => {
+    if (isInitialRender.current) {
+      initialEventRef.current = event;
+      isInitialRender.current = false;
+    }
+  }, [event]);
+
+  const onSubmit = (event: Event) => {
+    if (isNewEvent) {
+      dispatch(createEvent(event));
+      toast.success(EventFormConstants.TOAST_MESSAGES.SUCCESS_EVENT_CREATION);
+    } else {
+      const isEventChanged =
+        JSON.stringify(event) !== JSON.stringify(initialEventRef.current);
+
+      if (isEventChanged) {
+        dispatch(updateEvent(event));
+        toast.info(EventFormConstants.TOAST_MESSAGES.SUCCESS_EVENT_UPDATE);
+      }
+    }
+  };
+
+  // Will be used when all the steps are created
+  const submitEventToBackend = async () => {
+    try {
+      console.log("Submitting event to backend:", event);
+      toast.success("Event submitted successfully!");
+    } catch (error) {
+      toast.error("Failed to submit event.");
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    submitForm: async () => {
+      const isFormValid = await trigger();
+
+      if (isFormValid) {
+        handleSubmit(onSubmit)();
+        return Promise.resolve(true);
+      } else {
+        return Promise.reject(false);
+      }
+    },
+  }));
 
   const venueValidation = {
     validate: (value: string) =>
@@ -37,16 +109,20 @@ const EventForm: React.FC = () => {
   return (
     <Box sx={EventFormStyles.formContainer}>
       <form onSubmit={handleSubmit(onSubmit)} className="event-form">
+        <Box sx={EventFormStyles.backButton}></Box>
+
         <Box sx={EventFormStyles.leftBox}>
           <FormInput
             name={EventFormConstants.NAMES.EVENT_TITLE}
             control={control}
             label={EventFormConstants.LABELS.EVENT_TITLE}
+            defaultValue={event.title}
             required
+            onChange={(e) => handleChange("title", e.target.value)}
             rules={{
               minLength: {
                 value:
-                  EventFormConstants.VALIDATIONS.EVENT_TITLE.MIN_LENGTH.MESSAGE,
+                  EventFormConstants.VALIDATIONS.EVENT_TITLE.MIN_LENGTH.VALUE,
                 message:
                   EventFormConstants.VALIDATIONS.EVENT_TITLE.MIN_LENGTH.MESSAGE,
               },
@@ -58,8 +134,8 @@ const EventForm: React.FC = () => {
               },
             }}
             error={
-              typeof errors.eventTitle?.message === "string"
-                ? errors.eventTitle.message
+              typeof errors.title?.message === "string"
+                ? errors.title?.message
                 : undefined
             }
             sx={EventFormStyles.backButton}
@@ -69,7 +145,9 @@ const EventForm: React.FC = () => {
             name={EventFormConstants.NAMES.EVENT_DESCRIPTION}
             control={control}
             label={EventFormConstants.LABELS.EVENT_DESCRIPTION}
+            defaultValue={event.description}
             required
+            onChange={(e) => handleChange("description", e.target.value)}
             rules={{
               minLength: {
                 value:
@@ -83,8 +161,8 @@ const EventForm: React.FC = () => {
             multiline
             rows={8}
             error={
-              typeof errors.eventDescription?.message === "string"
-                ? errors.eventDescription.message
+              typeof errors.description?.message === "string"
+                ? errors.description.message
                 : undefined
             }
           />
@@ -92,11 +170,14 @@ const EventForm: React.FC = () => {
 
         <Box sx={EventFormStyles.rightBox}>
           <Box sx={EventFormStyles.eventDatesBox}>
-            <Typography variant="h6">Event Dates</Typography>
+            <Typography variant="h6">
+              {EventFormConstants.LABELS.EVENT_DATES}
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Controller
-                name={EventFormConstants.NAMES.EVENT_DATES}
+                name="dates"
                 control={control}
+                defaultValue={event.dates || []}
                 rules={{
                   required: EventFormConstants.VALIDATIONS.EVENT_DATES.REQUIRED,
                   validate: (value) =>
@@ -106,15 +187,18 @@ const EventForm: React.FC = () => {
                 render={({ field }) => (
                   <MultiDatePicker
                     selectedDates={field.value || []}
-                    setSelectedDates={(dates: Dayjs[]) => field.onChange(dates)}
+                    setSelectedDates={(dates: Dayjs[]) => {
+                      field.onChange(dates);
+                      handleChange("dates", dates);
+                    }}
                   />
                 )}
               />
             </LocalizationProvider>
 
-            {typeof errors.eventDates?.message === "string" && (
+            {typeof errors.dates?.message === "string" && (
               <Typography variant="body2" color="error">
-                {errors.eventDates.message}
+                {errors.dates.message}
               </Typography>
             )}
           </Box>
@@ -126,37 +210,42 @@ const EventForm: React.FC = () => {
               rules={venueValidation}
               label={EventFormConstants.LABELS.VENUE}
               options={EventFormConstants.VALIDATIONS.VENUE.VALID_OPTIONS}
-              required
               error={
-                typeof errors.venue?.message === "string"
-                  ? errors.venue.message
+                typeof errors.venueTitle?.message === "string"
+                  ? errors.venueTitle.message
                   : undefined
               }
+              onChange={(value) => handleChange("venueTitle", value)}
+              defaultValue={event.venueTitle}
             />
 
             <FormSelect
               name={EventFormConstants.NAMES.CATEGORY}
               control={control}
               label={EventFormConstants.LABELS.CATEGORY}
-              options={EventFormConstants.SELECT_OPTIONS.CATEGORIES}
+              options={categories}
               required
               error={
                 typeof errors.category?.message === "string"
                   ? errors.category.message
                   : undefined
               }
+              onChange={(e) => handleChange("category", e.target.value)}
+              defaultValue=""
             />
 
             <FormSelect
               name={EventFormConstants.NAMES.AGE_RESTRICTION}
               control={control}
               label={EventFormConstants.LABELS.AGE_RESTRICTION}
-              options={EventFormConstants.SELECT_OPTIONS.AGE_RESTRICTIONS}
+              options={ageRestrictions}
+              defaultValue={AgeRestriction.ALL_AGES}
               error={
                 typeof errors.ageRestriction?.message === "string"
                   ? errors.ageRestriction.message
                   : undefined
               }
+              onChange={(e) => handleChange("ageRestriction", e.target.value)}
             />
           </Box>
         </Box>
@@ -165,6 +254,6 @@ const EventForm: React.FC = () => {
       </form>
     </Box>
   );
-};
+});
 
 export default EventForm;
