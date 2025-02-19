@@ -1,9 +1,12 @@
 import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, selectAuth, clearError } from '../../redux/slices/authSlice';
+import { AppDispatch } from '../../redux/store';
 import "./LoginPage.scss";
 import sideImage from "../../assets/side-image.png";
 import gmailLogo from "../../assets/google-color.png";
+import { LoginPageConstants } from "../../constants/LoginPageConstants";
 
 interface FormValues {
   username: string;
@@ -17,21 +20,21 @@ interface Errors {
 }
 
 const LoginPage: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector(selectAuth);
   const [formValues, setFormValues] = useState<FormValues>({
     username: '',
     password: '',
     rememberMe: false,
   });
   const [errors, setErrors] = useState<Errors>({ username: '', password: '' });
-  const [loginError, setLoginError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormValues({
-      ...formValues,
-      [name]: type === 'checkbox' ? checked : value,
+    ...formValues,
+      [name]: type === 'checkbox'? checked: value,
     });
   };
 
@@ -39,11 +42,11 @@ const LoginPage: FC = () => {
     let valid = true;
     const newErrors: Errors = { username: '', password: '' };
     if (!formValues.username) {
-      newErrors.username = 'Please enter your email or username';
+      newErrors.username = LoginPageConstants.ERROR_MISSING_IDENTIFIER;
       valid = false;
     }
     if (!formValues.password) {
-      newErrors.password = 'Please enter your password';
+      newErrors.password = LoginPageConstants.ERROR_MISSING_PASSWORD;
       valid = false;
     }
     setErrors(newErrors);
@@ -52,33 +55,18 @@ const LoginPage: FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoginError('');
+    dispatch(clearError());
     if (!validateForm()) return;
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        'http://localhost:8081/api/v1/auth/login',
-        {
-          loginIdentifier: formValues.username,
-          password: formValues.password,
-        }
-      );
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-      navigate('/dashboard');
-    } catch (err) {
-      const errorMessage = axios.isAxiosError(err)
-        ? err.response?.data?.message
-        : null;
-    
-      setLoginError(errorMessage || 'An unexpected error occurred.');
-    } finally {
-      setLoading(false);
-    }
+
+    dispatch(loginUser(formValues))
+    .unwrap()
+    .then(() => navigate('/dashboard'))
+    .catch((error: any) => {
+        console.error(LoginPageConstants.LOGIN_FAILED, error);
+      });
   };
 
   const handleGmailLogin = () => {
-    // Placeholder for Gmail login action
     alert('Gmail login clicked (to be implemented)');
   };
 
@@ -91,34 +79,34 @@ const LoginPage: FC = () => {
 
         <div className="login-form-container">
           <div className="login-form-top">
-            <h1>Login</h1>
+            <h1>{LoginPageConstants.LOGIN_TEXT}</h1>
             <div className="error-container">
-              {loginError && <p className="error">{loginError}</p>}
+              {error && <p className="error">{error}</p>} 
             </div>
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label htmlFor="username">Email/Username</label>
+                <label htmlFor="username">{LoginPageConstants.EMAIL_USERNAME_LABEL}</label>
                 <input
                   type="text"
                   id="username"
                   name="username"
                   value={formValues.username}
                   onChange={handleInputChange}
-                  placeholder="Enter your email or username"
+                  placeholder={LoginPageConstants.PLACEHOLDER_FOR_IDENTIFIER}
                 />
                 {errors.username && (
                   <span className="error">{errors.username}</span>
                 )}
               </div>
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{LoginPageConstants.PASSWORD_LABEL}</label>
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formValues.password}
                   onChange={handleInputChange}
-                  placeholder="Enter your password"
+                  placeholder= {LoginPageConstants.PLACEHOLDER_FOR_PASSWORD}
                 />
                 {errors.password && (
                   <span className="error">{errors.password}</span>
@@ -132,23 +120,23 @@ const LoginPage: FC = () => {
                   checked={formValues.rememberMe}
                   onChange={handleInputChange}
                 />
-                <label htmlFor="rememberMe">Remember Me</label>
+                <label htmlFor="rememberMe">{LoginPageConstants.REMEMBER_ME_LABEL}</label>
               </div>
               <button type="submit" className="login-button" disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
+                {loading ? LoginPageConstants.LOGGING_IN : LoginPageConstants.LOGIN_TEXT}
               </button>
             </form>
-            <div className="or-separator">or</div>
+            <div className="or-separator">{LoginPageConstants.OR_SEPARATOR}</div>
             <div className="gmail-login">
               <button onClick={handleGmailLogin} className="gmail-button">
                 <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
-                <span>Login with Gmail</span>
+                <span>{LoginPageConstants.GMAIL_LOGIN_TEXT}</span>
               </button>
             </div>
           </div>
           <div className="login-form-bottom">
             <p className="signup-prompt">
-              Don't have an account? <Link to="/register">Sign up!</Link>
+              {LoginPageConstants.SIGNUP_PROMPT} <Link to="/register">{LoginPageConstants.SIGNUP_TEXT}</Link>
             </p>
           </div>
         </div>
