@@ -29,9 +29,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +53,7 @@ public class AuthService {
     private final TemplateEngine templateEngine;
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -213,6 +212,50 @@ public class AuthService {
         context.setVariable("code", code);
         log.debug("Generated HTML verification message for user: {}", username);
         return templateEngine.process("verify-account-mail", context);
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword, String confirmPassword) {
+        log.info("Resetting password using token.");
+        if (!newPassword.equals(confirmPassword)) {
+            log.warn("Passwords do not match");
+            throw new PasswordsDoNotMatchException("Passwords do not match. Please try again.");
+        }
+
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("%s is not found", username)));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.saveAndFlush(user);
+        log.info("Password reset successfully for user: {}", username);
+    }
+
+    public void forgotPassword(String email) {
+        log.info("Processing forgot password for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(String.format("%s is not found", email)));
+
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("reset", true);
+        String resetToken = jwtService.generateToken(extraClaims, user);
+
+        //String resetLink = "https://localhost:8081/api/v1/auth/reset-password?token=" + resetToken;
+        String resetLink = "http://localhost:5173/reset-password?token=" + resetToken;
+
+        Context context = new Context();
+        context.setVariable("username", user.getUsername());
+        context.setVariable("resetLink", resetLink);
+
+        String emailBody = templateEngine.process("reset-password-mail", context);
+
+        try {
+            emailService.sendResetPasswordEmail(user.getEmail(), "Reset Your Password", emailBody);
+            log.info("Password reset email sent to: {}", email);
+        } catch (MessagingException e) {
+            log.error("Failed to send reset password email to: {}", email, e);
+            throw new VerificationEmailNotSentException(String.format("Failed to send reset password email to %s", email), e);
+        }
     }
 
 }
