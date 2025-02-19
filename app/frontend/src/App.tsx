@@ -22,7 +22,7 @@ import CreateTicketPage from "./pages/adminPages/CreateTicketPage/CreateTicketPa
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.scss";
 import MockUserList from "./pages/MockUserList/MockUserList";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import SideBar from "./components/sidebar/SideBar";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
@@ -31,54 +31,57 @@ import RSVPCreatePage from './pages/RSVPCreatePage/RSVPCreatePage';
 
 export default function App() {
   const isSideBarOpen = useSelector((state: RootState) => state.sidebar.isOpen);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Router>
       <CssBaseline />
       <Navbar />
-      <SideBar />
       <Box sx={AppStyles.outerBoxStyles}>
-        <Box
-          sx={{
-            ...AppStyles.routesBoxStyles,
-            marginLeft: isSideBarOpen ? "260px" : "80px",
-          }}
-        >
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/tickets" element={<TicketsPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/not-found" element={<NotFoundPage />} />
-            <Route path="/mock-users" element={<MockUserList />} />
-            <Route path="*" element={<Navigate to="/not-found" replace />} />
-            // Admin routes
-            <Route
-              path="/dashboard/event-creation/event"
-              element={<CreateEventPage />}
-            />
-            <Route
-              path="/dashboard/event-creation/venue"
-              element={<CreateVenuePage />}
-            />
-            <Route
-              path="/dashboard/event-creation/ticket"
-              element={<CreateTicketPage />}
-            />
-            <Route
-              path="/dashboard/event-creation/success"
-              element={<CreateEventSucessPage />}
-            />
-            <Route path="/dashboard/your-events" />
-            <Route path="/dashboard/your-events-statistics" />
-            <Route path="/dashboard/rsvp-creation"  element={<RSVPCreatePage />} />
-            <Route path="/dashboard/account" element={<AccountPage />} />
-          </Routes>
-        </Box>
-        <Footer />
+      <SideBar />
+          <Box
+            sx={{
+              ...AppStyles.routesBoxStyles,
+              marginLeft: isSideBarOpen ? "260px" : 
+              isMobile ? 0 : "80px",
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/tickets" element={<TicketsPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/not-found" element={<NotFoundPage />} />
+              <Route path="/mock-users" element={<MockUserList />} />
+              <Route path="*" element={<Navigate to="/not-found" replace />} />
+              // Admin routes
+              <Route
+                path="/dashboard/event-creation/event"
+                element={<CreateEventPage />}
+              />
+              <Route
+                path="/dashboard/event-creation/venue"
+                element={<CreateVenuePage />}
+              />
+              <Route
+                path="/dashboard/event-creation/ticket"
+                element={<CreateTicketPage />}
+              />
+              <Route
+                path="/dashboard/event-creation/success"
+                element={<CreateEventSucessPage />}
+              />
+              <Route path="/dashboard/your-events" />
+              <Route path="/dashboard/your-events-statistics" />
+              <Route path="/dashboard/rsvp-creation"  element={<RSVPCreatePage />} />
+              <Route path="/dashboard/account" element={<AccountPage />} />
+            </Routes>
+          </Box>
+          <Footer />
       </Box>
     </Router>
   );
