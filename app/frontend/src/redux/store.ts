@@ -5,10 +5,17 @@ import eventReducer from "./slices/eventSlice";
 export const store = configureStore({
   reducer: {
     users: usersReducer,
-    event: eventReducer
+    event: eventReducer,
   },
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["event/updateEvent"],
+        ignoredPaths: ["event.event.dates"],
+      },
+    }),
 });
 
-// Export RootState and AppDispatch types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
