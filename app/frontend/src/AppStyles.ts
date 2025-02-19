@@ -12,6 +12,5 @@ export const AppStyles = {
     flexDirection: "column",
     paddingTop: "60px",
     transition: "0.3s all",
-    zIndex: -1
   }
 };

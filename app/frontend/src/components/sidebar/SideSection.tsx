@@ -28,8 +28,8 @@ export const SideSection: FC<SidebarProps> = ({ items, title }) => {
   const toggleClass = (isActive : boolean): string => {
     if (isActive) {
       return isOpen ? 
-      "link-active link-open" : 
-      "link-active link-closed";
+      "link-active-open" : 
+      "link-active-closed";
     } 
 
     return "link-styles";
