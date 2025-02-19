@@ -1,4 +1,9 @@
 export const SideBarStyles = {
+  iconButtonStyles: { 
+    pt: "84px", 
+    justifyContent: "flex-start", 
+    ml: 1.5 
+  },
 
   drawerContentBoxStyles: {
     display: "flex",
@@ -8,22 +13,22 @@ export const SideBarStyles = {
     overflow: "hidden",
   },
 
-  drawerContentInnerBoxStyles: { 
-    display: "flex", 
-    justifyContent: "flex-start", 
-    p: 1.5 
+  drawerContentInnerBoxStyles: {
+    display: "flex",
+    justifyContent: "flex-start",
+    p: 1.5,
   },
 
   drawerStyles: {
-      boxSizing: "border-box",
-      transition: "width 0.3s",
-      top: 64,
-      height: `calc(100vh - ${64}px - ${80}px)`,
+    boxSizing: "border-box",
+    transition: "width 0.3s",
+    top: 64,
+    height: `calc(100vh - ${64}px - ${80}px)`,
   },
 
   listSubheaderStyles: {
     backgroundColor: "#D2D2DA",
-    transition: "0.3s ease"
+    transition: "0.3s ease",
   },
 
   listItemTextStyles: {
@@ -35,8 +40,7 @@ export const SideBarStyles = {
 
   listItemButtonStyles: {
     justifyContent: "flex-start",
-    pr:0,
+    pr: 0,
     height: 48,
-  }
-
-}
+  },
+};
