@@ -46,7 +46,7 @@ const RegisterForm: FC = () => {
 
   const navigate = useNavigate();
 
-  const url = "http://localhost:8081/api/v1/auth/register";
+  const url = import.meta.env.VITE_SIGN_UP_URL;
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       const response = await axios.post(url, data);
@@ -116,6 +116,7 @@ const RegisterForm: FC = () => {
           <TextField
             label="Password"
             variant="outlined"
+            type="password"
             {...register("password", {
               required: validationErrors.password.required,
               pattern: {
@@ -130,6 +131,7 @@ const RegisterForm: FC = () => {
           <TextField
             label="Confirm password"
             variant="outlined"
+            type="password"
             {...register("confirmPassword", {
               required: validationErrors.confirmPassword.required,
               validate: (value) =>
