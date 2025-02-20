@@ -53,21 +53,7 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
             </Button>
           </Box>
 
-          <Typography
-            variant="body2"
-            sx={{
-              color: "error.main",
-            }}
-          >
-            {error ? error : " "}
-          </Typography>
-
-          <Stack
-            direction="row"
-            spacing={1}
-            flexWrap="wrap"
-            sx={MultiDatePickerStyles.stackWrapper}
-          >
+          <Box sx={MultiDatePickerStyles.stackWrapper}>
             {selectedDates
               .sort((a, b) => (a.isBefore(b) ? -1 : 1))
               .map((date, index) => (
@@ -80,7 +66,7 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
                   }}
                 />
               ))}
-          </Stack>
+          </Box>
         </Stack>
       </Box>
     </LocalizationProvider>

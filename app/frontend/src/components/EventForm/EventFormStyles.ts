@@ -52,7 +52,6 @@ export const EventFormStyles = {
     justifyContent: "flex-start",
     maxWidth: "40%",
     maxHeight: "100%",
-    gap: "8px",
     height: "100%",
     paddingTop: "120px",
 
