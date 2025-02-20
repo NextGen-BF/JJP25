@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, useEffect } from "react";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -26,6 +25,8 @@ import { AppDispatch } from "../../redux/store";
 import { RootState } from "../../redux/store";
 import { registerUser } from "../../redux/services/authService";
 import { resetState } from "../../redux/slices/authSlice";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 type FormFields = {
   email: string;
@@ -207,32 +208,31 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={["DatePicker"]}>
-              <Controller
-                name="birthDate"
-                control={control}
-                rules={{ required: validationErrors.birthdate.required }}
-                render={({ field, fieldState: { error } }) => (
-                  <Box display="flex" flexDirection="column">
-                    <DatePicker
-                      label="Birthdate"
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(date) =>
-                        field.onChange(date ? date.toISOString() : "")
-                      }
-                      slotProps={{ textField: { variant: "outlined" } }}
-                    />
-                    {error && (
-                      <Box className="error-box" sx={{ mt: 2 }}>
-                        {error.message}
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              />
-            </DemoContainer>
-          </LocalizationProvider>
+          <Controller
+            name="birthDate"
+            control={control}
+            rules={{ required: validationErrors.birthdate.required }}
+            render={({ field, fieldState: { error } }) => (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Birthdate"
+                  value={field.value ? dayjs(field.value) : null}
+                  onChange={(date) =>
+                    field.onChange(
+                      date ? date.utc().startOf("day").toISOString() : ""
+                    )
+                  }
+                  slotProps={{
+                    textField: {
+                      variant: "outlined",
+                      error: !!error,
+                      helperText: error ? error.message : " ",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            )}
+          />
         </Box>
       </Box>
       <Button
