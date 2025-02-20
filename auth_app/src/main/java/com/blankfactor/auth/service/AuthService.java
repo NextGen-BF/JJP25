@@ -47,6 +47,7 @@ public class AuthService {
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
+    private static final String TOKEN_PARAM_STRING = "?token=";
 
     @Value("${app.reset-password.url}")
     private String resetPasswordBaseUrl;
@@ -249,7 +250,7 @@ public class AuthService {
         extraClaims.put("reset", true);
         String resetToken = jwtService.generateToken(extraClaims, user);
 
-        String resetLink = resetPasswordBaseUrl + "?token=" + resetToken;
+        String resetLink = resetPasswordBaseUrl + TOKEN_PARAM_STRING + resetToken;
 
         Context context = new Context();
         context.setVariable("username", user.getUsername());
