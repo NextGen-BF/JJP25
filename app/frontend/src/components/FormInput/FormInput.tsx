@@ -45,7 +45,7 @@ const FormInput: React.FC<FormInputProps> = ({
         render={({ field }) => (
           <TextField
             {...field}
-            label={label}
+            aria-label={label}
             fullWidth
             required={required}
             multiline={multiline}
