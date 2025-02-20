@@ -51,17 +51,16 @@ const RegisterForm: FC = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, success } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { loading, success } = useSelector((state: RootState) => state.auth);
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       const resultAction = await dispatch(registerUser(data));
-  
+
       if (registerUser.rejected.match(resultAction)) {
         const errorResponse = resultAction.payload as { message?: string };
-        const errorMessage = errorResponse?.message || "An unexpected error occurred.";
+        const errorMessage =
+          errorResponse?.message || "An unexpected error occurred.";
         if (errorMessage.includes("@")) {
           setError("email", { type: "server", message: errorMessage });
         } else {
@@ -98,8 +97,10 @@ const RegisterForm: FC = () => {
       <Box className="form-content-box">
         <Box className="form-content-item-box">
           <TextField
+            error={!!errors.email}
             label="Email"
             variant="outlined"
+            helperText={errors.email ? errors.email.message : " "}
             {...register("email", {
               required: validationErrors.email.required,
               pattern: {
@@ -108,13 +109,12 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          {errors.email && (
-            <Box className="error-box">{errors.email.message}</Box>
-          )}
           <TextField
+            error={!!errors.password}
             label="Password"
             variant="outlined"
             type="password"
+            helperText={errors.password ? errors.password.message : " "}
             {...register("password", {
               required: validationErrors.password.required,
               pattern: {
@@ -123,13 +123,14 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          {errors.password && (
-            <Box className="error-box">{errors.password.message}</Box>
-          )}
           <TextField
+            error={!!errors.confirmPassword}
             label="Confirm password"
             variant="outlined"
             type="password"
+            helperText={
+              errors.confirmPassword ? errors.confirmPassword.message : " "
+            }
             {...register("confirmPassword", {
               required: validationErrors.confirmPassword.required,
               validate: (value) =>
@@ -137,9 +138,6 @@ const RegisterForm: FC = () => {
                 validationErrors.confirmPassword.mismatch,
             })}
           />
-          {errors.confirmPassword && (
-            <Box className="error-box">{errors.confirmPassword.message}</Box>
-          )}
           <FormLabel>Role</FormLabel>
           <Controller
             name="role"
@@ -163,8 +161,10 @@ const RegisterForm: FC = () => {
         </Box>
         <Box className="form-content-item-box">
           <TextField
+            error={!!errors.username}
             label="Username"
             variant="outlined"
+            helperText={errors.username ? errors.username.message : " "}
             {...register("username", {
               required: validationErrors.username.required,
               pattern: {
@@ -173,12 +173,11 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          {errors.username && (
-            <Box className="error-box">{errors.username.message}</Box>
-          )}
           <TextField
+            error={!!errors.firstName}
             label="First name"
             variant="outlined"
+            helperText={errors.firstName ? errors.firstName.message : " "}
             {...register("firstName", {
               required: validationErrors.firstName.required,
               minLength: {
@@ -191,12 +190,11 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          {errors.firstName && (
-            <Box className="error-box">{errors.firstName.message}</Box>
-          )}
           <TextField
+            error={!!errors.lastName}
             label="Last name"
             variant="outlined"
+            helperText={errors.lastName ? errors.lastName.message : " "}
             {...register("lastName", {
               required: validationErrors.lastName.required,
               minLength: {
@@ -209,9 +207,6 @@ const RegisterForm: FC = () => {
               },
             })}
           />
-          {errors.lastName && (
-            <Box className="error-box">{errors.lastName.message}</Box>
-          )}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={["DatePicker"]}>
               <Controller
