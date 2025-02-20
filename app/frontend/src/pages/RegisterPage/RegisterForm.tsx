@@ -51,7 +51,7 @@ const RegisterForm: FC = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, success } = useSelector(
+  const { loading, success } = useSelector(
     (state: RootState) => state.auth
   );
 

@@ -7,7 +7,6 @@ type AuthState = {
   firstName: string | null;
   lastName: string | null;
   loading: boolean;
-  error: string | null;
   success: boolean;
 };
 
@@ -17,7 +16,6 @@ const initialState: AuthState = {
   firstName: null,
   lastName: null,
   loading: false,
-  error: null,
   success: false,
 };
 
@@ -27,7 +25,6 @@ const authSlice = createSlice({
   reducers: {
     resetState: (state) => {
       state.loading = false;
-      state.error = null;
       state.success = false;
     },
   },
@@ -35,12 +32,10 @@ const authSlice = createSlice({
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
         state.success = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
+        state.loading = false; 
         state.success = true;
         const { email, username, firstName, lastName } = action.payload;
         state.email = email;
@@ -48,9 +43,8 @@ const authSlice = createSlice({
         state.firstName = firstName;
         state.lastName = lastName;
       })
-      .addCase(registerUser.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload as string;
         state.success = false;
       });
   },
