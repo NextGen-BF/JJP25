@@ -19,6 +19,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +47,10 @@ public class AuthService {
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
+    private static final String TOKEN_PARAM_STRING = "?token=";
+
+    @Value("${app.reset-password.url}")
+    private String resetPasswordBaseUrl;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -245,8 +250,7 @@ public class AuthService {
         extraClaims.put("reset", true);
         String resetToken = jwtService.generateToken(extraClaims, user);
 
-        //String resetLink = "https://localhost:8081/api/v1/auth/reset-password?token=" + resetToken;
-        String resetLink = "http://localhost:5173/reset-password?token=" + resetToken;
+        String resetLink = resetPasswordBaseUrl + TOKEN_PARAM_STRING + resetToken;
 
         Context context = new Context();
         context.setVariable("username", user.getUsername());
