@@ -1,4 +1,4 @@
-import { useState, FC, Fragment } from "react";
+import { useState, FC, useRef } from "react";
 import {
   Stepper,
   Step,
@@ -12,6 +12,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from "./EventStepperStyles";
 import { EventStepperConstants } from "../../constants/EventStepperConstants";
+import EventForm from "../EventForm/EventForm";
 
 const steps = [
   EventStepperConstants.EVENT_CREATION,
@@ -21,13 +22,18 @@ const steps = [
 
 const EventStepper: FC = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const formRef = useRef<{ submitForm: () => Promise<boolean> } | null>(null);
   const [skipped, setSkipped] = useState(new Set<number>());
 
   const isStepOptional = (step: number) => step === 1;
 
   const isStepSkipped = (step: number) => skipped.has(step);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (formRef.current) {
+      await formRef.current.submitForm();
+    }
+
     let newSkipped = skipped;
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
@@ -62,12 +68,7 @@ const EventStepper: FC = () => {
   const renderStepForm = () => {
     switch (activeStep) {
       case 0:
-        return (
-          <Box sx={{ mt: 2 }}>
-            <TextField label="Event Name" fullWidth sx={{ mb: 2 }} />
-            <TextField label="Event Description" fullWidth sx={{ mb: 2 }} />
-          </Box>
-        );
+        return <EventForm ref={formRef} />;
       case 1:
         return (
           <Box sx={{ mt: 2 }}>
@@ -125,7 +126,7 @@ const EventStepper: FC = () => {
           <Typography sx={{ mt: 2, mb: 1 }}>
             {EventStepperConstants.ALL_STEPS_COMPLETED}
           </Typography>
-          <Box sx={EventStepperStyles.defaultBoxStyling}>
+          <Box sx={EventStepperStyles.ButtonBox}>
             <Box sx={{ flex: "1 1 auto" }} />
             <Button sx={EventStepperStyles.stepButton} onClick={handleReset}>
               {EventStepperConstants.RESET_STEPS}
@@ -134,21 +135,16 @@ const EventStepper: FC = () => {
         </>
       ) : (
         <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            {EventStepperConstants.CURR_STEP} {activeStep + 1}
-          </Typography>
           {/* Box for form and buttons for navigation of the stepper */}
-          <Box sx={{ mt: 2 }}>
-            {renderStepForm()}
-            <Box sx={EventStepperStyles.defaultBoxStyling}>
+          <Box sx={{ pt: 2 }}>
+            <Box sx={EventStepperStyles.ButtonBox}>
               <Button
-                color="inherit"
                 disabled={activeStep === 0}
+                sx={EventStepperStyles.stepButton}
                 onClick={handleBack}
               >
                 <ArrowBackIosIcon
                   sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
-                  fontSize="small"
                 />
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
@@ -167,6 +163,7 @@ const EventStepper: FC = () => {
                 )}
               </Button>
             </Box>
+            {renderStepForm()}
           </Box>
         </>
       )}

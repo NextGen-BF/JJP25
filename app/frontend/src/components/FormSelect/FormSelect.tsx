@@ -62,9 +62,9 @@ const FormSelect: React.FC<FormSelectProps> = ({
           </Select>
         )}
       />
-      {error && (
-        <FormHelperText sx={{ color: "error.main" }}>{error}</FormHelperText>
-      )}
+      <FormHelperText sx={{ color: "error.main" }}>
+        {error ? error : " "}
+      </FormHelperText>
     </FormControl>
   );
 };

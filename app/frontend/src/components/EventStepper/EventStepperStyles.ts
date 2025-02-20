@@ -15,10 +15,12 @@ export const EventStepperStyles = {
   },
 
   stepperContainer: {
-    width: "100%",
-    maxWidth: "1000px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    width: "90%",
+    maxWidth: "1200px",
     margin: "10px auto 0",
-    padding: "16px",
   },
 
   stepLabel: (activeStep: number, index: number) => ({
@@ -57,12 +59,11 @@ export const EventStepperStyles = {
   stepButton: {
     color: EventStepperConstants.SECONDARY_COLOR,
     display: "flex",
-    alignItems: "center",
   },
 
-  defaultBoxStyling: {
+  ButtonBox: {
     display: "flex",
     flexDirection: "row",
-    pt: 2,
+    mb: 0.5,
   },
 };
