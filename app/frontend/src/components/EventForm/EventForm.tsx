@@ -109,8 +109,6 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
   return (
     <Box sx={EventFormStyles.formContainer}>
       <form onSubmit={handleSubmit(onSubmit)} className="event-form">
-        <Box sx={EventFormStyles.backButton}></Box>
-
         <Box sx={EventFormStyles.leftBox}>
           <FormInput
             name={EventFormConstants.NAMES.EVENT_TITLE}
@@ -138,7 +136,6 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
                 ? errors.title?.message
                 : undefined
             }
-            sx={EventFormStyles.backButton}
           />
 
           <FormInput
@@ -249,8 +246,6 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
             />
           </Box>
         </Box>
-
-        <Box sx={EventFormStyles.nextButton}></Box>
       </form>
     </Box>
   );
