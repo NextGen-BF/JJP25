@@ -31,7 +31,7 @@ export const MultiDatePickerStyles = {
 
   stackWrapper: {
     width: "100%",
-    minHeight: "40px",
+    minHeight: "56px",
     maxWidth: "calc(100% + 8px)",
     display: "flex",
     flexDirection: "row",
