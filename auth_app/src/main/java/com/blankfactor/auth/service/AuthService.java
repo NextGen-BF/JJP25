@@ -224,7 +224,10 @@ public class AuthService {
 
         String username = jwtService.extractUsername(token);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(String.format("%s is not found", username)));
+                .orElseThrow(() -> {
+                    log.warn("User not found with username: {}", username);
+                    return new UserNotFoundException(String.format("Username %s is not found", username));
+                });
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.saveAndFlush(user);
@@ -234,8 +237,10 @@ public class AuthService {
     public void forgotPassword(String email) {
         log.info("Processing forgot password for email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("%s is not found", email)));
-
+                .orElseThrow(() -> {
+                        log.warn("User not found with email: {}", email);
+                        return new UserNotFoundException(String.format("Email %s is not found", email));
+                        });
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("reset", true);
         String resetToken = jwtService.generateToken(extraClaims, user);

@@ -48,6 +48,15 @@ public class AuthControllerUT {
     private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
     private static final String RESET_PASSWORD_ENDPOINT = "/api/v1/auth/reset-password";
+    private static final String VALID_TOKEN = "validToken";
+    private static final String INVALID_TOKEN = "invalidToken";
+    private static final String NEW_PASSWORD = "newPassword1!";
+    private static final String DIFFERENT_PASSWORD = "differentPassword";
+    private static final String PASSWORD_RESET_SUCCESS_MESSAGE = "Password has been reset successfully";
+    private static final String PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE = "Passwords do not match. Please try again.";
+    private static final String JWT_TOKEN_EXPIRED_ERROR_MESSAGE = "JWT token is expired or invalid";
+    private static final String USER_NOT_FOUND_ERROR_MESSAGE = "User is not found";
+
 
 
     @Autowired
@@ -599,81 +608,81 @@ public class AuthControllerUT {
 
         @Test
         void shouldSuccessfullyResetPassword() throws Exception {
-            String requestBody = """
+            String requestBody = String.format("""
                 {
-                    "token": "validToken",
-                    "newPassword": "newPassword1!",
-                    "confirmPassword": "newPassword1!"
+                    "token": "%s",
+                    "newPassword": "%s",
+                    "confirmPassword": "%s"
                 }
-                """;
+                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
-            doNothing().when(authService).resetPassword("validToken", "newPassword1!", "newPassword1!");
+            doNothing().when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-
                     .andExpect(status().isOk())
-                    .andExpect(content().string("Password has been reset successfully"));
+                    .andExpect(content().string(PASSWORD_RESET_SUCCESS_MESSAGE));
         }
 
         @Test
         void shouldReturnBadRequestWhenPasswordsDoNotMatch() throws Exception {
-            String requestBody = """
+            String requestBody = String.format("""
                 {
-                    "token": "validToken",
-                    "newPassword": "newPassword1!",
-                    "confirmPassword": "differentPassword"
+                    "token": "%s",
+                    "newPassword": "%s",
+                    "confirmPassword": "%s"
                 }
-                """;
-            String ERROR_MESSAGE = "Passwords do not match. Please try again.";
+                """, VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
 
-            doThrow(new PasswordsDoNotMatchException(ERROR_MESSAGE)).when(authService).resetPassword("validToken", "newPassword1!", "differentPassword");
+            doThrow(new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE))
+                    .when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
+
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+                    .andExpect(jsonPath("$.message").value(PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE));
         }
 
         @Test
         void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
-            String requestBody = """
+            String requestBody = String.format("""
                 {
-                    "token": "invalidToken",
-                    "newPassword": "newPassword1!",
-                    "confirmPassword": "newPassword1!"
+                    "token": "%s",
+                    "newPassword": "%s",
+                    "confirmPassword": "%s"
                 }
-                """;
-            String ERROR_MESSAGE = "JWT token is expired or invalid";
+                """, INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
-            doThrow(new ExpiredJwtException(null, null, ERROR_MESSAGE)).when(authService).resetPassword("invalidToken", "newPassword1!", "newPassword1!");
+            doThrow(new ExpiredJwtException(null, null, JWT_TOKEN_EXPIRED_ERROR_MESSAGE))
+                    .when(authService).resetPassword(INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+                    .andExpect(jsonPath("$.message").value(JWT_TOKEN_EXPIRED_ERROR_MESSAGE));
         }
 
         @Test
         void shouldReturnNotFoundWhenUserIsNotFound() throws Exception {
-            String requestBody = """
+            String requestBody = String.format("""
                 {
-                    "token": "validToken",
-                    "newPassword": "newPassword1!",
-                    "confirmPassword": "newPassword1!"
+                    "token": "%s",
+                    "newPassword": "%s",
+                    "confirmPassword": "%s"
                 }
-                """;
-            String ERROR_MESSAGE = "testuser is not found";
+                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
-            doThrow(new UserNotFoundException(ERROR_MESSAGE)).when(authService).resetPassword("validToken", "newPassword1!", "newPassword1!");
+
+            doThrow(new UserNotFoundException(USER_NOT_FOUND_ERROR_MESSAGE))
+                    .when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+                    .andExpect(jsonPath("$.message").value(USER_NOT_FOUND_ERROR_MESSAGE));
         }
     }
 
