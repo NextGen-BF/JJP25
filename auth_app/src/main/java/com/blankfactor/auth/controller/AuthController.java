@@ -4,9 +4,7 @@ import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.LoginResponse;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.LoginRequest;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.imp.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
 import jakarta.validation.Valid;
@@ -57,6 +55,21 @@ public class AuthController {
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
         log.debug("Generated JWT token for user: {}", loginRequest.getLoginIdentifier());
         return ResponseEntity.ok(loginResponse);
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        log.info("Forgot password request received for email: {}", request.getEmail());
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok("Password reset link sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        log.info("Reset password request received with token");
+        authService.resetPassword(request.getToken(), request.getNewPassword(), request.getConfirmPassword());
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 
 }
