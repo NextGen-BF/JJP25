@@ -10,6 +10,7 @@ export const EventFormStyles = {
     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",
     display: "flex",
     padding: "0 50px",
+    overflow: "hidden",
 
     "@media (max-width: 768px)": {
       position: "absolute",
@@ -18,7 +19,7 @@ export const EventFormStyles = {
       justifyContent: "flex-start",
       maxWidth: "90%",
       maxHeight: "100%",
-      height: "75%",
+      height: "77%",
       overflowY: "scroll",
       padding: "0 5%",
     },
@@ -36,9 +37,9 @@ export const EventFormStyles = {
     paddingTop: "120px",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 45%",
-      maxHeight: "45%",
-      paddingTop: "20px",
+      flex: "0 1 50%",
+      maxHeight: "50%",
+      paddingTop: "10px",
       maxWidth: "100%",
       width: "100%",
       gap: "10px",
@@ -56,10 +57,9 @@ export const EventFormStyles = {
     paddingTop: "120px",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 45%",
-      maxHeight: "45%",
-      paddingTop: "20px",
-      gap: "12px",
+      flex: "0 1 40%",
+      maxHeight: "40%",
+      paddingTop: "10px",
       maxWidth: "100%",
       width: "100%",
     },
@@ -72,7 +72,6 @@ export const EventFormStyles = {
     maxWidth: "100%",
 
     "@media (max-width: 768px)": {
-      gap: "12px",
       maxWidth: "100%",
     },
   },
