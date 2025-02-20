@@ -66,7 +66,9 @@ export const EventFormStyles = {
     },
   },
 
-  eventDatesBox: {},
+  eventDatesBox: {
+    gap: "16px",
+  },
 
   selectorsBox: {
     display: "flex",

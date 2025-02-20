@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { Controller } from "react-hook-form";
 import { Autocomplete, TextField, FormControl } from "@mui/material";
 
@@ -15,7 +15,7 @@ interface FormAutoCompleteProps {
   onChange?: (value: string) => void;
 }
 
-const FormAutoComplete: React.FC<FormAutoCompleteProps> = ({
+const FormAutoComplete: FC<FormAutoCompleteProps> = ({
   defaultValue,
   name,
   control,

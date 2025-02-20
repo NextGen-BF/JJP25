@@ -131,11 +131,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
                   EventFormConstants.VALIDATIONS.EVENT_TITLE.PATTERN.MESSAGE,
               },
             }}
-            error={
-              typeof errors.title?.message === "string"
-                ? errors.title?.message
-                : undefined
-            }
+            error={errors.title?.message}
           />
 
           <FormInput
@@ -157,17 +153,13 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
             }}
             multiline
             rows={8}
-            error={
-              typeof errors.description?.message === "string"
-                ? errors.description.message
-                : undefined
-            }
+            error={errors.description?.message}
           />
         </Box>
 
         <Box sx={EventFormStyles.rightBox}>
           <Box sx={EventFormStyles.eventDatesBox}>
-            <Typography variant="h6">
+            <Typography variant="h6" sx={{ pb: 2 }}>
               {EventFormConstants.LABELS.EVENT_DATES}
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -207,11 +199,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
               rules={venueValidation}
               label={EventFormConstants.LABELS.VENUE}
               options={EventFormConstants.VALIDATIONS.VENUE.VALID_OPTIONS}
-              error={
-                typeof errors.venueTitle?.message === "string"
-                  ? errors.venueTitle.message
-                  : undefined
-              }
+              error={errors.venueTitle?.message}
               onChange={(value) => handleChange("venueTitle", value)}
               defaultValue={event.venueTitle}
             />
@@ -222,11 +210,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
               label={EventFormConstants.LABELS.CATEGORY}
               options={categories}
               required
-              error={
-                typeof errors.category?.message === "string"
-                  ? errors.category.message
-                  : undefined
-              }
+              error={errors.category?.message}
               onChange={(e) => handleChange("category", e.target.value)}
               defaultValue=""
             />
@@ -237,11 +221,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
               label={EventFormConstants.LABELS.AGE_RESTRICTION}
               options={ageRestrictions}
               defaultValue={AgeRestriction.ALL_AGES}
-              error={
-                typeof errors.ageRestriction?.message === "string"
-                  ? errors.ageRestriction.message
-                  : undefined
-              }
+              error={errors.ageRestriction?.message}
               onChange={(e) => handleChange("ageRestriction", e.target.value)}
             />
           </Box>
