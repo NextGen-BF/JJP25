@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateUserRequest {
+public class RegisterRequest {
 
     @NotNull(message = "{id.required}")
     private Long id;

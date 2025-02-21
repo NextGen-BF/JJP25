@@ -1,5 +1,5 @@
 create table if not exists users (
-    id integer not null auto_increment,
+    id integer not null,
     created_at datetime(6) not null,
     phone varchar(15),
     profile_picture varchar(255),
