@@ -1,9 +1,9 @@
 export const VenueFormStyles = {
   formContainer: {
     position: "relative",
-    width: "100vw",
+    width: "90vw",
     height: "80vh",
-    maxWidth: "1000px",
+    maxWidth: "1200px",
     maxHeight: "680px",
     backgroundColor: "#f5f5f7",
     borderRadius: "15px",
