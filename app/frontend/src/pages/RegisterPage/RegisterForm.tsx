@@ -52,7 +52,7 @@ const RegisterForm: FC = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, success } = useSelector((state: RootState) => state.auth);
+  const { loading, success } = useSelector((state: RootState) => state.registerData);
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
