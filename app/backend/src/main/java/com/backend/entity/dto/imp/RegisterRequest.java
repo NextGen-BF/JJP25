@@ -16,6 +16,6 @@ public class RegisterRequest {
 
     @NotNull(message = "{role.required}")
     @Pattern(regexp = "^(ATTENDEE|ORGANISER)$", message = "{role.invalid}")
-    private String userType;
+    private String role;
 
 }

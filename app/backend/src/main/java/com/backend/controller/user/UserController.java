@@ -1,5 +1,6 @@
 package com.backend.controller.user;
 
+import com.backend.entity.dto.exp.RegisterResponse;
 import com.backend.entity.dto.imp.RegisterRequest;
 import com.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
-        this.userService.register(registerRequest);
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
+        RegisterResponse registerResponse = this.userService.register(registerRequest);
+        return ResponseEntity.ok().body(registerResponse);
     }
 
 }
