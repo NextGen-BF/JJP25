@@ -1,6 +1,8 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
+import com.blankfactor.auth.entity.dto.exp.InformResponse;
+import com.blankfactor.auth.entity.dto.imp.InformRequest;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
@@ -20,12 +22,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -78,7 +83,8 @@ public class AuthService {
                 .build();
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
-        sendVerificationEmail(user);
+        // TODO: move somewhere else, because it causes a huge delay: sendVerificationEmail(user);
+        ResponseEntity<InformResponse> informResponseResponseEntity = informEmsApp(user.getId(), registerRequest.getRole());
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
@@ -265,6 +271,16 @@ public class AuthService {
             log.error("Failed to send reset password email to: {}", email, e);
             throw new VerificationEmailNotSentException(String.format("Failed to send reset password email to %s", email), e);
         }
+    }
+
+    private ResponseEntity<InformResponse> informEmsApp(Long id, String role) {
+        InformRequest informRequest = InformRequest.builder()
+                .id(id)
+                .role(role.toUpperCase())
+                .build();
+        RestClient restClient = RestClient.create();
+        // TODO
+        return null;
     }
 
 }
