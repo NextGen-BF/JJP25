@@ -1,4 +1,5 @@
 export const VenueFormConstants = {
+  BUTTON_NAME: "Attach to Event",
   NAMES: {
     VENUE_NAME: "name",
     COUNTRY: "country",

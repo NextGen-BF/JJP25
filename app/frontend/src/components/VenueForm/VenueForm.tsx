@@ -56,7 +56,6 @@ const VenueForm: FC = () => {
     const isFormValid = await trigger();
 
     if (!isFormValid) {
-      toast.error("Please fill in all required fields correctly.");
       return;
     }
 
@@ -160,7 +159,7 @@ const VenueForm: FC = () => {
 
           <Box sx={VenueFormStyles.buttonBox}>
             <ButtonComponent
-              label="Attach to Event"
+              label={VenueFormConstants.BUTTON_NAME}
               color="primary"
               hoverColor="secondary"
               size="medium"
