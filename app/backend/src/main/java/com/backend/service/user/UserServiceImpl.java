@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -31,11 +30,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = User.builder()
                 .id(registerRequest.getId())
-                .phone(null)
-                .profilePicture(null)
                 .type(registerRequest.getRole().equals(UserType.ATTENDEE.name()) ? UserType.ATTENDEE : UserType.ORGANISER)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
         this.userRepository.saveAndFlush(user);
         log.debug("User with id {} registered successfully", registerRequest.getId());

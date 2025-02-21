@@ -12,6 +12,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,15 +71,21 @@ public class User {
     private UserType type;
 
     @Column(unique = true, length = 15)
+    @ColumnDefault("null")
     private String phone;
 
     @Column(length = 255)
+    @ColumnDefault("null")
     private String profilePicture;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @ColumnDefault("current_timestamp(6)")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @ColumnDefault("current_timestamp(6)")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Override
