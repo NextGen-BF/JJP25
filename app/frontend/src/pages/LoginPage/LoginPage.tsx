@@ -6,7 +6,7 @@ import { AppDispatch } from '../../redux/store';
 import "./LoginPage.scss";
 import sideImage from "../../assets/side-image.png";
 import gmailLogo from "../../assets/google-color.png";
-import { LoginPageConstants } from "../../constants/LoginPageConstants";
+import { LoginPageConstants } from "../../constants/AuthenticationConstants";
 
 interface FormValues {
   username: string;
@@ -137,6 +137,9 @@ const LoginPage: FC = () => {
           <div className="login-form-bottom">
             <p className="signup-prompt">
               {LoginPageConstants.SIGNUP_PROMPT} <Link to="/register">{LoginPageConstants.SIGNUP_TEXT}</Link>
+            </p>
+            <p className="forgot-password-link">
+              <Link to="/forgot-password">{LoginPageConstants.FORGOT_PASSWORD_PROMPT}</Link>
             </p>
           </div>
         </div>
