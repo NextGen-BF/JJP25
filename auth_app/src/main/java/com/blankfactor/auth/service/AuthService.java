@@ -19,6 +19,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,9 +30,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +47,10 @@ public class AuthService {
     private static final String PASSWORDS_DO_NOT_MATCH = "Passwords do not match. Please try again.";
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
+    private static final String TOKEN_PARAM_STRING = "?token=";
+
+    @Value("${app.reset-password.url}")
+    private String resetPasswordBaseUrl;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -55,6 +58,7 @@ public class AuthService {
     private final TemplateEngine templateEngine;
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -213,6 +217,54 @@ public class AuthService {
         context.setVariable("code", code);
         log.debug("Generated HTML verification message for user: {}", username);
         return templateEngine.process("verify-account-mail", context);
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword, String confirmPassword) {
+        log.info("Resetting password using token.");
+        if (!newPassword.equals(confirmPassword)) {
+            log.warn("Passwords do not match");
+            throw new PasswordsDoNotMatchException("Passwords do not match. Please try again.");
+        }
+
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("User not found with username: {}", username);
+                    return new UserNotFoundException(String.format("Username %s is not found", username));
+                });
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.saveAndFlush(user);
+        log.info("Password reset successfully for user: {}", username);
+    }
+
+    public void forgotPassword(String email) {
+        log.info("Processing forgot password for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                        log.warn("User not found with email: {}", email);
+                        return new UserNotFoundException(String.format("Email %s is not found", email));
+                        });
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("reset", true);
+        String resetToken = jwtService.generateToken(extraClaims, user);
+
+        String resetLink = resetPasswordBaseUrl + TOKEN_PARAM_STRING + resetToken;
+
+        Context context = new Context();
+        context.setVariable("username", user.getUsername());
+        context.setVariable("resetLink", resetLink);
+
+        String emailBody = templateEngine.process("reset-password-mail", context);
+
+        try {
+            emailService.sendResetPasswordEmail(user.getEmail(), "Reset Your Password", emailBody);
+            log.info("Password reset email sent to: {}", email);
+        } catch (MessagingException e) {
+            log.error("Failed to send reset password email to: {}", email, e);
+            throw new VerificationEmailNotSentException(String.format("Failed to send reset password email to %s", email), e);
+        }
     }
 
 }
