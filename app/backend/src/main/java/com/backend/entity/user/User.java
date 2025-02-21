@@ -72,7 +72,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserType type;
 
-    @Column(nullable = false, unique = true, length = 15)
+    @Column(unique = true, length = 15)
     private String phone;
 
     @Column(length = 255)
