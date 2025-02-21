@@ -2,21 +2,22 @@ import React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Button, Stack, Chip } from "@mui/material";
+import { Button, Stack, Chip, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { MultiDatePickerConstants } from "../../constants/MultiDatePickerConstants";
 import { MultiDatePickerStyles } from "./MultiDatePickerStyles";
 import Box from "@mui/material/Box";
-import { DeleteOutline, DeleteOutlineRounded } from "@mui/icons-material";
 
 interface MultiDatePickerProps {
   selectedDates: Dayjs[];
   setSelectedDates: (dates: Dayjs[]) => void;
+  error?: string;
 }
 
 const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
   selectedDates,
   setSelectedDates,
+  error,
 }) => {
   const handleAddDate = (newDate: Dayjs | null) => {
     if (newDate && !selectedDates.some((date) => date.isSame(newDate, "day"))) {
@@ -52,26 +53,20 @@ const MultiDatePicker: React.FC<MultiDatePickerProps> = ({
             </Button>
           </Box>
 
-          {/* Should think about displaying of chips in the future */}
-          <Stack
-            direction="row"
-            spacing={1}
-            flexWrap="wrap"
-            sx={MultiDatePickerStyles.stackWrapper}
-          >
+          <Box sx={MultiDatePickerStyles.stackWrapper}>
             {selectedDates
               .sort((a, b) => (a.isBefore(b) ? -1 : 1))
               .map((date, index) => (
                 <Chip
                   key={index}
-                  label={date.format("YYYY-MM-DD")}
+                  label={date.format("DD/MM/YYYY")}
                   onDelete={() => handleRemoveDate(date)}
                   style={{
                     ...MultiDatePickerStyles.chip,
                   }}
                 />
               ))}
-          </Stack>
+          </Box>
         </Stack>
       </Box>
     </LocalizationProvider>

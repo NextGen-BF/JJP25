@@ -158,7 +158,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
         </Box>
 
         <Box sx={EventFormStyles.rightBox}>
-          <Box sx={EventFormStyles.eventDatesBox}>
+          <Box>
             <Typography variant="h6" sx={{ pb: 2 }}>
               {EventFormConstants.LABELS.EVENT_DATES}
             </Typography>

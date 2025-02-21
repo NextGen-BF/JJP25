@@ -1,15 +1,16 @@
 export const EventFormStyles = {
   formContainer: {
     position: "relative",
-    width: "100vw",
+    width: "90vw",
     height: "80vh",
-    maxWidth: "1000px",
+    maxWidth: "1200px",
     maxHeight: "680px",
     backgroundColor: "#f5f5f7",
     borderRadius: "15px",
     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",
     display: "flex",
-    padding: "0 8%",
+    padding: "0 50px",
+    overflow: "hidden",
 
     "@media (max-width: 768px)": {
       position: "absolute",
@@ -18,7 +19,7 @@ export const EventFormStyles = {
       justifyContent: "flex-start",
       maxWidth: "90%",
       maxHeight: "100%",
-      height: "85%",
+      height: "77%",
       overflowY: "scroll",
       padding: "0 5%",
     },
@@ -36,9 +37,9 @@ export const EventFormStyles = {
     paddingTop: "120px",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 45%",
-      maxHeight: "45%",
-      paddingTop: "20px",
+      flex: "0 1 50%",
+      maxHeight: "50%",
+      paddingTop: "10px",
       maxWidth: "100%",
       width: "100%",
       gap: "10px",
@@ -52,33 +53,25 @@ export const EventFormStyles = {
     justifyContent: "flex-start",
     maxWidth: "40%",
     maxHeight: "100%",
-    gap: "24px",
     height: "100%",
     paddingTop: "120px",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 45%",
-      maxHeight: "45%",
-      paddingTop: "20px",
-      gap: "12px",
+      flex: "0 1 40%",
+      maxHeight: "40%",
+      paddingTop: "10px",
       maxWidth: "100%",
       width: "100%",
     },
   },
 
-  eventDatesBox: {
-    gap: "16px",
-  },
-
   selectorsBox: {
     display: "flex",
     flexDirection: "column",
-    gap: "24px",
     width: "100%",
-    maxWidth: "600px",
+    maxWidth: "100%",
 
     "@media (max-width: 768px)": {
-      gap: "12px",
       maxWidth: "100%",
     },
   },

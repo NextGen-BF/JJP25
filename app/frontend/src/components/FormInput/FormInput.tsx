@@ -51,8 +51,11 @@ const FormInput: React.FC<FormInputProps> = ({
             multiline={multiline}
             rows={rows}
             error={!!error}
-            helperText={error}
-            sx={{ mb: 2, ...sx }}
+            helperText={error ? error : " "}
+            sx={{
+              mb: 2,
+              ...sx,
+            }}
             onChange={(e) => {
               field.onChange(e);
               if (onChange) {

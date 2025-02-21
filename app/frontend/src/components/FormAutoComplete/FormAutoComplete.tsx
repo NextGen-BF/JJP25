@@ -51,7 +51,7 @@ const FormAutoComplete: FC<FormAutoCompleteProps> = ({
                 {...params}
                 label={label}
                 error={!!error}
-                helperText={error}
+                helperText={error ? error : " "}
               />
             )}
             sx={{ ...sx }}
