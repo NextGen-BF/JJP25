@@ -13,7 +13,7 @@ type RegisterPayload = {
 };
 
 export const registerUser = createAsyncThunk(
-  "auth/register",
+  "registerData/register",
   async (userData: RegisterPayload, { rejectWithValue }) => {
     try {
       const url = import.meta.env.VITE_SIGN_UP_URL;

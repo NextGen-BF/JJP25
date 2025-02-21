@@ -23,8 +23,8 @@ import { label } from "./Labels";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../redux/store";
 import { RootState } from "../../redux/store";
-import { registerUser } from "../../redux/services/authService";
-import { resetState } from "../../redux/slices/authSlice";
+import { registerUser } from "../../redux/services/registerService";
+import { resetState } from "../../redux/slices/registerSlice";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 

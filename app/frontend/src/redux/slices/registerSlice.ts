@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { registerUser } from "../services/authService";
+import { registerUser } from "../services/registerService";
 
-type AuthState = {
+type userDataState = {
   email: string | null;
   username: string | null;
   firstName: string | null;
@@ -10,7 +10,7 @@ type AuthState = {
   success: boolean;
 };
 
-const initialState: AuthState = {
+const initialState: userDataState = {
   email: null,
   username: null,
   firstName: null,
@@ -20,7 +20,7 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: "registerData",
   initialState,
   reducers: {
     resetState: (state) => {
