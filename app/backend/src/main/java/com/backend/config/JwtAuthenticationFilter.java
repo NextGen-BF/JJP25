@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +22,8 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final String secretKey = "i2p5jX9yLqKJ6qfZtU1vA9xNb3uKmMxZ1FOUJcOJx2Q=";
+    @Value("${security.jwt.secret-key}")
+    private String secretKey;
 
     @Override
     protected void doFilterInternal(
