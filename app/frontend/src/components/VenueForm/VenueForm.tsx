@@ -18,6 +18,18 @@ import {
   updateVenue,
 } from "../../redux/slices/venueSlice";
 import ButtonComponent from "../button/ButtonComponent";
+import { z } from "zod";
+
+const venueValidationSchema = {
+  phone: z
+    .string()
+    .regex(
+      VenueFormConstants.VALIDATION.PHONE_REGEX,
+      VenueFormConstants.VALIDATION.PHONE
+    ),
+
+  website: z.string().url(VenueFormConstants.VALIDATION.WEBSITE),
+};
 
 const VenueForm: FC = () => {
   const dispatch = useDispatch();
@@ -35,11 +47,13 @@ const VenueForm: FC = () => {
     defaultValues: venue,
     mode: "onChange",
     reValidateMode: "onSubmit",
+    shouldUnregister: true,
   });
 
-  const handleChange = (field: keyof Venue, value: any) => {
+  const handleChange = async (field: keyof Venue, value: any) => {
     dispatch(updateVenue({ [field]: value }));
     setValue(field, value);
+    await trigger(field);
   };
 
   const initialVenueRef = useRef<Venue>(venue);
@@ -95,6 +109,16 @@ const VenueForm: FC = () => {
             defaultValue={venue.phone}
             error={errors.phone?.message as string}
             onChange={(e) => handleChange("phone", e.target.value)}
+            rules={{
+              required: false,
+              validate: (value: string) => {
+                if (!value) return true;
+                return (
+                  venueValidationSchema.phone.safeParse(value).success ||
+                  VenueFormConstants.VALIDATION.PHONE_FORMAT
+                );
+              },
+            }}
           />
           <FormInput
             name={VenueFormConstants.NAMES.WEBSITE}
@@ -103,6 +127,16 @@ const VenueForm: FC = () => {
             defaultValue={venue.website}
             error={errors.website?.message as string}
             onChange={(e) => handleChange("website", e.target.value)}
+            rules={{
+              required: false,
+              validate: (value: string) => {
+                if (!value) return true;
+                return (
+                  venueValidationSchema.website.safeParse(value).success ||
+                  VenueFormConstants.VALIDATION.WEBSITE
+                );
+              },
+            }}
           />
 
           <Box sx={{ pt: 3 }}>

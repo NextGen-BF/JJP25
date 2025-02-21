@@ -42,19 +42,15 @@ export const VenueFormConstants = {
     "Mexico",
   ],
 
-  VALIDATIONS: {
-    REQUIRED: "This field is required.",
-    PHONE: {
-      PATTERN: {
-        VALUE: /^[0-9]{10,15}$/,
-        MESSAGE: "Please enter a valid phone number.",
-      },
-    },
-    WEBSITE: {
-      PATTERN: {
-        VALUE: /^(https?:\/\/)?([\w\d-]+\.)+[\w\d]{2,}(\/.*)?$/,
-        MESSAGE: "Please enter a valid website URL.",
-      },
-    },
+  VALIDATION: {
+    PHONE_REGEX: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/,
+    PHONE:
+      "Phone number must be valid, including country code (e.g., +359123456789)",
+    WEBSITE:
+      "Invalid website URL. Use http:// or https:// followed by a valid domain name.",
+    REQUIRED: "This field is required",
+    INVALID_URL: "Please enter a valid URL",
+    PHONE_FORMAT:
+      "Phone number must be in a valid format, such as +359123456789",
   },
 };

@@ -68,6 +68,7 @@ export const VenueFormStyles = {
     flexDirection: "column",
     gap: "8px",
     width: "100%",
+
     "@media (max-width: 768px)": {
       gap: "0px",
     },
