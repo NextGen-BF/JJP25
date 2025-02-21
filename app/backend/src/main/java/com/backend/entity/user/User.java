@@ -1,6 +1,5 @@
 package com.backend.entity.user;
 
-import com.backend.entity.BaseEntity;
 import com.backend.entity.feedback.Feedback;
 import com.backend.entity.event.Event;
 import com.backend.entity.notification.Notification;
@@ -79,16 +78,6 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     @Override
     public boolean equals(Object o) {
