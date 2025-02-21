@@ -9,7 +9,7 @@ export const VenueFormStyles = {
     borderRadius: "15px",
     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",
     display: "flex",
-    padding: "0 8%",
+    padding: "0 50px",
 
     "@media (max-width: 768px)": {
       position: "absolute",
