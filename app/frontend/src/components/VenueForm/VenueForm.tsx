@@ -64,7 +64,6 @@ const VenueForm: FC = () => {
       toast.success(VenueFormConstants.TOAST_MESSAGES.SUCCESS_VENUE_CREATION);
       setIsSubmitted(true);
     } else {
-      console.log("venue", venue);
       const isVenueChanged =
         JSON.stringify(venue) !== JSON.stringify(initialVenueRef.current);
 
