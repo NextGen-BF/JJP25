@@ -17,6 +17,8 @@ import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
 import CreateEventPage from "./pages/adminPages/CreateEventPage/CreateEventPage";
 import CreateEventSucessPage from "./pages/adminPages/CreateEventSucessPage/CreateEventSucessPage";
 import AccountPage from "./pages/adminPages/AccountPage/AccountPage";
+import ResetPasswordPage from "./pages/ResetPassswordPage/ResetPasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.scss";
 import MockUserList from "./pages/MockUserList/MockUserList";
@@ -44,6 +46,8 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/not-found" element={<NotFoundPage />} />
             <Route path="/mock-users" element={<MockUserList />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="*" element={<Navigate to="/not-found" replace />} />
             // Admin routes
             <Route
