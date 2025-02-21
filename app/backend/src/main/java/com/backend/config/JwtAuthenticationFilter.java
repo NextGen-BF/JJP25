@@ -42,9 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token)
                     .getBody();
-            if (!"ems_auth_app".equals(claims.getIssuer())) {
-                throw new JwtException("Invalid Token Issuer");
-            }
             Date expiration = claims.getExpiration();
             if (expiration.before(new Date())) {
                 throw new JwtException("Token Expired");
