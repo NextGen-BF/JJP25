@@ -76,7 +76,7 @@ const VenueForm: FC = () => {
 
   return (
     <Box sx={VenueFormStyles.formContainer}>
-      <form onSubmit={handleSubmit(onSubmit)} className="event-form">
+      <form onSubmit={handleSubmit(onSubmit)} className="venue-form">
         <Box sx={VenueFormStyles.leftBox}>
           <FormInput
             name={VenueFormConstants.NAMES.VENUE_NAME}
