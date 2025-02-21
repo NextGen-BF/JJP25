@@ -2,6 +2,7 @@ package com.backend.entity.dto.imp;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Getter
@@ -12,6 +13,7 @@ import lombok.*;
 public class RegisterRequest {
 
     @NotNull(message = "{id.required}")
+    @Positive(message = "{id.invalid}")
     private Long id;
 
     @NotNull(message = "{role.required}")
