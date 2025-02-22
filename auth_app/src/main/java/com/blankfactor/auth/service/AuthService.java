@@ -1,16 +1,12 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
-import com.blankfactor.auth.entity.dto.exp.InformResponse;
 import com.blankfactor.auth.entity.dto.imp.InformRequest;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
 import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
@@ -22,8 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +40,8 @@ public class AuthService {
 
     private static final String USER_NOT_FOUND = "%s is not found";
     private static final String USER_FOUND = "%s is already in use";
+    private static final String USER_EXISTS = "User with id: %s already exists";
+    private static final String USER_NOT_AUTHENTICATED = "The request might not have token or has an expired one";
     private static final String USER_ALREADY_VERIFIED = "%s is already verified";
     private static final String CODE_EXPIRED = "Verification code %s has expired";
     private static final String CODE_INCORRECT = "Incorrect verification code: %s";
@@ -64,6 +62,7 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RestClient restClient;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -84,7 +83,8 @@ public class AuthService {
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
         // TODO: move somewhere else, because it causes a huge delay: sendVerificationEmail(user);
-        ResponseEntity<InformResponse> informResponseResponseEntity = informEmsApp(user.getId(), registerRequest.getRole());
+        // TODO: user should be verified first in order for this to work -> String token = instantLogin(user, user.getPassword());
+        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
@@ -249,9 +249,9 @@ public class AuthService {
         log.info("Processing forgot password for email: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                        log.warn("User not found with email: {}", email);
-                        return new UserNotFoundException(String.format("Email %s is not found", email));
-                        });
+                    log.warn("User not found with email: {}", email);
+                    return new UserNotFoundException(String.format("Email %s is not found", email));
+                });
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("reset", true);
         String resetToken = jwtService.generateToken(extraClaims, user);
@@ -273,14 +273,31 @@ public class AuthService {
         }
     }
 
-    private ResponseEntity<InformResponse> informEmsApp(Long id, String role) {
-        InformRequest informRequest = InformRequest.builder()
-                .id(id)
-                .role(role.toUpperCase())
-                .build();
-        RestClient restClient = RestClient.create();
-        // TODO
-        return null;
+    /* private String instantLogin(User user, String password) {
+        this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), password));
+        return this.jwtService.generateToken(user);
+    } */
+
+    private void informEmsApp(Long id, String role, String token) {
+        this.restClient
+                .post()
+                .uri("http://localhost:8080/register")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(InformRequest.builder()
+                        .id(id)
+                        .role(role.toUpperCase())
+                        .build())
+                .exchange((request, response) -> {
+                    if (response.getStatusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
+                        throw new InvalidInformRequestException(USER_NOT_AUTHENTICATED);
+                    }
+                    if (response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
+                        throw new UserExistsException(String.format(USER_EXISTS, id));
+                    }
+                    return true;
+                });
     }
 
 }

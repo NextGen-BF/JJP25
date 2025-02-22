@@ -3,10 +3,7 @@ package com.blankfactor.auth.exception;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.log4j.Log4j2;
@@ -34,31 +31,43 @@ public class GlobalExceptionHandler {
             JwtException.class,
             ExpiredJwtException.class,
             IllegalArgumentException.class})
-    public ResponseEntity<Map<String, String>> handleCustomExceptions(RuntimeException ex) {
+    public ResponseEntity<Map<String, String>> handleBadRequest(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorized(InvalidCredentialsException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({UserNotVerifiedException.class, InvalidInformRequestException.class})
+    public ResponseEntity<Map<String, String>> handleForbidden(UserNotVerifiedException ex){
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler({UserNotFoundException.class})
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(RuntimeException ex) {
+    public ResponseEntity<Map<String, String>> handleNotFound(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("404", "NOT_FOUND", ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UserVerifiedException.class, UserFoundException.class})
-    public ResponseEntity<Map<String, String>> handleUserVerifiedException(RuntimeException ex) {
+    @ExceptionHandler({UserVerifiedException.class, UserFoundException.class, UserExistsException.class})
+    public ResponseEntity<Map<String, String>> handleConfilt(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler({ExpiredVerificationCodeException.class})
-    public ResponseEntity<Map<String, String>> handleExpiredVerificationCodeException(RuntimeException ex) {
+    public ResponseEntity<Map<String, String>> handleGone(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("410", "GONE", ex.getMessage()), new HttpHeaders(), HttpStatus.GONE);
     }
 
     @ExceptionHandler({Exception.class, VerificationEmailNotSentException.class})
-    public ResponseEntity<Map<String, String>> handleVerificationEmailNotSentException(Exception ex) {
+    public ResponseEntity<Map<String, String>> handleInternalServerError(Exception ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -72,18 +81,6 @@ public class GlobalExceptionHandler {
                 ));
         log.error("Validation errors: {}", fieldErrorsMap);
         return new ResponseEntity<>(fieldErrorsMap, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserNotVerifiedException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotVerifiedException(UserNotVerifiedException ex){
-        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
-        return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
-        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
-        return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     private Map<String, String> getErrorsMap(String code, String title, String message) {
