@@ -87,7 +87,7 @@ public class AuthService {
                 .build();
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
-        // TODO: move somewhere else, because it causes a huge delay: sendVerificationEmail(user);
+        sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
