@@ -161,6 +161,7 @@ public class AuthService {
         log.debug("User with email {} verified successfully", userEmail);
         autoLogin(user);
         informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
+        log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
@@ -281,12 +282,15 @@ public class AuthService {
     }
 
     private void autoLogin(User user) {
+        log.debug("Attempting to automatically login user with email: {}", user.getEmail());
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(user.getUsername());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.debug("User with email {} logged in successfully", user.getEmail());
     }
 
     private void informEmsApp(Long id, String role, String token) {
+        log.debug("Sending { \"id\": \"{}\", \"role:\" \"{}\" } to ems_app backend", id, role);
         try {
             this.restClient
                     .post()
@@ -299,9 +303,11 @@ public class AuthService {
                             .build())
                     .exchange((request, response) -> {
                         if (response.getStatusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
+                            log.error("The request was forbidden due to missing or expired token.");
                             throw new InvalidInformRequestException(USER_NOT_AUTHENTICATED);
                         }
                         if (response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
+                            log.error("The request faced a conflict due to the existence of user with id: {}", id);
                             throw new UserExistsException(String.format(USER_EXISTS, id));
                         }
                         return true;
