@@ -156,19 +156,6 @@ const VenueForm: FC = () => {
 
         <Box sx={VenueFormStyles.rightBox}>
           <Box sx={VenueFormStyles.fieldsBox}>
-            <Typography sx={FormInputStyles.typography}>
-              {VenueFormConstants.LABELS.COUNTRY}
-            </Typography>
-            <FormAutoComplete
-              name={VenueFormConstants.NAMES.COUNTRY}
-              control={control}
-              label={VenueFormConstants.LABELS.COUNTRY}
-              defaultValue={venue.country}
-              options={VenueFormConstants.COUNTRIES}
-              required
-              error={errors.country?.message as string}
-              onChange={(value) => handleChange("country", value)}
-            />
             <FormInput
               name={VenueFormConstants.NAMES.CITY}
               control={control}
@@ -184,10 +171,22 @@ const VenueForm: FC = () => {
               label={VenueFormConstants.LABELS.ADDRESS}
               defaultValue={venue.address}
               multiline
-              rows={3}
+              rows={4}
               required
               error={errors.address?.message as string}
               onChange={(e) => handleChange("address", e.target.value)}
+            />
+
+            <FormAutoComplete
+              name={VenueFormConstants.NAMES.COUNTRY}
+              control={control}
+              label={VenueFormConstants.LABELS.COUNTRY}
+              defaultValue={venue.country}
+              options={VenueFormConstants.COUNTRIES}
+              required
+              error={errors.country?.message as string}
+              onChange={(value) => handleChange("country", value)}
+              sx={{ pt: 1 }}
             />
           </Box>
 
