@@ -30,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -55,6 +56,7 @@ public class AuthService {
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
     private static final String TOKEN_PARAM_STRING = "?token=";
+    private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment.";
 
     @Value("${app.reset-password.url}")
     private String resetPasswordBaseUrl;
@@ -285,24 +287,28 @@ public class AuthService {
     }
 
     private void informEmsApp(Long id, String role, String token) {
-        this.restClient
-                .post()
-                .uri("http://localhost:8080/register")
-                .header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(InformRequest.builder()
-                        .id(id)
-                        .role(role.toUpperCase())
-                        .build())
-                .exchange((request, response) -> {
-                    if (response.getStatusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
-                        throw new InvalidInformRequestException(USER_NOT_AUTHENTICATED);
-                    }
-                    if (response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
-                        throw new UserExistsException(String.format(USER_EXISTS, id));
-                    }
-                    return true;
-                });
+        try {
+            this.restClient
+                    .post()
+                    .uri("http://localhost:8080/register")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(InformRequest.builder()
+                            .id(id)
+                            .role(role.toUpperCase())
+                            .build())
+                    .exchange((request, response) -> {
+                        if (response.getStatusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
+                            throw new InvalidInformRequestException(USER_NOT_AUTHENTICATED);
+                        }
+                        if (response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
+                            throw new UserExistsException(String.format(USER_EXISTS, id));
+                        }
+                        return true;
+                    });
+        } catch (ResourceAccessException e) {
+            throw new ServiceUnavailableException(SERVICE_UNAVAILABLE);
+        }
     }
 
 }

@@ -72,6 +72,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap("500", "INTERNAL_SERVER_ERROR", ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler({ServiceUnavailableException.class})
+    public ResponseEntity<Map<String, String>> handleServiceUnavailable(Exception ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("503", "SERVICE_UNAVAILABLE", ex.getMessage()), new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, List<String>> fieldErrorsMap = ex.getBindingResult().getFieldErrors().stream()
