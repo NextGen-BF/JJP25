@@ -1,5 +1,5 @@
-import { useForm, Controller } from "react-hook-form";
-import { Box, Button, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { Box } from "@mui/material";
 import { VenueFormStyles } from "./VenueFormStyles";
 import { VenueFormConstants } from "../../constants/VenueFormConstants";
 import "./VenueFormStyles.scss";
@@ -19,7 +19,7 @@ import {
 } from "../../redux/slices/venueSlice";
 import ButtonComponent from "../button/ButtonComponent";
 import { z } from "zod";
-import { FormInputStyles } from "../FormInput/FormInputStyles";
+import { FormStyles } from "../../styles/FormStyles";
 
 const venueValidationSchema = {
   phone: z
@@ -90,7 +90,7 @@ const VenueForm: FC = () => {
   };
 
   return (
-    <Box sx={VenueFormStyles.formContainer}>
+    <Box sx={FormStyles.formContainer}>
       <form onSubmit={handleSubmit(onSubmit)} className="venue-form">
         <Box sx={VenueFormStyles.leftBox}>
           <FormInput

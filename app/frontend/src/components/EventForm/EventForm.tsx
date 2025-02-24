@@ -5,6 +5,7 @@ import "./EventFormStyles.scss";
 import FormSelect from "../FormSelect/FormSelect";
 import FormInput from "../FormInput/FormInput";
 import { EventFormConstants } from "../../constants/EventFormConstants";
+import { FormInputStyles } from "../FormInput/FormInputStyles";
 import FormAutoComplete from "../FormAutoComplete/FormAutoComplete";
 import { Dayjs } from "dayjs";
 import MultiDatePicker from "../MultiDatePicker/MultiDatePicker";
@@ -22,6 +23,7 @@ import {
 } from "../../redux/slices/eventSlice";
 import { Event } from "../../redux/slices/eventSlice";
 import { RootState } from "../../redux/store";
+import { FormStyles } from "../../styles/FormStyles";
 
 const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
   const dispatch = useDispatch();
@@ -107,7 +109,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
   };
 
   return (
-    <Box sx={EventFormStyles.formContainer}>
+    <Box sx={FormStyles.formContainer}>
       <form onSubmit={handleSubmit(onSubmit)} className="event-form">
         <Box sx={EventFormStyles.leftBox}>
           <FormInput
@@ -159,7 +161,7 @@ const EventForm = forwardRef((props, ref: React.ForwardedRef<unknown>) => {
 
         <Box sx={EventFormStyles.rightBox}>
           <Box>
-            <Typography variant="h6" sx={{ pb: 2 }}>
+            <Typography sx={{ pb: 2, ...FormInputStyles.typography }}>
               {EventFormConstants.LABELS.EVENT_DATES}
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
