@@ -23,6 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +67,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RestClient restClient;
+    private final UserDetailsService userDetailsService;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -83,8 +88,6 @@ public class AuthService {
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
         // TODO: move somewhere else, because it causes a huge delay: sendVerificationEmail(user);
-        // TODO: user should be verified first in order for this to work -> String token = instantLogin(user, user.getPassword());
-        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
@@ -154,6 +157,8 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} verified successfully", userEmail);
+        autoLogin(user);
+        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
@@ -273,11 +278,11 @@ public class AuthService {
         }
     }
 
-    /* private String instantLogin(User user, String password) {
-        this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), password));
-        return this.jwtService.generateToken(user);
-    } */
+    private void autoLogin(User user) {
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(user.getUsername());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
     private void informEmsApp(Long id, String role, String token) {
         this.restClient
