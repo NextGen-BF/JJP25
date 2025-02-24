@@ -28,7 +28,7 @@ const FormAutoComplete: FC<FormAutoCompleteProps> = ({
   onChange,
 }) => {
   return (
-    <FormControl fullWidth sx={{ mb: 2 }} error={!!error}>
+    <FormControl fullWidth error={!!error}>
       <Controller
         name={name}
         control={control}
