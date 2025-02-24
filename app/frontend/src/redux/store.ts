@@ -3,6 +3,7 @@ import usersReducer from "./slices/usersSlice";
 import eventReducer from "./slices/eventSlice";
 import venueReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
+import ticketReducer from "./slices/ticketSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     event: eventReducer,
     venue: venueReducer,
     auth: authReducer,
+    ticket: ticketReducer,
   },
 
   middleware: (getDefaultMiddleware) =>

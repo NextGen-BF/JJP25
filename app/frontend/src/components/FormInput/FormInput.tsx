@@ -5,6 +5,7 @@ import { FormInputStyles } from "./FormInputStyles";
 
 interface FormInputProps {
   defaultValue: string;
+  type?: string;
   name: string;
   control: any;
   rules?: object;
@@ -21,6 +22,7 @@ interface FormInputProps {
 
 const FormInput: React.FC<FormInputProps> = ({
   defaultValue,
+  type = "text",
   name,
   control,
   rules,
@@ -46,6 +48,7 @@ const FormInput: React.FC<FormInputProps> = ({
         render={({ field }) => (
           <TextField
             {...field}
+            type={type}
             aria-label={label}
             fullWidth
             required={required}
