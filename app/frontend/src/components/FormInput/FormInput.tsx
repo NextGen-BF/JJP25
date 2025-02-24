@@ -1,6 +1,7 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { TextField, Typography } from "@mui/material";
+import { FormInputStyles } from "./FormInputStyles";
 
 interface FormInputProps {
   defaultValue: string;
@@ -33,7 +34,7 @@ const FormInput: React.FC<FormInputProps> = ({
 }) => {
   return (
     <>
-      <Typography variant="h6">{label}</Typography>
+      <Typography sx={FormInputStyles.typography}>{label}</Typography>
       <Controller
         name={name}
         control={control}
@@ -51,8 +52,10 @@ const FormInput: React.FC<FormInputProps> = ({
             multiline={multiline}
             rows={rows}
             error={!!error}
-            helperText={error}
-            sx={{ mb: 2, ...sx }}
+            helperText={error ? error : " "}
+            sx={{
+              ...sx,
+            }}
             onChange={(e) => {
               field.onChange(e);
               if (onChange) {

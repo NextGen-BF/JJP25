@@ -33,7 +33,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   onChange,
 }) => {
   return (
-    <FormControl fullWidth sx={{ mb: 2 }}>
+    <FormControl fullWidth>
       <InputLabel>{label}</InputLabel>
       <Controller
         name={name}
@@ -62,9 +62,9 @@ const FormSelect: React.FC<FormSelectProps> = ({
           </Select>
         )}
       />
-      {error && (
-        <FormHelperText sx={{ color: "error.main" }}>{error}</FormHelperText>
-      )}
+      <FormHelperText sx={{ color: "error.main" }}>
+        {error ? error : " "}
+      </FormHelperText>
     </FormControl>
   );
 };

@@ -1,4 +1,4 @@
-export const EventFormStyles = {
+export const VenueFormStyles = {
   leftBox: {
     flex: "0 1 50%",
     display: "flex",
@@ -8,14 +8,14 @@ export const EventFormStyles = {
     maxHeight: "100%",
     paddingTop: "100px",
     paddingBottom: "100px",
+    gap: "8px",
     height: "100%",
-    gap: "16px",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 50%",
+      flex: "0 1 45%",
       paddingTop: "0px",
       paddingBottom: "0px",
-      maxHeight: "auto%",
+      maxHeight: "auto",
       maxWidth: "90%",
       width: "90%",
       gap: "0px",
@@ -31,27 +31,39 @@ export const EventFormStyles = {
     justifyContent: "flex-start",
     maxWidth: "40%",
     maxHeight: "100%",
+    gap: "8px",
     height: "100%",
 
     "@media (max-width: 768px)": {
-      flex: "0 1 40%",
-      maxHeight: "40%",
+      flex: "0 1 45%",
       paddingTop: "0px",
       paddingBottom: "0px",
+      maxHeight: "auto",
       maxWidth: "90%",
       width: "90%",
+      gap: "0px",
     },
   },
 
-  selectorsBox: {
+  fieldsBox: {
     display: "flex",
     flexDirection: "column",
-    width: "100%",
-    maxWidth: "100%",
     gap: "8px",
+    width: "100%",
 
     "@media (max-width: 768px)": {
-      maxWidth: "100%",
+      gap: "0px",
+    },
+  },
+
+  buttonBox: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+
+    "@media (max-width: 768px)": {
+      alignItems: "center",
+      paddingBottom: "24px",
     },
   },
 };

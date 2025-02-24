@@ -1,9 +1,7 @@
-import EventForm from "../../../components/EventForm/EventForm"
+import EventStepper from "../../../components/EventStepper/EventStepper";
 
 const CreateEventPage = () => {
-  return (
-    <EventForm/>
-  )
-}
+  return <EventStepper />;
+};
 
 export default CreateEventPage;
