@@ -37,13 +37,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleUnauthorized(InvalidCredentialsException ex) {
+    public ResponseEntity<Map<String, String>> handleUnauthorized(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({UserNotVerifiedException.class, InvalidInformRequestException.class})
-    public ResponseEntity<Map<String, String>> handleForbidden(UserNotVerifiedException ex){
+    public ResponseEntity<Map<String, String>> handleForbidden(RuntimeException ex){
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }

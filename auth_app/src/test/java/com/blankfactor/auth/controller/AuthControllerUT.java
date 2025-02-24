@@ -7,12 +7,11 @@ import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
 import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
+import com.blankfactor.auth.exception.custom.InvalidInformRequestException;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.ServiceUnavailableException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -56,8 +55,6 @@ public class AuthControllerUT {
     private static final String PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE = "Passwords do not match. Please try again.";
     private static final String JWT_TOKEN_EXPIRED_ERROR_MESSAGE = "JWT token is expired or invalid";
     private static final String USER_NOT_FOUND_ERROR_MESSAGE = "User is not found";
-
-
 
     @Autowired
     private MockMvc mockMvc;
@@ -309,7 +306,10 @@ public class AuthControllerUT {
          * 3.Incorrect verification code
          * 4.User already verified
          * 5.Blank values (ex. "email": "")
-         * 6.Plain object (ex. {}) */
+         * 6.Plain object (ex. {})
+         * 7.Method informEmsApp() throws Forbidden
+         * 8.Method informEmsApp() throws Conflict
+         * 9.Verification not possible */
 
         @Test
         void shouldSuccessfullyVerifyUser() throws Exception {
@@ -425,6 +425,67 @@ public class AuthControllerUT {
                     .andExpect(jsonPath("$.verificationCode").isArray())
                     .andExpect(jsonPath("$.verificationCode", hasSize(1)));
         }
+
+        @Test
+        void shouldReturnResponseWithInvalidInformRequestError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "The request might not have token or has an expired one";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new InvalidInformRequestException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithUserExistsError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "User with id: 1 already exists";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserExistsException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithServiceUnavailableError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "Sorry, verification is not possible at the moment.";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new ServiceUnavailableException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isServiceUnavailable())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
     }
 
     @Nested
@@ -609,12 +670,12 @@ public class AuthControllerUT {
         @Test
         void shouldSuccessfullyResetPassword() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
             doNothing().when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
@@ -627,12 +688,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnBadRequestWhenPasswordsDoNotMatch() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
 
             doThrow(new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE))
                     .when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
@@ -647,12 +708,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
             doThrow(new ExpiredJwtException(null, null, JWT_TOKEN_EXPIRED_ERROR_MESSAGE))
                     .when(authService).resetPassword(INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
@@ -667,12 +728,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnNotFoundWhenUserIsNotFound() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
 
             doThrow(new UserNotFoundException(USER_NOT_FOUND_ERROR_MESSAGE))

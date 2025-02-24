@@ -171,7 +171,7 @@ public class AuthServiceIT {
 
     @Nested
     class VerifyTests {
-        @Test
+        @Test // TODO: depends on ems_app, because makes an actual request
         void shouldSuccessfullyVerifyUser() {
             // Given
             RegisterRequest registerRequest = new RegisterRequest(
@@ -205,7 +205,7 @@ public class AuthServiceIT {
             assertTrue(userNotFoundException.getMessage().equals(verifyRequest.getEmail() + " is not found"));
         }
 
-        @Test
+        @Test // TODO: depends on ems_app, because makes an actual request
         void shouldThrowUserVerifiedExceptionWhenTheUserIsAlreadyVerified() {
             // Given
             RegisterRequest registerRequest = new RegisterRequest(
@@ -308,7 +308,7 @@ public class AuthServiceIT {
             assertTrue(userNotFoundException.getMessage().equals(email + " is not found"));
         }
 
-        @Test
+        @Test // TODO: depends on ems_app, because makes an actual request
         void shouldThrowUserVerifiedExceptionWhenTheUserIsAlreadyVerified() {
             // Given
             RegisterRequest registerRequest = new RegisterRequest(

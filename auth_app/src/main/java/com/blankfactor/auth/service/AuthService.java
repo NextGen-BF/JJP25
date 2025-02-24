@@ -56,7 +56,7 @@ public class AuthService {
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
     private static final String TOKEN_PARAM_STRING = "?token=";
-    private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment.";
+    private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment";
 
     @Value("${app.reset-password.url}")
     private String resetPasswordBaseUrl;

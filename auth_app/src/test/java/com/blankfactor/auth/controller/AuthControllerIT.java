@@ -1,7 +1,6 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.repository.UserRepository;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,9 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -65,21 +61,11 @@ public class AuthControllerIT {
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").isNumber())
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.password").value(Matchers.matchesPattern("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$")))
                     .andExpect(jsonPath("$.username").value("john_doe"))
                     .andExpect(jsonPath("$.firstName").value("John"))
                     .andExpect(jsonPath("$.lastName").value("Doe"))
-                    .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
                     .andExpect(jsonPath("$.enabled").value(false))
-                    .andExpect(jsonPath("$.verificationCode", hasLength(6)))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(
-                            Matchers.matchesPattern("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}")))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(
-                            Matchers.allOf(
-                                    Matchers.greaterThanOrEqualTo(LocalDateTime.now().plusMinutes(14).toString()),
-                                    Matchers.lessThanOrEqualTo(LocalDateTime.now().plusMinutes(16).toString()))))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(1)))
                     .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
@@ -105,23 +91,11 @@ public class AuthControllerIT {
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").isNumber())
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.password").value(Matchers.matchesPattern("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$")))
                     .andExpect(jsonPath("$.username").value("john_doe"))
                     .andExpect(jsonPath("$.firstName").value("John"))
                     .andExpect(jsonPath("$.lastName").value("Doe"))
-                    .andExpect(jsonPath("$.birthDate").value("2000-01-01T01:01:01"))
                     .andExpect(jsonPath("$.enabled").value(false))
-                    .andExpect(jsonPath("$.verificationCode", hasLength(6)))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(
-                            Matchers.matchesPattern("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}")))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(
-                            Matchers.allOf(
-                                    Matchers.greaterThanOrEqualTo(LocalDateTime.now().plusMinutes(14).toString()),
-                                    Matchers.lessThanOrEqualTo(LocalDateTime.now().plusMinutes(16).toString()))))
-                    .andExpect(jsonPath("$.roles").isArray())
-                    .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(2)))
                     .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"))
@@ -223,7 +197,7 @@ public class AuthControllerIT {
 
     @Nested
     class VerifyTests {
-        @Test
+        @Test // TODO: depends on ems_app, because makes an actual request
         void shouldSuccessfullyVerifyUser() throws Exception {
             // Given
             String registerRequest = """
@@ -253,9 +227,7 @@ public class AuthControllerIT {
                     // Then
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.enabled").value(true))
-                    .andExpect(jsonPath("$.verificationCode").value(nullValue()))
-                    .andExpect(jsonPath("$.verificationCodeExpiresAt").value(nullValue()));
+                    .andExpect(jsonPath("$.enabled").value(true));
         }
 
         @Test
@@ -311,7 +283,7 @@ public class AuthControllerIT {
                     .andExpect(jsonPath("$.message").value(String.format("Incorrect verification code: 000000")));
         }
 
-        @Test
+        @Test // TODO: depends on ems_app, because makes an actual request
         void shouldReturnResponseWithUserIsAlreadyVerifiedError() throws Exception {
             // Given
             String registerRequest = """

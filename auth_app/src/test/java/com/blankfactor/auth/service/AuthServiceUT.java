@@ -10,10 +10,7 @@ import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
 import com.blankfactor.auth.exception.custom.VerificationEmailNotSentException;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +23,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 
 import java.time.LocalDateTime;
@@ -59,6 +59,12 @@ public class AuthServiceUT {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private UserDetailsService userDetailsService;
+
+    @Mock
+    private RestClient restClient;
 
     @InjectMocks
     private AuthService authService;
