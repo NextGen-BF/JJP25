@@ -22,7 +22,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.ResourceAccessException;
@@ -69,8 +68,15 @@ public class AuthServiceUT {
     @InjectMocks
     private AuthService authService;
 
-    private static final String TEST_EMAIL = "test@example.com";
-    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_EMAIL = "example@email.com";
+    private static final String TEST_PASSWORD = "Password1!";
+    private static final String TEST_USERNAME = "john_doe";
+    private static final String TEST_FIRST_NAME = "John";
+    private static final String TEST_LAST_NAME = "Doe";
+    private static final String TEST_BIRTHDATE = "2000-01-01T01:01:01";
+    private static final String TEST_ATTENDEE_ROLE = "attendee";
+    private static final String TEST_ORGANISER_ROLE = "organiser";
+    private static final String TEST_VERIFICATION_CODE = "123456";
     private static final String VALID_TOKEN = "validToken";
     private static final String NEW_PASSWORD = "newPassword1!";
     private static final String DIFFERENT_PASSWORD = "differentPassword";
@@ -80,53 +86,57 @@ public class AuthServiceUT {
         @Test
         void shouldThrowUserFoundExceptionWhenUserWithSuchEmailExists() {
             // Given
-            RegisterRequest request = new RegisterRequest();
-            request.setEmail(TEST_EMAIL);
-            request.setUsername(TEST_USERNAME);
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .build();
 
             // When
-            User existingUser = new User();
-            existingUser.setEmail(request.getEmail());
-            when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(existingUser));
+            User existingUser = User.builder()
+                    .email(registerRequest.getEmail())
+                    .build();
+            when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(existingUser));
 
             // Then
-            UserFoundException exception = assertThrows(UserFoundException.class, () -> authService.validateCredentials(request));
+            UserFoundException exception = assertThrows(UserFoundException.class, () -> authService.validateCredentials(registerRequest));
             assertEquals(TEST_EMAIL + " is already in use", exception.getMessage());
         }
 
         @Test
         void shouldThrowUserFoundExceptionWhenUserWithSuchUsernameExists() {
             // Given
-            RegisterRequest request = new RegisterRequest();
-            request.setEmail(TEST_EMAIL);
-            request.setUsername(TEST_USERNAME);
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .build();
+            User existingUser = User.builder()
+                    .username(registerRequest.getUsername())
+                    .build();
 
             // When
-            when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-            User existingUser = new User();
-            existingUser.setUsername(request.getUsername());
-            when(userRepository.findByUsername(request.getUsername())).thenReturn(Optional.of(existingUser));
+            when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
+            when(userRepository.findByUsername(registerRequest.getUsername())).thenReturn(Optional.of(existingUser));
 
             // Then
-            UserFoundException exception = assertThrows(UserFoundException.class, () -> authService.validateCredentials(request));
+            UserFoundException exception = assertThrows(UserFoundException.class, () -> authService.validateCredentials(registerRequest));
             assertEquals(TEST_USERNAME + " is already in use", exception.getMessage());
         }
 
         @Test
         void shouldThrowPasswordsDoNotMatchExceptionWhenThePasswordsDoNotMatch() {
             // Given
-            RegisterRequest request = new RegisterRequest();
-            request.setEmail(TEST_EMAIL);
-            request.setUsername(TEST_USERNAME);
-            request.setPassword("password");
-            request.setConfirmPassword("differentPassword");
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .password(TEST_PASSWORD)
+                    .confirmPassword("notMatchingPassword").build();
 
             // When
-            when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-            when(userRepository.findByUsername(request.getUsername())).thenReturn(Optional.empty());
+            when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
+            when(userRepository.findByUsername(registerRequest.getUsername())).thenReturn(Optional.empty());
 
             // Then
-            PasswordsDoNotMatchException exception = assertThrows(PasswordsDoNotMatchException.class, () -> authService.validateCredentials(request));
+            PasswordsDoNotMatchException exception = assertThrows(PasswordsDoNotMatchException.class, () -> authService.validateCredentials(registerRequest));
             assertEquals("Passwords do not match. Please try again.", exception.getMessage());
         }
     }
@@ -136,56 +146,53 @@ public class AuthServiceUT {
         @Test
         void shouldSuccessfullyRegisterUser() throws MessagingException {
             // Given
-            RegisterRequest request = new RegisterRequest(
-                    TEST_EMAIL,
-                    "password",
-                    "password",
-                    TEST_USERNAME,
-                    "Test",
-                    "User",
-                    LocalDateTime.parse("2000-01-01T01:01:01"),
-                    "attendee"
-            );
-
-            when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-            when(userRepository.findByUsername(request.getUsername())).thenReturn(Optional.empty());
-            when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
-            when(modelMapper.map(any(User.class), eq(RegisterResponse.class))).thenReturn(new RegisterResponse());
-            when(templateEngine.process(anyString(), any())).thenReturn("Mocked Email Content");
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .email(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .confirmPassword(TEST_PASSWORD)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .birthDate(LocalDateTime.parse(TEST_BIRTHDATE))
+                    .role(TEST_ATTENDEE_ROLE)
+                    .build();
 
             // When
-            RegisterResponse response = authService.register(request);
+            when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
+            when(userRepository.findByUsername(registerRequest.getUsername())).thenReturn(Optional.empty());
+            when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encodedPassword");
+            when(modelMapper.map(any(User.class), eq(RegisterResponse.class))).thenReturn(new RegisterResponse());
+            when(templateEngine.process(anyString(), any())).thenReturn("Mocked Email Content");
+            RegisterResponse registerResponse = authService.register(registerRequest);
 
             // Then
             verify(userRepository).saveAndFlush(any(User.class));
-            verify(emailService).sendVerificationEmail(eq(request.getEmail()), eq("Account Verification"), eq("Mocked Email Content"));
-            assertNotNull(response);
+            verify(emailService).sendVerificationEmail(eq(registerRequest.getEmail()), eq("Account Verification"), eq("Mocked Email Content"));
+            assertNotNull(registerResponse);
         }
 
         @Test
         void shouldThrowVerificationEmailNotSentExceptionWhenEmailIsNotSent() throws MessagingException {
             // Given
-            RegisterRequest request = new RegisterRequest(
-                    TEST_EMAIL,
-                    "password",
-                    "password",
-                    TEST_USERNAME,
-                    "Test",
-                    "User",
-                    LocalDateTime.parse("2000-01-01T01:01:01"),
-                    "attendee"
-            );
+            RegisterRequest registerRequest = RegisterRequest.builder()
+                    .email(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .confirmPassword(TEST_PASSWORD)
+                    .username(TEST_USERNAME)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .birthDate(LocalDateTime.parse(TEST_BIRTHDATE))
+                    .role(TEST_ATTENDEE_ROLE).build();
 
             // When
-            when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-            when(userRepository.findByUsername(request.getUsername())).thenReturn(Optional.empty());
-            when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+            when(userRepository.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
+            when(userRepository.findByUsername(registerRequest.getUsername())).thenReturn(Optional.empty());
+            when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encodedPassword");
             when(templateEngine.process(anyString(), any())).thenReturn("Mocked Email Content");
             doThrow(new MessagingException("Failed to send email")).when(emailService).sendVerificationEmail(anyString(), anyString(), anyString());
 
             // Then
-            VerificationEmailNotSentException exception = assertThrows(VerificationEmailNotSentException.class, () -> authService.register(request));
-            assertEquals("Failed to send verification email to test@example.com", exception.getMessage());
+            VerificationEmailNotSentException exception = assertThrows(VerificationEmailNotSentException.class, () -> authService.register(registerRequest));
+            assertEquals("Failed to send verification email to " + TEST_EMAIL, exception.getMessage());
         }
     }
 
@@ -194,9 +201,10 @@ public class AuthServiceUT {
         @Test
         void shouldThrowUserNotFoundExceptionWhenUserWithSuchEmailDoesNotExits() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest();
-            verifyRequest.setEmail(TEST_EMAIL);
-            verifyRequest.setVerificationCode("123456");
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
 
             // When
             when(userRepository.findByEmail(verifyRequest.getEmail())).thenReturn(Optional.empty());
@@ -209,11 +217,13 @@ public class AuthServiceUT {
         @Test
         void shouldThrowUserVerifiedExceptionWhenTheUserIsVerified() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest();
-            verifyRequest.setEmail(TEST_EMAIL);
-            verifyRequest.setVerificationCode("123456");
-            User user = new User();
-            user.setEnabled(true);
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .enabled(true)
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -226,52 +236,55 @@ public class AuthServiceUT {
         @Test
         void shouldThrowIncorrectVerificationCodeExceptionWhenTheCodeIsIncorrect() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest();
-            verifyRequest.setEmail(TEST_EMAIL);
-            verifyRequest.setVerificationCode("123456");
-            User user = new User();
-            user.setEnabled(false);
-            user.setVerificationCode("654321");
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .enabled(true)
+                    .verificationCode("654321").build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // Then
             IncorrectVerificationCodeException exception = assertThrows(IncorrectVerificationCodeException.class, () -> authService.verify(verifyRequest));
-            assertEquals("Incorrect verification code: 123456", exception.getMessage());
+            assertEquals("Incorrect verification code: " + TEST_VERIFICATION_CODE, exception.getMessage());
         }
 
         @Test
         void shouldThrowExpiredVerificationCodeExceptionWhenTheCodeHasExpired() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest();
-            verifyRequest.setEmail(TEST_EMAIL);
-            String code = "123456";
-            verifyRequest.setVerificationCode(code);
-            User user = new User();
-            user.setEnabled(false);
-            user.setVerificationCode(code);
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().minusMinutes(1));
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .enabled(false)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .verificationCodeExpiresAt(LocalDateTime.now().minusMinutes(1))
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // Then
             ExpiredVerificationCodeException exception = assertThrows(ExpiredVerificationCodeException.class, () -> authService.verify(verifyRequest));
-            assertEquals("Verification code 123456 has expired", exception.getMessage());
+            assertEquals("Verification code " + TEST_VERIFICATION_CODE + " has expired", exception.getMessage());
         }
 
         @Test
         void shouldSuccessfullyVerifyUser() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest();
-            verifyRequest.setEmail(TEST_EMAIL);
-            String code = "123456";
-            verifyRequest.setVerificationCode(code);
-            User user = new User();
-            user.setEnabled(false);
-            user.setVerificationCode(code);
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .enabled(false)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(10))
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -285,12 +298,16 @@ public class AuthServiceUT {
         @Test
         void shouldThrowServiceUnavailableException() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
-            User user = new User();
-            user.setEmail(TEST_EMAIL);
-            user.setEnabled(false);
-            user.setVerificationCode("123456");
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .email(TEST_EMAIL)
+                    .enabled(false)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -304,12 +321,16 @@ public class AuthServiceUT {
         @Test
         void shouldThrowInvalidInformRequestException() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
-            User user = new User();
-            user.setEmail(TEST_EMAIL);
-            user.setEnabled(false);
-            user.setVerificationCode("123456");
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .email(TEST_EMAIL)
+                    .enabled(false)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -323,12 +344,16 @@ public class AuthServiceUT {
         @Test
         void shouldThrowUserExistsException() {
             // Given
-            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
-            User user = new User();
-            user.setEmail(TEST_EMAIL);
-            user.setEnabled(false);
-            user.setVerificationCode("123456");
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            VerifyRequest verifyRequest = VerifyRequest.builder()
+                    .email(TEST_EMAIL)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .build();
+            User user = User.builder()
+                    .email(TEST_EMAIL)
+                    .enabled(false)
+                    .verificationCode(TEST_VERIFICATION_CODE)
+                    .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
