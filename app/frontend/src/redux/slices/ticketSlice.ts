@@ -38,6 +38,15 @@ const ticketSlice = createSlice({
         (_, index) => index !== action.payload
       );
     },
+    updateTicket: (
+      state,
+      action: PayloadAction<{ index: number; ticket: Ticket }>
+    ) => {
+      const { index, ticket } = action.payload;
+      if (state.tickets[index]) {
+        state.tickets[index] = ticket;
+      }
+    },
     resetTickets: (state) => {
       state.tickets = initialState.tickets;
       state.status = "idle";
@@ -46,5 +55,6 @@ const ticketSlice = createSlice({
   },
 });
 
-export const { addTicket, removeTicket, resetTickets } = ticketSlice.actions;
+export const { addTicket, removeTicket, updateTicket, resetTickets } =
+  ticketSlice.actions;
 export default ticketSlice.reducer;
