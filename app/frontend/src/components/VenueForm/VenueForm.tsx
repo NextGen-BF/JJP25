@@ -19,6 +19,7 @@ import {
 } from "../../redux/slices/venueSlice";
 import ButtonComponent from "../button/ButtonComponent";
 import { z } from "zod";
+import { FormInputStyles } from "../FormInput/FormInputStyles";
 
 const venueValidationSchema = {
   phone: z
@@ -155,7 +156,7 @@ const VenueForm: FC = () => {
 
         <Box sx={VenueFormStyles.rightBox}>
           <Box sx={VenueFormStyles.fieldsBox}>
-            <Typography variant="h6">
+            <Typography sx={FormInputStyles.typography}>
               {VenueFormConstants.LABELS.COUNTRY}
             </Typography>
             <FormAutoComplete

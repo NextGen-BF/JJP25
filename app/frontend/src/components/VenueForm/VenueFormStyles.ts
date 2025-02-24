@@ -56,7 +56,7 @@ export const VenueFormStyles = {
     "@media (max-width: 768px)": {
       flex: "0 1 45%",
       paddingTop: "0px",
-      maxHeight: "45%",
+      maxHeight: "auto",
       maxWidth: "90%",
       width: "90%",
       gap: "0px",

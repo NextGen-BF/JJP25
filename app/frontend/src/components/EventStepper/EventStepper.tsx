@@ -30,8 +30,10 @@ const EventStepper: FC = () => {
   const [skipped, setSkipped] = useState(new Set<number>());
   const venueTitle = useSelector(
     (state: RootState) => state.event.event.venueTitle
-  );
-  const venue = useSelector((state: RootState) => state.venue.venue);
+  ); // from Event state
+  const isVenueCreated = useSelector(
+    (state: RootState) => state.venue.isVenueCreated
+  ); // from Venue state
 
   const isStepOptional = (step: number) => step === 1;
 
@@ -42,7 +44,7 @@ const EventStepper: FC = () => {
       await formRef.current.submitForm();
     }
 
-    if (activeStep === 1 && !venue && !venueTitle) {
+    if (activeStep === 1 && !isVenueCreated && !venueTitle) {
       toast.error("Please select or create a new venue to proceed.");
       return;
     }
