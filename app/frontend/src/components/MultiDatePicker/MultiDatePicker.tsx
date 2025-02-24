@@ -2,7 +2,7 @@ import React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Button, Stack, Chip, Typography } from "@mui/material";
+import { Button, Stack, Chip } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { MultiDatePickerConstants } from "../../constants/MultiDatePickerConstants";
 import { MultiDatePickerStyles } from "./MultiDatePickerStyles";

@@ -15,7 +15,7 @@ export const VenueFormStyles = {
       display: "flex",
       flexDirection: "row",
       maxHeight: "100%",
-      height: "calc(100vh - 144px - 60px)", // Subtract navbar and footer height
+      height: "calc(100vh - 144px - 120px)", // Subtract navbar and footer height
       overflowY: "scroll",
       padding: "0 20px",
     },
@@ -68,6 +68,10 @@ export const VenueFormStyles = {
     flexDirection: "column",
     gap: "8px",
     width: "100%",
+
+    "@media (max-width: 768px)": {
+      gap: "0px",
+    },
   },
 
   buttonBox: {

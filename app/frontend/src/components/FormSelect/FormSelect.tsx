@@ -33,7 +33,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   onChange,
 }) => {
   return (
-    <FormControl fullWidth sx={{ mb: 2 }}>
+    <FormControl fullWidth>
       <InputLabel>{label}</InputLabel>
       <Controller
         name={name}

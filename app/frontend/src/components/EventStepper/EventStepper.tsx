@@ -13,6 +13,10 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { EventStepperStyles } from "./EventStepperStyles";
 import { EventStepperConstants } from "../../constants/EventStepperConstants";
 import EventForm from "../EventForm/EventForm";
+import VenueForm from "../VenueForm/VenueForm";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { toast } from "react-toastify";
 
 const steps = [
   EventStepperConstants.EVENT_CREATION,
@@ -24,6 +28,12 @@ const EventStepper: FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const formRef = useRef<{ submitForm: () => Promise<boolean> } | null>(null);
   const [skipped, setSkipped] = useState(new Set<number>());
+  const venueTitle = useSelector(
+    (state: RootState) => state.event.event.venueTitle
+  ); // from Event state
+  const isVenueCreated = useSelector(
+    (state: RootState) => state.venue.isVenueCreated
+  ); // from Venue state
 
   const isStepOptional = (step: number) => step === 1;
 
@@ -32,6 +42,11 @@ const EventStepper: FC = () => {
   const handleNext = async () => {
     if (formRef.current) {
       await formRef.current.submitForm();
+    }
+
+    if (activeStep === 1 && !isVenueCreated && !venueTitle) {
+      toast.error("Please select or create a new venue to proceed.");
+      return;
     }
 
     let newSkipped = skipped;
@@ -70,12 +85,7 @@ const EventStepper: FC = () => {
       case 0:
         return <EventForm ref={formRef} />;
       case 1:
-        return (
-          <Box sx={{ mt: 2 }}>
-            <TextField label="Venue Name" fullWidth sx={{ mb: 2 }} />
-            <TextField label="Venue Address" fullWidth sx={{ mb: 2 }} />
-          </Box>
-        );
+        return <VenueForm />;
       case 2:
         return (
           <Box sx={{ mt: 2 }}>
@@ -148,11 +158,11 @@ const EventStepper: FC = () => {
                 />
               </Button>
               <Box sx={{ flex: "1 1 auto" }} />
-              {isStepOptional(activeStep) && (
+              {/* {isStepOptional(activeStep) && (
                 <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                   Skip
                 </Button>
-              )}
+              )} */}
               <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
                 {activeStep === steps.length - 1 ? (
                   EventStepperConstants.FINISH_STEP

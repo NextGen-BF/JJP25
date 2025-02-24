@@ -18,6 +18,19 @@ import {
   updateVenue,
 } from "../../redux/slices/venueSlice";
 import ButtonComponent from "../button/ButtonComponent";
+import { z } from "zod";
+import { FormInputStyles } from "../FormInput/FormInputStyles";
+
+const venueValidationSchema = {
+  phone: z
+    .string()
+    .regex(
+      VenueFormConstants.VALIDATION.PHONE_REGEX,
+      VenueFormConstants.VALIDATION.PHONE
+    ),
+
+  website: z.string().url(VenueFormConstants.VALIDATION.WEBSITE),
+};
 
 const VenueForm: FC = () => {
   const dispatch = useDispatch();
@@ -35,11 +48,13 @@ const VenueForm: FC = () => {
     defaultValues: venue,
     mode: "onChange",
     reValidateMode: "onSubmit",
+    shouldUnregister: true,
   });
 
-  const handleChange = (field: keyof Venue, value: any) => {
+  const handleChange = async (field: keyof Venue, value: any) => {
     dispatch(updateVenue({ [field]: value }));
     setValue(field, value);
+    await trigger(field);
   };
 
   const initialVenueRef = useRef<Venue>(venue);
@@ -76,7 +91,7 @@ const VenueForm: FC = () => {
 
   return (
     <Box sx={VenueFormStyles.formContainer}>
-      <form onSubmit={handleSubmit(onSubmit)} className="event-form">
+      <form onSubmit={handleSubmit(onSubmit)} className="venue-form">
         <Box sx={VenueFormStyles.leftBox}>
           <FormInput
             name={VenueFormConstants.NAMES.VENUE_NAME}
@@ -95,6 +110,16 @@ const VenueForm: FC = () => {
             defaultValue={venue.phone}
             error={errors.phone?.message as string}
             onChange={(e) => handleChange("phone", e.target.value)}
+            rules={{
+              required: false,
+              validate: (value: string) => {
+                if (!value) return true;
+                return (
+                  venueValidationSchema.phone.safeParse(value).success ||
+                  VenueFormConstants.VALIDATION.PHONE_FORMAT
+                );
+              },
+            }}
           />
           <FormInput
             name={VenueFormConstants.NAMES.WEBSITE}
@@ -103,6 +128,16 @@ const VenueForm: FC = () => {
             defaultValue={venue.website}
             error={errors.website?.message as string}
             onChange={(e) => handleChange("website", e.target.value)}
+            rules={{
+              required: false,
+              validate: (value: string) => {
+                if (!value) return true;
+                return (
+                  venueValidationSchema.website.safeParse(value).success ||
+                  VenueFormConstants.VALIDATION.WEBSITE
+                );
+              },
+            }}
           />
 
           <Box sx={{ pt: 3 }}>
@@ -121,19 +156,6 @@ const VenueForm: FC = () => {
 
         <Box sx={VenueFormStyles.rightBox}>
           <Box sx={VenueFormStyles.fieldsBox}>
-            <Typography variant="h6">
-              {VenueFormConstants.LABELS.COUNTRY}
-            </Typography>
-            <FormAutoComplete
-              name={VenueFormConstants.NAMES.COUNTRY}
-              control={control}
-              label={VenueFormConstants.LABELS.COUNTRY}
-              defaultValue={venue.country}
-              options={VenueFormConstants.COUNTRIES}
-              required
-              error={errors.country?.message as string}
-              onChange={(value) => handleChange("country", value)}
-            />
             <FormInput
               name={VenueFormConstants.NAMES.CITY}
               control={control}
@@ -149,10 +171,22 @@ const VenueForm: FC = () => {
               label={VenueFormConstants.LABELS.ADDRESS}
               defaultValue={venue.address}
               multiline
-              rows={3}
+              rows={4}
               required
               error={errors.address?.message as string}
               onChange={(e) => handleChange("address", e.target.value)}
+            />
+
+            <FormAutoComplete
+              name={VenueFormConstants.NAMES.COUNTRY}
+              control={control}
+              label={VenueFormConstants.LABELS.COUNTRY}
+              defaultValue={venue.country}
+              options={VenueFormConstants.COUNTRIES}
+              required
+              error={errors.country?.message as string}
+              onChange={(value) => handleChange("country", value)}
+              sx={{ pt: 1 }}
             />
           </Box>
 
