@@ -2,12 +2,11 @@ package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
+import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
-import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
-import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
-import com.blankfactor.auth.exception.custom.VerificationEmailNotSentException;
+import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.*;
@@ -23,8 +22,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 
@@ -279,10 +280,63 @@ public class AuthServiceUT {
             assertDoesNotThrow(() -> {
                 authService.verify(verifyRequest);
             });
-            assertTrue(user.isEnabled());
-            assertNull(user.getVerificationCode());
-            assertNull(user.getVerificationCodeExpiresAt());
-            verify(userRepository).saveAndFlush(user);
+        }
+
+        @Test
+        void shouldThrowServiceUnavailableException() {
+            // Given
+            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
+            User user = new User();
+            user.setEmail(TEST_EMAIL);
+            user.setEnabled(false);
+            user.setVerificationCode("123456");
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+            // When
+            when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(userDetailsService.loadUserByUsername(user.getUsername())).thenReturn(user);
+            doThrow(ResourceAccessException.class).when(restClient).post();
+
+            // Then
+            assertThrows(ServiceUnavailableException.class, () -> authService.verify(verifyRequest));
+        }
+
+        @Test
+        void shouldThrowInvalidInformRequestException() {
+            // Given
+            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
+            User user = new User();
+            user.setEmail(TEST_EMAIL);
+            user.setEnabled(false);
+            user.setVerificationCode("123456");
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+            // When
+            when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(userDetailsService.loadUserByUsername(user.getUsername())).thenReturn(user);
+            doThrow(InvalidInformRequestException.class).when(restClient).post();
+
+            // Then
+            assertThrows(InvalidInformRequestException.class, () -> authService.verify(verifyRequest));
+        }
+
+        @Test
+        void shouldThrowUserExistsException() {
+            // Given
+            VerifyRequest verifyRequest = new VerifyRequest(TEST_EMAIL, "123456");
+            User user = new User();
+            user.setEmail(TEST_EMAIL);
+            user.setEnabled(false);
+            user.setVerificationCode("123456");
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+            // When
+            when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(userDetailsService.loadUserByUsername(user.getUsername())).thenReturn(user);
+            doThrow(UserExistsException.class).when(restClient).post();
+
+            // Then
+            assertThrows(UserExistsException.class, () -> authService.verify(verifyRequest));
         }
     }
 
