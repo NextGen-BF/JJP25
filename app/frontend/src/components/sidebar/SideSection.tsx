@@ -46,8 +46,8 @@ export const SideSection: FC<SidebarProps> = ({ items, title }) => {
       </ListSubheader>
       <List>
         {items.map((item, index) => (
-          <NavLink to={item.linkTo} className={({ isActive }) => toggleClass(isActive)} >
-            <ListItem key={index} disablePadding >
+          <NavLink key={index} to={item.linkTo} className={({ isActive }) => toggleClass(isActive)} >
+            <ListItem disablePadding >
               <ListItemButton disableRipple className="list-item-button">
                 <ListItemIcon >
                   <item.icon />
