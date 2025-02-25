@@ -1,8 +1,8 @@
 package com.blankfactor.auth.service;
 
+import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
 import com.blankfactor.auth.entity.dto.imp.LoginRequest;
 import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
 import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
@@ -30,6 +30,7 @@ import org.thymeleaf.TemplateEngine;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -75,7 +76,6 @@ public class AuthServiceUT {
     private static final String TEST_LAST_NAME = "Doe";
     private static final String TEST_BIRTHDATE = "2000-01-01T01:01:01";
     private static final String TEST_ATTENDEE_ROLE = "attendee";
-    private static final String TEST_ORGANISER_ROLE = "organiser";
     private static final String TEST_VERIFICATION_CODE = "123456";
     private static final String VALID_TOKEN = "validToken";
     private static final String NEW_PASSWORD = "newPassword1!";
@@ -241,8 +241,9 @@ public class AuthServiceUT {
                     .verificationCode(TEST_VERIFICATION_CODE)
                     .build();
             User user = User.builder()
-                    .enabled(true)
-                    .verificationCode("654321").build();
+                    .enabled(false)
+                    .verificationCode("654321")
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -307,6 +308,7 @@ public class AuthServiceUT {
                     .enabled(false)
                     .verificationCode(TEST_VERIFICATION_CODE)
                     .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .roles(Set.of(Role.ROLE_USER))
                     .build();
 
             // When
@@ -330,6 +332,7 @@ public class AuthServiceUT {
                     .enabled(false)
                     .verificationCode(TEST_VERIFICATION_CODE)
                     .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
                     .build();
 
             // When
@@ -353,6 +356,7 @@ public class AuthServiceUT {
                     .enabled(false)
                     .verificationCode(TEST_VERIFICATION_CODE)
                     .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
+                    .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
                     .build();
 
             // When
@@ -380,10 +384,10 @@ public class AuthServiceUT {
         @Test
         void shouldThrowUserVerifiedExceptionWhenUserIsAlreadyVerified() {
             // Given
-            User user = new User();
-            user.setEmail(TEST_EMAIL);
-            user.setEnabled(true);
-
+            User user = User.builder()
+                    .email(TEST_EMAIL)
+                    .enabled(true)
+                    .build();
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
@@ -395,9 +399,10 @@ public class AuthServiceUT {
         @Test
         void shouldSuccessfullyResendVerificationCode() throws MessagingException {
             // Given
-            User user = new User();
-            user.setEmail(TEST_EMAIL);
-            user.setEnabled(false);
+            User user = User.builder()
+                    .email(TEST_EMAIL)
+                    .enabled(false)
+                    .build();
 
             // When
             when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
@@ -416,9 +421,11 @@ public class AuthServiceUT {
     class LoginTests {
         @Test
         void loginWithValidEmailReturnsUser() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier(TEST_EMAIL);
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .build();
 
             User user = User.builder()
                     .id(1L)
@@ -428,11 +435,11 @@ public class AuthServiceUT {
                     .enabled(true)
                     .build();
 
-            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
-                    .thenReturn(Optional.of(user));
-
+            // When
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL)).thenReturn(Optional.of(user));
             User result = authService.login(loginRequest);
 
+            // Then
             assertNotNull(result);
             assertEquals(user.getId(), result.getId());
             assertEquals(user.getEmail(), result.getEmail());
@@ -440,9 +447,11 @@ public class AuthServiceUT {
 
         @Test
         void loginWithValidUsernameReturnsUser() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier(TEST_USERNAME);
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(TEST_USERNAME)
+                    .password(TEST_PASSWORD)
+                    .build();
 
             User user = User.builder()
                     .id(1L)
@@ -452,11 +461,11 @@ public class AuthServiceUT {
                     .enabled(true)
                     .build();
 
-            when(userRepository.findByEmailOrUsername(TEST_USERNAME))
-                    .thenReturn(Optional.of(user));
-
+            // When
+            when(userRepository.findByEmailOrUsername(TEST_USERNAME)).thenReturn(Optional.of(user));
             User result = authService.login(loginRequest);
 
+            // Then
             assertNotNull(result);
             assertEquals(user.getId(), result.getId());
             assertEquals(user.getEmail(), result.getEmail());
@@ -464,21 +473,26 @@ public class AuthServiceUT {
 
         @Test
         void loginWithNonExistentUserThrowsInvalidCredentialsException() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier("nonexistent@example.com");
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .build();
 
-            when(userRepository.findByEmailOrUsername("nonexistent@example.com"))
-                    .thenReturn(Optional.empty());
+            // When
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL)).thenReturn(Optional.empty());
 
+            // Then
             assertThrows(InvalidCredentialsException.class, () -> authService.login(loginRequest));
         }
 
         @Test
         void loginWithUnverifiedUserThrowsUserNotVerifiedException() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier(TEST_EMAIL);
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .build();
 
             User user = User.builder()
                     .id(2L)
@@ -488,18 +502,22 @@ public class AuthServiceUT {
                     .enabled(false)
                     .build();
 
-            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
-                    .thenReturn(Optional.of(user));
+            // When
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL)).thenReturn(Optional.of(user));
 
+            // Then
             Exception exception = assertThrows(UserNotVerifiedException.class, () -> authService.login(loginRequest));
             assertTrue(exception.getMessage().contains("Account is not verified"));
         }
 
         @Test
         void loginWithInvalidCredentialsThrowsInvalidPasswordException() {
-            LoginRequest loginRequest = new LoginRequest();
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(TEST_EMAIL)
+                    .password(TEST_PASSWORD)
+                    .build();
             loginRequest.setLoginIdentifier(TEST_EMAIL);
-            loginRequest.setPassword("wrongPassword");
 
             User user = User.builder()
                     .id(3L)
@@ -509,39 +527,48 @@ public class AuthServiceUT {
                     .enabled(true)
                     .build();
 
-            when(userRepository.findByEmailOrUsername(TEST_EMAIL))
-                    .thenReturn(Optional.of(user));
-
+            // When
+            when(userRepository.findByEmailOrUsername(TEST_EMAIL)).thenReturn(Optional.of(user));
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenThrow(new BadCredentialsException("Bad credentials"));
 
+            // Then
             assertThrows(InvalidCredentialsException.class, () -> authService.login(loginRequest));
         }
 
         @Test
         void loginWithNullIdentifierThrowsIllegalArgumentException() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier(null);
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(null)
+                    .password(TEST_PASSWORD)
+                    .build();
 
+            // When & Then
             assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
         }
 
         @Test
         void loginWithEmptyIdentifierThrowsIllegalArgumentException() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier("");
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier("")
+                    .password(TEST_PASSWORD)
+                    .build();
 
+            // When & Then
             assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
         }
 
         @Test
         void loginWithBlankIdentifierThrowsIllegalArgumentException() {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setLoginIdentifier("   ");
-            loginRequest.setPassword("password");
+            // Given
+            LoginRequest loginRequest = LoginRequest.builder()
+                    .loginIdentifier(" ")
+                    .password(TEST_PASSWORD)
+                    .build();
 
+            // When & Then
             assertThrows(IllegalArgumentException.class, () -> authService.login(loginRequest));
         }
     }
@@ -551,39 +578,36 @@ public class AuthServiceUT {
 
         @Test
         void shouldSuccessfullyResetPassword() {
-            String token = VALID_TOKEN;
-            String newPassword = NEW_PASSWORD;
-            String username = TEST_USERNAME;
-            User user = new User();
-            user.setUsername(username);
+            // Given
+            User user = User.builder().username(TEST_USERNAME).build();
 
-            when(jwtService.extractUsername(token)).thenReturn(username);
-            when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+            // When
+            when(jwtService.extractUsername(VALID_TOKEN)).thenReturn(TEST_USERNAME);
+            when(userRepository.findByUsername(TEST_USERNAME)).thenReturn(Optional.of(user));
+            authService.resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
-            authService.resetPassword(token, newPassword, NEW_PASSWORD);
-
-            verify(passwordEncoder).encode(newPassword);
+            // Then
+            verify(passwordEncoder).encode(NEW_PASSWORD);
             verify(userRepository).saveAndFlush(user);
-            assertEquals(passwordEncoder.encode(newPassword), user.getPassword());
+            assertEquals(passwordEncoder.encode(NEW_PASSWORD), user.getPassword());
         }
 
         @Test
         void shouldThrowPasswordsDoNotMatchExceptionWhenPasswordsDoNotMatch() {
-
+            // Given & When & Then
             assertThrows(PasswordsDoNotMatchException.class,
                     () -> authService.resetPassword(VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD));
         }
 
         @Test
         void shouldThrowUserNotFoundExceptionWhenUserIsNotFound() {
-            String token = VALID_TOKEN;
-            String username = TEST_USERNAME;
+            // When
+            when(jwtService.extractUsername(VALID_TOKEN)).thenReturn(TEST_USERNAME);
+            when(userRepository.findByUsername(TEST_USERNAME)).thenReturn(Optional.empty());
 
-            when(jwtService.extractUsername(token)).thenReturn(username);
-            when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
+            // Then
             assertThrows(UserNotFoundException.class,
-                    () -> authService.resetPassword(token, NEW_PASSWORD, NEW_PASSWORD));
+                    () -> authService.resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD));
         }
 
     }
