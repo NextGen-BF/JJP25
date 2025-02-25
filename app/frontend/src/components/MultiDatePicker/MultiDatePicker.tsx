@@ -1,12 +1,17 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Button, Stack, Chip } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { MultiDatePickerConstants } from "../../constants/MultiDatePickerConstants";
 import { MultiDatePickerStyles } from "./MultiDatePickerStyles";
 import Box from "@mui/material/Box";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface MultiDatePickerProps {
   selectedDates: Dayjs[];
@@ -19,15 +24,21 @@ const MultiDatePicker: FC<MultiDatePickerProps> = ({
   setSelectedDates,
   error,
 }) => {
-  const handleAddDate = (newDate: Dayjs | null) => {
-    if (newDate && !selectedDates.some((date) => date.isSame(newDate, "day"))) {
+  const [tempDate, setTempDate] = useState<Dayjs | null>(null);
+
+  const handleAcceptDate = (newDate: Dayjs | null) => {
+    if (
+      newDate &&
+      !selectedDates.some((date) => date.isSame(newDate, "minute"))
+    ) {
       setSelectedDates([...selectedDates, newDate]);
     }
+    setTempDate(null);
   };
 
   const handleRemoveDate = (dateToRemove: Dayjs) => {
     setSelectedDates(
-      selectedDates.filter((date) => !date.isSame(dateToRemove, "day"))
+      selectedDates.filter((date) => !date.isSame(dateToRemove, "minute"))
     );
   };
 
@@ -36,11 +47,14 @@ const MultiDatePicker: FC<MultiDatePickerProps> = ({
       <Box sx={{ ...MultiDatePickerStyles.boxWrapper }}>
         <Stack spacing={2}>
           <Box sx={MultiDatePickerStyles.datePickerReset}>
-            <DatePicker
+            <DateTimePicker
               label={MultiDatePickerConstants.SELECT_DATES}
-              onChange={handleAddDate}
               minDate={dayjs()}
               maxDate={dayjs().add(MultiDatePickerConstants.MAX_YEARS, "year")}
+              value={tempDate}
+              onChange={setTempDate}
+              onAccept={handleAcceptDate}
+              slotProps={{ actionBar: { actions: [] } }}
               sx={{
                 ...MultiDatePickerStyles.calendarIcon,
                 ...MultiDatePickerStyles.calendarPicker,
@@ -49,7 +63,7 @@ const MultiDatePicker: FC<MultiDatePickerProps> = ({
             />
 
             <Button variant="outlined" onClick={() => setSelectedDates([])}>
-              Reset
+              {MultiDatePickerConstants.RESET}
             </Button>
           </Box>
 
@@ -59,7 +73,7 @@ const MultiDatePicker: FC<MultiDatePickerProps> = ({
               .map((date, index) => (
                 <Chip
                   key={index}
-                  label={date.format("DD/MM/YYYY")}
+                  label={date.format("HH:mm DD/MM/YYYY")}
                   onDelete={() => handleRemoveDate(date)}
                   style={{
                     ...MultiDatePickerStyles.chip,

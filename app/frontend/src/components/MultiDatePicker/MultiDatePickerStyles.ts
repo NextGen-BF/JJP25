@@ -53,6 +53,7 @@ export const MultiDatePickerStyles = {
 
     "@media (max-width: 768px)": {
       flexBasis: "100px",
+      fontSize: "11px",
     },
   },
 };
