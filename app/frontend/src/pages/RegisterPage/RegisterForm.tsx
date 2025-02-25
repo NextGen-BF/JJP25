@@ -1,32 +1,41 @@
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { FC, useEffect } from "react";
+// MUI components
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+// React libraries
+import { FC, useEffect } from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import dayjs from "dayjs";
-import googleLogo from "../../assets/google-color.png";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+// Other libraries
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
+// Styling
+import googleLogo from "../../assets/google-color.png";
 import "./RegisterForm.scss";
+
+// Constants
 import { validationErrors } from "./ValidationErrors";
 import { regex } from "./Regex";
 import { label } from "./Labels";
-import { useDispatch, useSelector } from "react-redux";
+
+// Redux related
 import { AppDispatch } from "../../redux/store";
 import { RootState } from "../../redux/store";
 import { registerUser } from "../../redux/services/registerService";
 import { resetState } from "../../redux/slices/registerSlice";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
 
 type FormFields = {
   email: string;
@@ -52,7 +61,9 @@ const RegisterForm: FC = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, success } = useSelector((state: RootState) => state.registerData);
+  const { loading, success } = useSelector(
+    (state: RootState) => state.registerData
+  );
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
