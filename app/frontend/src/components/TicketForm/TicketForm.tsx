@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { TicketFormStyles } from "./TicketFormStyles";
 import FormInput from "../FormInput/FormInput";
 import FormSelect from "../FormSelect/FormSelect";
@@ -15,6 +15,7 @@ import { RootState } from "../../redux/store";
 import { FormStyles } from "../../styles/FormStyles";
 import "./TicketFormStyles.scss";
 import TicketTable from "./TicketTable";
+import { TicketFormConstants } from "../../constants/TicketFormConstants";
 
 const TicketForm = () => {
   const dispatch = useDispatch();
@@ -71,38 +72,56 @@ const TicketForm = () => {
 
   return (
     <Box sx={FormStyles.formContainer}>
-      <form onSubmit={handleSubmit(onSubmit)} className="ticket-form">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="ticket-form"
+        noValidate
+      >
         <Box sx={TicketFormStyles.formTableBox}>
           <Box sx={TicketFormStyles.formInfoBox}>
             <Box sx={TicketFormStyles.leftBox}>
               <FormInput
-                name="description"
+                name={TicketFormConstants.NAMES.DESCRIPTION}
                 control={control}
-                label="Ticket Description"
+                label={TicketFormConstants.LABELS.DESCRIPTION}
                 multiline={true}
                 rows={2.2} // to align items in the form
                 defaultValue=""
-                required
                 error={errors.description?.message}
+                required
+                rules={{
+                  required:
+                    TicketFormConstants.VALIDATION_MESSAGES
+                      .DESCRIPTION_REQUIRED,
+                  minLength: {
+                    value:
+                      TicketFormConstants.VALIDATION_MESSAGES
+                        .DESCRIPTION_MIN_VALUE,
+                    message:
+                      TicketFormConstants.VALIDATION_MESSAGES
+                        .DESCRIPTION_MIN_LENGTH,
+                  },
+                }}
                 onChange={(e) => handleChange("description", e.target.value)}
               />
 
               <FormSelect
-                name="eventDate"
+                name={TicketFormConstants.NAMES.EVENT_DATE}
                 control={control}
-                label="Event Date"
+                label={TicketFormConstants.NAMES.EVENT_DATE}
                 options={["2025-03-01", "2025-03-02"]}
                 required
                 error={errors.eventDate?.message}
                 onChange={(e) => handleChange("eventDate", e.target.value)}
+                defaultValue=""
               />
             </Box>
 
             <Box sx={TicketFormStyles.rightBox}>
               <FormSelect
-                name="ticketType"
+                name={TicketFormConstants.NAMES.TICKET_TYPE}
                 control={control}
-                label="Ticket Type"
+                label={TicketFormConstants.LABELS.TICKET_TYPE}
                 options={Object.values(TicketType)}
                 required
                 error={errors.ticketType?.message}
@@ -112,29 +131,40 @@ const TicketForm = () => {
               <Box sx={TicketFormStyles.quantityPriceButtonBox}>
                 <Box>
                   <FormInput
-                    name="quantity"
+                    name={TicketFormConstants.NAMES.QUANTITY}
                     control={control}
-                    label="Quantity"
+                    label={TicketFormConstants.LABELS.QUANTITY}
                     type="number"
                     defaultValue="0"
                     required
                     error={errors.quantity?.message}
                     rules={{
-                      min: { value: 1, message: "Must be above 1" },
+                      min: {
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_MIN_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MIN,
+                      },
                       max: {
-                        value: 999,
-                        message: "Must be under 1000",
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_MAX_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MAX,
                       },
                       validate: (value: number) => {
                         if (!/^\d+$/.test(value.toString())) {
-                          return "Whole numbers only";
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_WHOLE_NUMBERS;
                         }
 
                         if (
                           value.toString().length > 1 &&
                           value.toString().startsWith("0")
                         ) {
-                          return "Leading zeros are not allowed";
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_LEADING_ZERO;
                         }
                         return true;
                       },
@@ -145,26 +175,40 @@ const TicketForm = () => {
 
                 <Box>
                   <FormInput
-                    name="price"
+                    name={TicketFormConstants.NAMES.PRICE}
                     control={control}
-                    label="Price"
+                    label={TicketFormConstants.LABELS.PRICE}
                     type="number"
                     defaultValue="1"
                     required
                     error={errors.price?.message}
                     rules={{
-                      min: { value: 0, message: "Price must be above 0" },
-                      max: { value: 9999.99, message: "Must be under 10000" },
+                      min: {
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .PRICE_MIN_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.PRICE_MIN,
+                      },
+                      max: {
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .PRICE_MAX_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.PRICE_MAX,
+                      },
                       validate: (value: number) => {
                         if (!/^\d+(\.\d{1,2})?$/.test(value.toString())) {
-                          return "Incorrect price format";
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .PRICE_FORMAT;
                         }
 
                         if (
                           value.toString().length > 1 &&
                           value.toString().startsWith("0")
                         ) {
-                          return "Incorrect price format";
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .PRICE_FORMAT;
                         }
                         return true;
                       },
@@ -173,7 +217,11 @@ const TicketForm = () => {
                   />
                 </Box>
 
-                <Button type="submit">Add</Button>
+                <Box sx={TicketFormStyles.buttonBox}>
+                  <Button type="submit" sx={TicketFormStyles.button}>
+                    {TicketFormConstants.LABELS.ADD_TICKET}
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Box>

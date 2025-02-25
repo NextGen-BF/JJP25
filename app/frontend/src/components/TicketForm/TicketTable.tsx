@@ -14,6 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { TicketFormStyles, TicketTableStyles } from "./TicketFormStyles";
 import { useState, FC, ChangeEvent } from "react";
+import { TicketTableConstants } from "../../constants/TicketFormConstants";
 
 interface TicketTableProps {
   onEdit: (index: number) => void; // Function to handle editing
@@ -50,16 +51,22 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
         <Table
           sx={TicketTableStyles.ticketTable}
           size="small"
-          aria-label="ticket table"
+          aria-label={TicketTableConstants.ARIA_LABELS.TICKET_TABLE}
         >
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Ticket Type</TableCell>
-              <TableCell>Event Date</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Quantity</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell>{TicketTableConstants.HEADERS.NUMBER}</TableCell>
+              <TableCell>{TicketTableConstants.HEADERS.TICKET_TYPE}</TableCell>
+              <TableCell>{TicketTableConstants.HEADERS.EVENT_DATE}</TableCell>
+              <TableCell align="right">
+                {TicketTableConstants.HEADERS.PRICE}
+              </TableCell>
+              <TableCell align="right">
+                {TicketTableConstants.HEADERS.QUANTITY}
+              </TableCell>
+              <TableCell align="center">
+                {TicketTableConstants.HEADERS.ACTIONS}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -75,7 +82,7 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
                     size="small"
                     onClick={() => onEdit(page * rowsPerPage + index)}
                   >
-                    <EditIcon fontSize="small" />
+                    <EditIcon sx={TicketTableStyles.editIcon} />
                   </IconButton>
                   <IconButton
                     size="small"
@@ -83,7 +90,7 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
                       handleTicketRemoval(page * rowsPerPage + index)
                     }
                   >
-                    <DeleteIcon fontSize="small" />
+                    <DeleteIcon sx={TicketTableStyles.deleteIcon} />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -93,7 +100,9 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
       </TableContainer>
 
       <TablePagination
-        rowsPerPageOptions={[3, 6]}
+        rowsPerPageOptions={
+          TicketTableConstants.PAGINATION.ROWS_PER_PAGE_OPTIONS
+        }
         component="div"
         count={tickets.length}
         rowsPerPage={rowsPerPage}

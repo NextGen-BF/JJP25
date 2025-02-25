@@ -74,6 +74,32 @@ export const TicketFormStyles = {
     flexDirection: "row",
     gap: "16px",
   },
+
+  buttonBox: {
+    display: "flex",
+    alignItems: "center",
+  },
+
+  button: {
+    mt: "6px",
+    backgroundColor: "transparent",
+    border: "1px solid var(--blankfactor-ultramarine-color)",
+    broderRadius: "4px",
+    color: "var(--blankfactor-ultramarine-color)",
+    maxHeight: "56px",
+    maxWidth: "80px",
+    fontSize: "14px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    ":hover": {
+      backgroundColor: "var(--blankfactor-ultramarine-color)",
+      color: "white",
+    },
+    ":focus": {
+      outline: "none",
+      boxShadow: "0 0 0 2px rgba(0, 0, 0, 0.2)",
+    },
+  },
 };
 
 export const TicketTableStyles = {
@@ -85,5 +111,23 @@ export const TicketTableStyles = {
 
   ticketTablePagination: {
     backgroundColor: "var(--separator-line-color)",
+  },
+
+  deleteIcon: {
+    color: "var(--error-color)",
+    fontSize: "24px",
+
+    "@media (max-width: 768px)": {
+      fontSize: "16px",
+    },
+  },
+
+  editIcon: {
+    color: "var(--blankfactor-ultramarine-color)",
+    fontSize: "24px",
+
+    "@media (max-width: 768px)": {
+      fontSize: "16px",
+    },
   },
 };
