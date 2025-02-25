@@ -156,8 +156,6 @@ public class UserControllerTest {
                     .andExpect(jsonPath("$.role[0]").value("User role is required."));
         }
 
-
     }
-
 
 }
