@@ -1,6 +1,8 @@
 package com.backend.exception;
 
 import com.backend.exception.user.UserFoundException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,12 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 @Log4j2
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler({JwtException.class, ExpiredJwtException.class})
+    public ResponseEntity<Map<String, String>> handleUnauthorized(RuntimeException ex) {
+        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler({UserFoundException.class})
     public ResponseEntity<Map<String, String>> handleConflict(RuntimeException ex) {
