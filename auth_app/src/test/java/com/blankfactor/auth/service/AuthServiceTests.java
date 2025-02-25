@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceUT {
+public class AuthServiceTests {
 
     @Mock
     private UserRepository userRepository;

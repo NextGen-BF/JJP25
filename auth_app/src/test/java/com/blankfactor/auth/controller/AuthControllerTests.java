@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = {AuthController.class})
-public class AuthControllerUT {
+public class AuthControllerTests {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
