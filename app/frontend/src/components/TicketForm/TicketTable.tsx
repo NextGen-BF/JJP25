@@ -55,16 +55,22 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
         >
           <TableHead>
             <TableRow>
-              <TableCell>{TicketTableConstants.HEADERS.NUMBER}</TableCell>
-              <TableCell>{TicketTableConstants.HEADERS.TICKET_TYPE}</TableCell>
-              <TableCell>{TicketTableConstants.HEADERS.EVENT_DATE}</TableCell>
-              <TableCell align="right">
+              <TableCell sx={TicketTableStyles.tableCell}>
+                {TicketTableConstants.HEADERS.NUMBER}
+              </TableCell>
+              <TableCell sx={TicketTableStyles.tableCell}>
+                {TicketTableConstants.HEADERS.TICKET_TYPE}
+              </TableCell>
+              <TableCell sx={TicketTableStyles.tableCell}>
+                {TicketTableConstants.HEADERS.EVENT_DATE}
+              </TableCell>
+              <TableCell align="right" sx={TicketTableStyles.tableCell}>
                 {TicketTableConstants.HEADERS.PRICE}
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={TicketTableStyles.tableCell}>
                 {TicketTableConstants.HEADERS.QUANTITY}
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={TicketTableStyles.tableCell}>
                 {TicketTableConstants.HEADERS.ACTIONS}
               </TableCell>
             </TableRow>
@@ -72,12 +78,22 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
           <TableBody>
             {displayedTickets.map((ticket, index) => (
               <TableRow key={index}>
-                <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                <TableCell>{ticket.ticketType}</TableCell>
-                <TableCell>{ticket.eventDate}</TableCell>
-                <TableCell align="right">${ticket.price}</TableCell>
-                <TableCell align="right">{ticket.quantity}</TableCell>
-                <TableCell align="center">
+                <TableCell sx={TicketTableStyles.tableCell}>
+                  {page * rowsPerPage + index + 1}
+                </TableCell>
+                <TableCell sx={TicketTableStyles.tableCell}>
+                  {ticket.ticketType}
+                </TableCell>
+                <TableCell sx={TicketTableStyles.tableCell}>
+                  {ticket.eventDate}
+                </TableCell>
+                <TableCell align="right" sx={TicketTableStyles.tableCell}>
+                  ${ticket.price}
+                </TableCell>
+                <TableCell align="right" sx={TicketTableStyles.tableCell}>
+                  {ticket.quantity}
+                </TableCell>
+                <TableCell align="center" sx={TicketTableStyles.tableCell}>
                   <IconButton
                     size="small"
                     onClick={() => onEdit(page * rowsPerPage + index)}

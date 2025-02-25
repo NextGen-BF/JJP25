@@ -1,5 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { TicketFormStyles } from "./TicketFormStyles";
 import FormInput from "../FormInput/FormInput";
 import FormSelect from "../FormSelect/FormSelect";
@@ -16,6 +16,8 @@ import { FormStyles } from "../../styles/FormStyles";
 import "./TicketFormStyles.scss";
 import TicketTable from "./TicketTable";
 import { TicketFormConstants } from "../../constants/TicketFormConstants";
+import { toast } from "react-toastify";
+import { FormInputStyles } from "../FormInput/FormInputStyles";
 
 const TicketForm = () => {
   const dispatch = useDispatch();
@@ -42,6 +44,9 @@ const TicketForm = () => {
 
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
+  // to not dispatch update if the ticket info is not changed
+  const [initialValues, setInitialValues] = useState<Ticket | null>(null);
+
   const handleChange = async (field: keyof Ticket, value: any) => {
     setValue(field, value);
     await trigger(field);
@@ -49,13 +54,22 @@ const TicketForm = () => {
 
   const onSubmit = async (data: Ticket) => {
     const isFormValid = await trigger();
+
     if (!isFormValid) return;
 
     if (editIndex !== null) {
-      dispatch(updateTicket({ index: editIndex, ticket: data }));
+      const hasChanges = JSON.stringify(data) !== JSON.stringify(initialValues);
+
+      if (hasChanges) {
+        dispatch(updateTicket({ index: editIndex, ticket: data }));
+        toast.info(TicketFormConstants.TOAST_MESSAGES.TICKET_EDIT_SUCCESS);
+      }
+
       setEditIndex(null);
+      setInitialValues(null);
     } else {
       dispatch(addTicket(data));
+      toast.success(TicketFormConstants.TOAST_MESSAGES.TICKET_ADD_SUCCESS);
     }
     reset();
   };
@@ -68,6 +82,7 @@ const TicketForm = () => {
     setValue("price", ticket.price);
     setValue("quantity", ticket.quantity);
     setEditIndex(index);
+    setInitialValues(ticket);
   };
 
   return (
@@ -131,50 +146,6 @@ const TicketForm = () => {
               <Box sx={TicketFormStyles.quantityPriceButtonBox}>
                 <Box>
                   <FormInput
-                    name={TicketFormConstants.NAMES.QUANTITY}
-                    control={control}
-                    label={TicketFormConstants.LABELS.QUANTITY}
-                    type="number"
-                    defaultValue="0"
-                    required
-                    error={errors.quantity?.message}
-                    rules={{
-                      min: {
-                        value:
-                          TicketFormConstants.VALIDATION_MESSAGES
-                            .QUANTITY_MIN_VALUE,
-                        message:
-                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MIN,
-                      },
-                      max: {
-                        value:
-                          TicketFormConstants.VALIDATION_MESSAGES
-                            .QUANTITY_MAX_VALUE,
-                        message:
-                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MAX,
-                      },
-                      validate: (value: number) => {
-                        if (!/^\d+$/.test(value.toString())) {
-                          return TicketFormConstants.VALIDATION_MESSAGES
-                            .QUANTITY_WHOLE_NUMBERS;
-                        }
-
-                        if (
-                          value.toString().length > 1 &&
-                          value.toString().startsWith("0")
-                        ) {
-                          return TicketFormConstants.VALIDATION_MESSAGES
-                            .QUANTITY_LEADING_ZERO;
-                        }
-                        return true;
-                      },
-                    }}
-                    onChange={(e) => handleChange("quantity", e.target.value)}
-                  />
-                </Box>
-
-                <Box>
-                  <FormInput
                     name={TicketFormConstants.NAMES.PRICE}
                     control={control}
                     label={TicketFormConstants.LABELS.PRICE}
@@ -217,16 +188,65 @@ const TicketForm = () => {
                   />
                 </Box>
 
+                <Box>
+                  <FormInput
+                    name={TicketFormConstants.NAMES.QUANTITY}
+                    control={control}
+                    label={TicketFormConstants.LABELS.QUANTITY}
+                    type="number"
+                    defaultValue="0"
+                    required
+                    error={errors.quantity?.message}
+                    rules={{
+                      min: {
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_MIN_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MIN,
+                      },
+                      max: {
+                        value:
+                          TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_MAX_VALUE,
+                        message:
+                          TicketFormConstants.VALIDATION_MESSAGES.QUANTITY_MAX,
+                      },
+                      validate: (value: number) => {
+                        if (!/^\d+$/.test(value.toString())) {
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_WHOLE_NUMBERS;
+                        }
+
+                        if (
+                          value.toString().length > 1 &&
+                          value.toString().startsWith("0")
+                        ) {
+                          return TicketFormConstants.VALIDATION_MESSAGES
+                            .QUANTITY_LEADING_ZERO;
+                        }
+                        return true;
+                      },
+                    }}
+                    onChange={(e) => handleChange("quantity", e.target.value)}
+                  />
+                </Box>
+
                 <Box sx={TicketFormStyles.buttonBox}>
                   <Button type="submit" sx={TicketFormStyles.button}>
-                    {TicketFormConstants.LABELS.ADD_TICKET}
+                    {editIndex === null
+                      ? TicketFormConstants.LABELS.ADD_TICKET
+                      : TicketFormConstants.LABELS.EDIT_TICKET}
                   </Button>
                 </Box>
               </Box>
             </Box>
           </Box>
 
-          <Box>
+          <Box sx={{ paddingBottom: 2 }}>
+            <Typography sx={{ pb: 1, ...FormInputStyles.typography }}>
+              {TicketFormConstants.LABELS.CREATED_TICKETS}
+            </Typography>
             <TicketTable onEdit={handleEdit} />
           </Box>
         </Box>

@@ -13,6 +13,7 @@ export const TicketFormStyles = {
 
     "@media (max-width: 768px)": {
       flex: "0 1 45%",
+      paddingTop: "20px",
       paddingBottom: "0px",
       maxHeight: "auto",
       maxWidth: "90%",
@@ -35,6 +36,7 @@ export const TicketFormStyles = {
 
     "@media (max-width: 768px)": {
       flex: "0 1 45%",
+      paddingTop: "0px",
       paddingBottom: "0px",
       maxHeight: "auto",
       maxWidth: "90%",
@@ -104,13 +106,15 @@ export const TicketFormStyles = {
 
 export const TicketTableStyles = {
   ticketTable: {
-    backgroundColor: "var(--separator-line-color)",
+    backgroundColor: "var(--anti-flash-white-color)",
+    border: "1px solid var(--blankfactor-ultramarine-color)",
     borderRadius: "4px",
     width: "100%",
   },
 
   ticketTablePagination: {
-    backgroundColor: "var(--separator-line-color)",
+    backgroundColor: "var(--anti-flash-white-color)",
+    border: "1px solid var(--blankfactor-ultramarine-color)",
   },
 
   deleteIcon: {
@@ -128,6 +132,13 @@ export const TicketTableStyles = {
 
     "@media (max-width: 768px)": {
       fontSize: "16px",
+    },
+  },
+
+  tableCell: {
+    "@media (max-width: 768px)": {
+      fontSize: "11px",
+      padding: "5px",
     },
   },
 };

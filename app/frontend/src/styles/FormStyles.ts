@@ -5,7 +5,7 @@ export const FormStyles = {
     height: "100%",
     maxWidth: "1200px",
     maxHeight: "680px",
-    backgroundColor: "#f5f5f7",
+    backgroundColor: "var(--anti-flash-white-color)",
     borderRadius: "15px",
     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",
     display: "flex",

@@ -33,11 +33,13 @@ const ticketSlice = createSlice({
     addTicket: (state, action: PayloadAction<Ticket>) => {
       state.tickets.push(action.payload);
     },
+
     removeTicket: (state, action: PayloadAction<number>) => {
       state.tickets = state.tickets.filter(
         (_, index) => index !== action.payload
       );
     },
+
     updateTicket: (
       state,
       action: PayloadAction<{ index: number; ticket: Ticket }>
@@ -47,6 +49,7 @@ const ticketSlice = createSlice({
         state.tickets[index] = ticket;
       }
     },
+
     resetTickets: (state) => {
       state.tickets = initialState.tickets;
       state.status = "idle";
