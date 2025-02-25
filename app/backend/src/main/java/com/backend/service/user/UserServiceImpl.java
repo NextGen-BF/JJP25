@@ -32,15 +32,15 @@ public class UserServiceImpl implements UserService {
                 .id(registerRequest.getId())
                 .type(registerRequest.getRole().equals(UserType.ATTENDEE.name()) ? UserType.ATTENDEE : UserType.ORGANISER)
                 .build();
-        this.userRepository.saveAndFlush(user);
+        User savedUser = this.userRepository.saveAndFlush(user);
         log.debug("User with id {} registered successfully", registerRequest.getId());
         return RegisterResponse.builder()
-                .id(user.getId())
-                .phone(user.getPhone())
-                .profilePicture(user.getProfilePicture())
-                .userType(user.getType().name())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
+                .id(savedUser.getId())
+                .phone(savedUser.getPhone())
+                .profilePicture(savedUser.getProfilePicture())
+                .userType(savedUser.getType().name())
+                .createdAt(savedUser.getCreatedAt())
+                .updatedAt(savedUser.getUpdatedAt())
                 .build();
     }
 
