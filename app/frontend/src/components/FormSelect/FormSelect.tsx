@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { Controller } from "react-hook-form";
 import {
   FormControl,
@@ -21,7 +21,7 @@ interface FormSelectProps {
   onChange?: (e: SelectChangeEvent<string | number | unknown>) => void;
 }
 
-const FormSelect: React.FC<FormSelectProps> = ({
+const FormSelect: FC<FormSelectProps> = ({
   name,
   control,
   label,
