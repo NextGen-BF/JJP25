@@ -22,6 +22,7 @@ import { FormInputStyles } from "../FormInput/FormInputStyles";
 const TicketForm = () => {
   const dispatch = useDispatch();
   const tickets = useSelector((state: RootState) => state.ticket.tickets);
+  const eventDates = useSelector((state: RootState) => state.event.event.dates);
 
   const {
     control,
@@ -124,7 +125,9 @@ const TicketForm = () => {
                 name={TicketFormConstants.NAMES.EVENT_DATE}
                 control={control}
                 label={TicketFormConstants.NAMES.EVENT_DATE}
-                options={["2025-03-01", "2025-03-02"]}
+                options={eventDates.map((date) =>
+                  date.format("HH:mm DD/MM/YYYY")
+                )}
                 required
                 error={errors.eventDate?.message}
                 onChange={(e) => handleChange("eventDate", e.target.value)}
@@ -243,7 +246,7 @@ const TicketForm = () => {
             </Box>
           </Box>
 
-          <Box sx={{ paddingBottom: 2 }}>
+          <Box sx={TicketFormStyles.tableBox}>
             <Typography sx={{ pb: 1, ...FormInputStyles.typography }}>
               {TicketFormConstants.LABELS.CREATED_TICKETS}
             </Typography>

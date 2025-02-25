@@ -14,6 +14,7 @@ import { EventStepperStyles } from "./EventStepperStyles";
 import { EventStepperConstants } from "../../constants/EventStepperConstants";
 import EventForm from "../EventForm/EventForm";
 import VenueForm from "../VenueForm/VenueForm";
+import TicketForm from "../TicketForm/TicketForm";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { toast } from "react-toastify";
@@ -87,12 +88,7 @@ const EventStepper: FC = () => {
       case 1:
         return <VenueForm />;
       case 2:
-        return (
-          <Box sx={{ mt: 2 }}>
-            <TextField label="Ticket Type" fullWidth sx={{ mb: 2 }} />
-            <TextField label="Ticket Price" fullWidth sx={{ mb: 2 }} />
-          </Box>
-        );
+        return <TicketForm />;
       default:
         return null;
     }
