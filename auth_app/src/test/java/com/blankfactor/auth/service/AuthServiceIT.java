@@ -37,9 +37,6 @@ public class AuthServiceIT {
     private static final String TEST_ATTENDEE_ROLE = "attendee";
     private static final String TEST_ORGANISER_ROLE = "organiser";
     private static final String TEST_VERIFICATION_CODE = "123456";
-    private static final String VALID_TOKEN = "validToken";
-    private static final String NEW_PASSWORD = "newPassword1!";
-    private static final String DIFFERENT_PASSWORD = "differentPassword";
 
     private final AuthService authService;
     private final UserRepository userRepository;

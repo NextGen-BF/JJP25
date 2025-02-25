@@ -1,5 +1,6 @@
 package com.blankfactor.auth.controller;
 
+import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,11 @@ public class AuthControllerIT {
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
     private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
+
+    private static final String TEST_EMAIL = "example@email.com";
+    private static final String TEST_USERNAME = "john_doe";
+    private static final String TEST_FIRST_NAME = "John";
+    private static final String TEST_LAST_NAME = "Doe";
 
     private final MockMvc mockMvc;
     private final UserRepository userRepository;
@@ -61,14 +67,14 @@ public class AuthControllerIT {
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.username").value("john_doe"))
-                    .andExpect(jsonPath("$.firstName").value("John"))
-                    .andExpect(jsonPath("$.lastName").value("Doe"))
+                    .andExpect(jsonPath("$.email").value(TEST_EMAIL))
+                    .andExpect(jsonPath("$.username").value(TEST_USERNAME))
+                    .andExpect(jsonPath("$.firstName").value(TEST_FIRST_NAME))
+                    .andExpect(jsonPath("$.lastName").value(TEST_LAST_NAME))
                     .andExpect(jsonPath("$.enabled").value(false))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(1)))
-                    .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
+                    .andExpect(jsonPath("$.roles[0]").value(Role.ROLE_USER.name()));
         }
 
         @Test
@@ -91,15 +97,15 @@ public class AuthControllerIT {
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest))
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.username").value("john_doe"))
-                    .andExpect(jsonPath("$.firstName").value("John"))
-                    .andExpect(jsonPath("$.lastName").value("Doe"))
+                    .andExpect(jsonPath("$.email").value(TEST_EMAIL))
+                    .andExpect(jsonPath("$.username").value(TEST_USERNAME))
+                    .andExpect(jsonPath("$.firstName").value(TEST_FIRST_NAME))
+                    .andExpect(jsonPath("$.lastName").value(TEST_LAST_NAME))
                     .andExpect(jsonPath("$.enabled").value(false))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(2)))
-                    .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"))
-                    .andExpect(jsonPath("$.roles[1]").value("ROLE_ADMIN"));
+                    .andExpect(jsonPath("$.roles[0]").value(Role.ROLE_USER.name()))
+                    .andExpect(jsonPath("$.roles[1]").value(Role.ROLE_ADMIN.name()));
         }
 
         @Test
@@ -126,7 +132,7 @@ public class AuthControllerIT {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value("409"))
                     .andExpect(jsonPath("$.title").value("CONFLICT"))
-                    .andExpect(jsonPath("$.message").value("example@email.com is already in use"));
+                    .andExpect(jsonPath("$.message").value(TEST_EMAIL + " is already in use"));
         }
 
         @Test
@@ -165,7 +171,7 @@ public class AuthControllerIT {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value("409"))
                     .andExpect(jsonPath("$.title").value("CONFLICT"))
-                    .andExpect(jsonPath("$.message").value("john_doe is already in use"));
+                    .andExpect(jsonPath("$.message").value(TEST_USERNAME + " is already in use"));
         }
 
         @Test
@@ -247,7 +253,7 @@ public class AuthControllerIT {
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.code").value("404"))
                     .andExpect(jsonPath("$.title").value("NOT_FOUND"))
-                    .andExpect(jsonPath("$.message").value("example@email.com is not found"));
+                    .andExpect(jsonPath("$.message").value(TEST_EMAIL + " is not found"));
         }
 
         @Test
@@ -307,7 +313,7 @@ public class AuthControllerIT {
 
             // When
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest));
-            String code = userRepository.findByEmail("example@email.com").get().getVerificationCode();
+            String code = userRepository.findByEmail(TEST_EMAIL).get().getVerificationCode();
             mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(String.format(verifyRequest, code)));
             mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(String.format(verifyRequest, code)))
 
@@ -315,7 +321,7 @@ public class AuthControllerIT {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value("409"))
                     .andExpect(jsonPath("$.title").value("CONFLICT"))
-                    .andExpect(jsonPath("$.message").value("example@email.com is already verified"));
+                    .andExpect(jsonPath("$.message").value(TEST_EMAIL + " is already verified"));
         }
     }
 
@@ -339,12 +345,12 @@ public class AuthControllerIT {
 
             // When
             mockMvc.perform(post(REGISTER_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(registerRequest));
-            String codeBefore = userRepository.findByEmail("example@email.com").get().getVerificationCode();
-            mockMvc.perform(post(RESEND_ENDPOINT + "?email=example@email.com"))
+            String codeBefore = userRepository.findByEmail(TEST_EMAIL).get().getVerificationCode();
+            mockMvc.perform(post(RESEND_ENDPOINT + "?email=" + TEST_EMAIL))
 
                     // Then
                     .andExpect(status().isOk());
-            String codeAfter = userRepository.findByEmail("example@email.com").get().getVerificationCode();
+            String codeAfter = userRepository.findByEmail(TEST_EMAIL).get().getVerificationCode();
             assertNotEquals(codeBefore, codeAfter);
         }
     }
