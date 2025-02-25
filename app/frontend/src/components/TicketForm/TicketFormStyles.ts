@@ -79,11 +79,11 @@ export const TicketFormStyles = {
 
   buttonBox: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
 
   button: {
-    mt: "6px",
+    mt: "30px",
     backgroundColor: "transparent",
     border: "1px solid var(--blankfactor-ultramarine-color)",
     broderRadius: "4px",
@@ -100,6 +100,10 @@ export const TicketFormStyles = {
     ":focus": {
       outline: "none",
       boxShadow: "0 0 0 2px rgba(0, 0, 0, 0.2)",
+    },
+
+    "@media (max-width: 768px)": {
+      mt: "24px",
     },
   },
 };
