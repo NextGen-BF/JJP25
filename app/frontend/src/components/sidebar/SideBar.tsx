@@ -1,7 +1,5 @@
 import {
-  Box,
   Drawer,
-  IconButton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -10,14 +8,9 @@ import ViewSidebarIcon from "@mui/icons-material/ViewSidebarOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toggleSidebarStatus } from "../../redux/slices/sidebarSlice";
-import { SideSection } from "./SideSection";
-import { SideBarStyles } from "./SideBarStyles";
-import {
-  sidebarItemsAccount,
-  sidebarItemsEvents,
-  sidebarItemsRSVPs,
-} from "../../constants/SidebarConstants";
+import { SideBarStyles } from "./SideBarStyles";;
 import IconButtonComponent from "../IconButton/IconButtonComponent";
+import DrawerContent from "./DrawerContent/DrawerContent";
 
 export const SideBar: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,24 +26,6 @@ export const SideBar: FC = () => {
   const toggleDrawer = () => {
     dispatch(toggleSidebarStatus());
   };
-
-  const DrawerContent = (
-    <Box sx={SideBarStyles.drawerContentBoxStyles}>
-      <Box sx={SideBarStyles.drawerContentInnerBoxStyles}>
-        <IconButton onClick={toggleDrawer} sx={{ mr: 100 }}>
-          <ViewSidebarIcon />
-        </IconButton>
-        <IconButtonComponent
-          onClick={toggleDrawer}
-          sx={{ mr: 100 }}
-          icon={<ViewSidebarIcon />}
-        />
-      </Box>
-      <SideSection items={sidebarItemsEvents} title="Event" />
-      <SideSection items={sidebarItemsRSVPs} title="RSVPs" />
-      <SideSection items={sidebarItemsAccount} title="Account" />
-    </Box>
-  );
 
   return (
     <>
@@ -72,7 +47,7 @@ export const SideBar: FC = () => {
           },
         }}
       >
-        {DrawerContent}
+        <DrawerContent />
       </Drawer>
     </>
   );
