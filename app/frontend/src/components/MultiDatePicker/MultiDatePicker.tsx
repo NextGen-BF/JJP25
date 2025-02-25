@@ -75,7 +75,7 @@ const MultiDatePicker: FC<MultiDatePickerProps> = ({
                   key={index}
                   label={date.format("HH:mm DD/MM/YYYY")}
                   onDelete={() => handleRemoveDate(date)}
-                  style={{
+                  sx={{
                     ...MultiDatePickerStyles.chip,
                   }}
                 />
