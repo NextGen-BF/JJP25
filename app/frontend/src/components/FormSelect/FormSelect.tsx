@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { Controller } from "react-hook-form";
 import {
   FormControl,
@@ -21,7 +21,7 @@ interface FormSelectProps {
   onChange?: (e: SelectChangeEvent<string | number | unknown>) => void;
 }
 
-const FormSelect: React.FC<FormSelectProps> = ({
+const FormSelect: FC<FormSelectProps> = ({
   name,
   control,
   label,
@@ -33,7 +33,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   onChange,
 }) => {
   return (
-    <FormControl fullWidth sx={{ mb: 2 }}>
+    <FormControl fullWidth>
       <InputLabel>{label}</InputLabel>
       <Controller
         name={name}
@@ -62,9 +62,9 @@ const FormSelect: React.FC<FormSelectProps> = ({
           </Select>
         )}
       />
-      {error && (
-        <FormHelperText sx={{ color: "error.main" }}>{error}</FormHelperText>
-      )}
+      <FormHelperText sx={{ color: "error.main" }}>
+        {error ? error : " "}
+      </FormHelperText>
     </FormControl>
   );
 };

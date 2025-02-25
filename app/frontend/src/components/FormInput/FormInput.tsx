@@ -1,9 +1,11 @@
-import React from "react";
+import { FC, ChangeEvent } from "react";
 import { Controller } from "react-hook-form";
 import { TextField, Typography } from "@mui/material";
+import { FormInputStyles } from "./FormInputStyles";
 
 interface FormInputProps {
   defaultValue: string;
+  type?: string;
   name: string;
   control: any;
   rules?: object;
@@ -13,13 +15,12 @@ interface FormInputProps {
   required?: boolean;
   error?: string;
   sx?: object;
-  onChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
+const FormInput: FC<FormInputProps> = ({
   defaultValue,
+  type = "text",
   name,
   control,
   rules,
@@ -33,7 +34,7 @@ const FormInput: React.FC<FormInputProps> = ({
 }) => {
   return (
     <>
-      <Typography variant="h6">{label}</Typography>
+      <Typography sx={FormInputStyles.typography}>{label}</Typography>
       <Controller
         name={name}
         control={control}
@@ -45,14 +46,17 @@ const FormInput: React.FC<FormInputProps> = ({
         render={({ field }) => (
           <TextField
             {...field}
+            type={type}
             aria-label={label}
             fullWidth
             required={required}
             multiline={multiline}
             rows={rows}
             error={!!error}
-            helperText={error}
-            sx={{ mb: 2, ...sx }}
+            helperText={error ? error : " "}
+            sx={{
+              ...sx,
+            }}
             onChange={(e) => {
               field.onChange(e);
               if (onChange) {

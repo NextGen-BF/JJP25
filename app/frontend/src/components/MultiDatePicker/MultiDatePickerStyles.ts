@@ -31,23 +31,28 @@ export const MultiDatePickerStyles = {
 
   stackWrapper: {
     width: "100%",
+    minHeight: "56px",
     maxWidth: "calc(100% + 8px)",
     display: "flex",
+    flexDirection: "row",
+    gap: "8px",
     flexWrap: "wrap",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
   },
 
   chip: {
+    display: "flex",
+    justifyContent: "space-between",
     backgroundColor: "var(--blankfactor-ultramarine-color)",
     color: "white",
     fontWeight: "1000",
     marginBottom: "8px",
-    width: "calc(33% - 8px)",
+    flexBasis: "100px",
     marginRight: "8px",
     marginLeft: "0px",
 
-    "@media (min-width: 768px) and (max-width:1150px)": {
-      width: "calc(50% - 8px)",
+    "@media (max-width: 768px)": {
+      flexBasis: "100px",
     },
   },
 };
