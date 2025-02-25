@@ -124,7 +124,7 @@ const TicketForm = () => {
               <FormSelect
                 name={TicketFormConstants.NAMES.EVENT_DATE}
                 control={control}
-                label={TicketFormConstants.NAMES.EVENT_DATE}
+                label={TicketFormConstants.LABELS.EVENT_DATE}
                 options={eventDates.map((date) =>
                   date.format("HH:mm DD/MM/YYYY")
                 )}
