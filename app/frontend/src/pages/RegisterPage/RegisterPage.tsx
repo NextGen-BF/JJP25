@@ -1,5 +1,10 @@
+// MUI components
 import { Box, Container } from "@mui/material";
+
+// React
 import { FC } from "react";
+
+// Components and Styling
 import "./RegisterPage.scss";
 import RegisterForm from "./RegisterForm";
 
