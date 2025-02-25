@@ -1,10 +1,11 @@
-import React from "react";
+import { FC, ChangeEvent } from "react";
 import { Controller } from "react-hook-form";
 import { TextField, Typography } from "@mui/material";
 import { FormInputStyles } from "./FormInputStyles";
 
 interface FormInputProps {
   defaultValue: string;
+  type?: string;
   name: string;
   control: any;
   rules?: object;
@@ -14,13 +15,12 @@ interface FormInputProps {
   required?: boolean;
   error?: string;
   sx?: object;
-  onChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
+const FormInput: FC<FormInputProps> = ({
   defaultValue,
+  type = "text",
   name,
   control,
   rules,
@@ -46,6 +46,7 @@ const FormInput: React.FC<FormInputProps> = ({
         render={({ field }) => (
           <TextField
             {...field}
+            type={type}
             aria-label={label}
             fullWidth
             required={required}
