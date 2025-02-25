@@ -33,11 +33,6 @@ public class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    @BeforeEach
-    public void setup() {
-        userRepository.deleteAll();
-    }
-
     @Nested
     class RegisterTests {
 
