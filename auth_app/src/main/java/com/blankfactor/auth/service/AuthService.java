@@ -23,9 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,6 +54,7 @@ public class AuthService {
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
     private static final String TOKEN_PARAM_STRING = "?token=";
     private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment";
+    private static final String REGISTER_ENDPOINT = "http://localhost:8080/api/v1/auth/register";
 
     @Value("${app.reset-password.url}")
     private String resetPasswordBaseUrl;
@@ -159,7 +157,6 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} verified successfully", userEmail);
-        autoLogin(user);
         informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
@@ -281,20 +278,12 @@ public class AuthService {
         }
     }
 
-    private void autoLogin(User user) {
-        log.debug("Attempting to automatically login user with email: {}", user.getEmail());
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(user.getUsername());
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.debug("User with email {} logged in successfully", user.getEmail());
-    }
-
     private void informEmsApp(Long id, String role, String token) {
         log.debug("Sending { \"id\": \"{}\", \"role:\" \"{}\" } to ems_app backend", id, role);
         try {
             this.restClient
                     .post()
-                    .uri("http://localhost:8080/register")
+                    .uri(REGISTER_ENDPOINT)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(InformRequest.builder()
