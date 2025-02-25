@@ -28,22 +28,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             IncorrectVerificationCodeException.class,
             PasswordsDoNotMatchException.class,
-            JwtException.class,
-            ExpiredJwtException.class,
             IllegalArgumentException.class})
     public ResponseEntity<Map<String, String>> handleBadRequest(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("400", "BAD_REQUEST", ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidCredentialsException.class)
+    @ExceptionHandler({InvalidCredentialsException.class, JwtException.class, ExpiredJwtException.class})
     public ResponseEntity<Map<String, String>> handleUnauthorized(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({UserNotVerifiedException.class, InvalidInformRequestException.class})
-    public ResponseEntity<Map<String, String>> handleForbidden(RuntimeException ex){
+    public ResponseEntity<Map<String, String>> handleForbidden(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
