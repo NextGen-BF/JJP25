@@ -1,4 +1,4 @@
-import { useState, FC, useRef } from "react";
+import { useState, FC, useRef, useEffect } from "react";
 import {
   Stepper,
   Step,
@@ -15,9 +15,10 @@ import { EventStepperConstants } from "../../constants/EventStepperConstants";
 import EventForm from "../EventForm/EventForm";
 import VenueForm from "../VenueForm/VenueForm";
 import TicketForm from "../TicketForm/TicketForm";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
+import { submitEventPayload } from "../../redux/services/eventPayloadService";
 
 const steps = [
   EventStepperConstants.EVENT_CREATION,
@@ -27,8 +28,10 @@ const steps = [
 
 const EventStepper: FC = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Flag to check if the form is submitting
   const formRef = useRef<{ submitForm: () => Promise<boolean> } | null>(null);
-  const [skipped, setSkipped] = useState(new Set<number>());
+
+  const dispatch = useDispatch<AppDispatch>();
   const venueTitle = useSelector(
     (state: RootState) => state.event.event.venueTitle
   ); // from Event state
@@ -37,8 +40,6 @@ const EventStepper: FC = () => {
   ); // from Venue state
 
   const isStepOptional = (step: number) => step === 1;
-
-  const isStepSkipped = (step: number) => skipped.has(step);
 
   const handleNext = async () => {
     if (formRef.current) {
@@ -49,36 +50,34 @@ const EventStepper: FC = () => {
       toast.error("Please select or create a new venue to proceed.");
       return;
     }
-
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
+    if (activeStep === steps.length - 1) {
+      await handleFinish();
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      throw new Error(EventStepperConstants.Errors.SKIP_ERROR);
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
   const handleReset = () => {
     setActiveStep(0);
+  };
+
+  const handleFinish = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      await dispatch(submitEventPayload());
+      toast.success("Event submitted successfully!");
+      setActiveStep(steps.length);
+    } catch (error) {
+      toast.error("An error occurred while submitting the event.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepForm = () => {
@@ -107,9 +106,6 @@ const EventStepper: FC = () => {
                 {EventStepperConstants.OPTIONAL_STEP}
               </Typography>
             );
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
           }
 
           return (
