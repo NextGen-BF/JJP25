@@ -1,17 +1,17 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
-import com.blankfactor.auth.entity.dto.incoming.InformRequest;
-import com.blankfactor.auth.entity.dto.incoming.LoginRequest;
+import com.blankfactor.auth.entity.dto.request.InformRequest;
+import com.blankfactor.auth.entity.dto.request.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.outgoing.RegisterResponse;
-import com.blankfactor.auth.entity.dto.outgoing.VerifyResponse;
-import com.blankfactor.auth.entity.dto.incoming.RegisterRequest;
-import com.blankfactor.auth.entity.dto.incoming.VerifyRequest;
+import com.blankfactor.auth.entity.dto.response.RegisterResponse;
+import com.blankfactor.auth.entity.dto.response.VerifyResponse;
+import com.blankfactor.auth.entity.dto.request.RegisterRequest;
+import com.blankfactor.auth.entity.dto.request.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.blankfactor.auth.entity.dto.outgoing;
+package com.blankfactor.auth.entity.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

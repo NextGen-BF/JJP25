@@ -1,7 +1,7 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.outgoing.UserResponse;
+import com.blankfactor.auth.entity.dto.response.UserResponse;
 import com.blankfactor.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
