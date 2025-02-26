@@ -54,10 +54,12 @@ public class AuthService {
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
     private static final String TOKEN_PARAM_STRING = "?token=";
     private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment";
-    private static final String REGISTER_ENDPOINT = "http://localhost:8080/api/v1/auth/register";
 
     @Value("${app.reset-password.url}")
-    private String resetPasswordBaseUrl;
+    private final String resetPasswordBaseUrl;
+
+    @Value("${app.register.endpoint}")
+    private final String registerEndpoint;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -67,7 +69,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RestClient restClient;
-    private final UserDetailsService userDetailsService;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -235,7 +236,7 @@ public class AuthService {
         log.info("Resetting password using token.");
         if (!newPassword.equals(confirmPassword)) {
             log.warn("Passwords do not match");
-            throw new PasswordsDoNotMatchException("Passwords do not match. Please try again.");
+            throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
         }
 
         String username = jwtService.extractUsername(token);
@@ -283,7 +284,7 @@ public class AuthService {
         try {
             this.restClient
                     .post()
-                    .uri(REGISTER_ENDPOINT)
+                    .uri(registerEndpoint)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(InformRequest.builder()
