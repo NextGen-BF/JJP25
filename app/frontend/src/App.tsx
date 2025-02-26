@@ -1,6 +1,4 @@
-import {
-  BrowserRouter as Router,
-} from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,17 +20,16 @@ export default function App() {
       <CssBaseline />
       <Navbar />
       <Box sx={AppStyles.outerBoxStyles}>
-      <SideBar />
-          <Box
-            sx={{
-              ...AppStyles.routesBoxStyles,
-              marginLeft: isSideBarOpen ? "260px" : 
-              isMobile ? 0 : "80px",
-            }}
-          >
-            <AppRoutes />
-          </Box>
-          <Footer />
+        <SideBar />
+        <Box
+          sx={{
+            ...AppStyles.routesBoxStyles,
+            marginLeft: isSideBarOpen ? "260px" : isMobile ? 0 : "80px",
+          }}
+        >
+          <AppRoutes />
+        </Box>
+        <Footer />
       </Box>
     </Router>
   );
