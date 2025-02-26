@@ -22,12 +22,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({JwtException.class, ExpiredJwtException.class})
-    public ResponseEntity<Map<String, String>> handleUnauthorized(RuntimeException ex) {
-        log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
-        return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
-    }
-
     @ExceptionHandler({UserFoundException.class})
     public ResponseEntity<Map<String, String>> handleConflict(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
