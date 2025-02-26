@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-
     private final JwtService jwtService;
 
     @PostMapping("/register")
@@ -31,11 +30,11 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping("/verify")
-    public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
-        log.info("Verification request received for email verification id: {}", verifyRequest.getUuid());
-        VerifyResponse response = this.authService.verify(verifyRequest);
-        log.info("User verified successfully with email verification id: {}", verifyRequest.getUuid());
+    @PostMapping("/verify/{id}")
+    public ResponseEntity<VerifyResponse> verify(@PathVariable String id, @RequestBody @Valid VerifyRequest verifyRequest) {
+        log.info("Verification request received for email verification id: {}", id);
+        VerifyResponse response = this.authService.verify(id, verifyRequest);
+        log.info("User verified successfully with email verification id: {}", id);
         return ResponseEntity.ok(response);
     }
 
@@ -56,7 +55,6 @@ public class AuthController {
         log.debug("Generated JWT token for user: {}", loginRequest.getLoginIdentifier());
         return ResponseEntity.ok(loginResponse);
     }
-
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {

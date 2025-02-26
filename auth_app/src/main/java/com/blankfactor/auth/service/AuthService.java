@@ -22,7 +22,6 @@ import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +38,7 @@ import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +72,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
-    private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RestClient restClient;
@@ -102,7 +101,15 @@ public class AuthService {
         this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
         sendVerificationEmail(user);
-        return this.modelMapper.map(user, RegisterResponse.class);
+        return RegisterResponse.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .enabled(user.getEnabled())
+                .roles(user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()))
+                .verifyId(emailVerification.getUuid())
+                .build();
     }
 
     public User login(LoginRequest input) {
@@ -143,14 +150,13 @@ public class AuthService {
     }
 
     @Transactional
-    public VerifyResponse verify(VerifyRequest verifyRequest) {
-        log.debug("Verifying user with email verification id: {}", verifyRequest.getUuid());
-        String requestUuid = verifyRequest.getUuid();
+    public VerifyResponse verify(String id, VerifyRequest verifyRequest) {
+        log.debug("Verifying user with email verification id: {}", id);
         String requestCode = verifyRequest.getCode();
-        Optional<EmailVerification> optionalEmailVerification = this.emailVerificationRepository.findByUuid(requestUuid);
+        Optional<EmailVerification> optionalEmailVerification = this.emailVerificationRepository.findByUuid(id);
         if (optionalEmailVerification.isEmpty()) {
-            log.warn("Email verification with id {} is not found", requestUuid);
-            throw new EmailVerificationNotFound(String.format(VERIFICATION_NOT_FOUND, requestUuid));
+            log.warn("Email verification with id {} is not found", id);
+            throw new EmailVerificationNotFound(String.format(VERIFICATION_NOT_FOUND, id));
         }
         EmailVerification emailVerification = optionalEmailVerification.get();
         User user = emailVerification.getUser();
@@ -169,13 +175,14 @@ public class AuthService {
         }
         user.setEnabled(true);
         this.userRepository.saveAndFlush(user);
+        emailVerification.setUuid(null);
         emailVerification.setCode(null);
         emailVerification.setCodeExpirationDate(null);
         this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} verified successfully", userEmail);
-        // informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
+        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
-        return this.modelMapper.map(user, VerifyResponse.class);
+        return VerifyResponse.builder().email(userEmail).enabled(user.getEnabled()).build();
     }
 
     @Transactional

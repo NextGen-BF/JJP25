@@ -24,4 +24,6 @@ public class RegisterResponse implements Serializable {
 
     private Set<String> roles;
 
+    private String verifyId;
+
 }

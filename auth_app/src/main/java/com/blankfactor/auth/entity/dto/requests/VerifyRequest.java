@@ -11,9 +11,6 @@ import lombok.*;
 @Builder
 public class VerifyRequest {
 
-    @NotNull(message = "{uuid.required}")
-    private String uuid;
-
     @NotNull(message = "{code.required}")
     @Size(min = 6, max = 6, message = "{code.invalid}")
     private String code;
