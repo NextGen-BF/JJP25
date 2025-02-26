@@ -3,10 +3,13 @@ import usersReducer from "./slices/usersSlice";
 import eventReducer from "./slices/eventSlice";
 import venueReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
+import sidebarReducer from "./slices/sidebarSlice"
 import ticketReducer from "./slices/ticketSlice";
 
 export const store = configureStore({
+  
   reducer: {
+    sidebar: sidebarReducer,
     users: usersReducer,
     event: eventReducer,
     venue: venueReducer,
@@ -21,6 +24,7 @@ export const store = configureStore({
         ignoredPaths: ["event.event.dates"],
       },
     }),
+
 });
 
 export type RootState = ReturnType<typeof store.getState>;

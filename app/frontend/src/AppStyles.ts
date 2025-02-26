@@ -5,6 +5,7 @@ export const AppStyles = {
     minHeight: "100vh",
     overflowY: "hidden",
   },
+
   routesBoxStyles: {
     flexGrow: 1,
     display: "flex",
