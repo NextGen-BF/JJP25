@@ -1,17 +1,17 @@
 package com.blankfactor.auth.service;
 
+import com.blankfactor.auth.entity.EmailVerification;
 import com.blankfactor.auth.entity.Role;
-import com.blankfactor.auth.entity.dto.incoming.InformRequest;
-import com.blankfactor.auth.entity.dto.incoming.LoginRequest;
+import com.blankfactor.auth.entity.dto.requests.InformRequest;
+import com.blankfactor.auth.entity.dto.requests.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
-import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
-import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.outgoing.RegisterResponse;
-import com.blankfactor.auth.entity.dto.outgoing.VerifyResponse;
-import com.blankfactor.auth.entity.dto.incoming.RegisterRequest;
-import com.blankfactor.auth.entity.dto.incoming.VerifyRequest;
+import com.blankfactor.auth.entity.dto.responses.RegisterResponse;
+import com.blankfactor.auth.entity.dto.responses.VerifyResponse;
+import com.blankfactor.auth.entity.dto.requests.RegisterRequest;
+import com.blankfactor.auth.entity.dto.requests.VerifyRequest;
+import com.blankfactor.auth.repository.EmailVerificationRepository;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +61,7 @@ public class AuthService {
     private String registerEndpoint;
 
     private final UserRepository userRepository;
+    private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
@@ -80,14 +81,18 @@ public class AuthService {
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .birthDate(registerRequest.getBirthDate())
-                .verificationCode(generateVerificationCode())
-                .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15))
                 .enabled(false)
                 .roles(registerRequest.getRole().equals("attendee") ? Set.of(Role.ROLE_USER) : Set.of(Role.ROLE_USER, Role.ROLE_ADMIN))
                 .build();
-        this.userRepository.saveAndFlush(user);
+        User savedUser = this.userRepository.saveAndFlush(user);
+        EmailVerification emailVerification = EmailVerification.builder()
+                .code(generateVerificationCode())
+                .codeExpirationDate(LocalDateTime.now().plusMinutes(15))
+                .user(savedUser)
+                .build();
+        this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
-        sendVerificationEmail(user);
+        // sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
@@ -139,22 +144,22 @@ public class AuthService {
             throw new UserNotFoundException(String.format(USER_NOT_FOUND, userEmail));
         }
         User user = optionalUser.get();
-        LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
+        // LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
         if (user.isEnabled()) {
             log.warn("User with email {} is already verified", userEmail);
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
-        if (!user.getVerificationCode().equals(userVerificationCode)) {
+        /* if (!user.getVerificationCode().equals(userVerificationCode)) {
             log.warn("Incorrect verification code: {} for email: {}", userVerificationCode, userEmail);
             throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
         }
         if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
             log.warn("Verification code expired: {} for email: {}", userVerificationCode, userEmail);
             throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
-        }
+        } */
         user.setEnabled(true);
-        user.setVerificationCode(null);
-        user.setVerificationCodeExpiresAt(null);
+        // user.setVerificationCode(null);
+        // user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} verified successfully", userEmail);
         informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
@@ -176,15 +181,15 @@ public class AuthService {
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, email));
         }
         String newCode = generateVerificationCode();
-        user.setVerificationCode(newCode);
-        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+        // user.setVerificationCode(newCode);
+        // user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         this.userRepository.saveAndFlush(user);
-        sendVerificationEmail(user);
+        // sendVerificationEmail(user);
         log.debug("Verification code resent successfully to email: {}", email);
         return newCode;
     }
 
-    public void sendVerificationEmail(User user) {
+    /* public void sendVerificationEmail(User user) {
         try {
             this.emailService.sendVerificationEmail(
                     user.getEmail(),
@@ -195,7 +200,7 @@ public class AuthService {
             log.error("Failed to send verification email to: {}", user.getEmail());
             throw new VerificationEmailNotSentException(String.format(EMAIL_NOT_SENT, user.getEmail()), e);
         }
-    }
+    } */
 
     public void validateCredentials(RegisterRequest registerRequest) {
         log.debug("Validating credentials for email: {}", registerRequest.getEmail());

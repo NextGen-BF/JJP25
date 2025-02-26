@@ -1,10 +1,10 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.outgoing.RegisterResponse;
-import com.blankfactor.auth.entity.dto.outgoing.VerifyResponse;
-import com.blankfactor.auth.entity.dto.incoming.RegisterRequest;
-import com.blankfactor.auth.entity.dto.incoming.VerifyRequest;
+import com.blankfactor.auth.entity.dto.responses.RegisterResponse;
+import com.blankfactor.auth.entity.dto.responses.VerifyResponse;
+import com.blankfactor.auth.entity.dto.requests.RegisterRequest;
+import com.blankfactor.auth.entity.dto.requests.VerifyRequest;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;

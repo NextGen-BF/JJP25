@@ -46,12 +46,6 @@ public class User implements UserDetails {
     @Column(name = "is_enabled", nullable = false)
     private Boolean enabled;
 
-    @Column(name = "verification_code")
-    private String verificationCode;
-
-    @Column(name = "verification_expiration_date")
-    private LocalDateTime verificationCodeExpiresAt;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))

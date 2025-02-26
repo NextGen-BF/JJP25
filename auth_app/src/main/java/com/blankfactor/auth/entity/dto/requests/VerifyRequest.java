@@ -1,4 +1,4 @@
-package com.blankfactor.auth.entity.dto.incoming;
+package com.blankfactor.auth.entity.dto.requests;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
