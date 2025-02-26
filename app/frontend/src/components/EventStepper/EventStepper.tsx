@@ -1,4 +1,4 @@
-import { useState, FC, useRef, useEffect } from "react";
+import { useState, FC, useRef } from "react";
 import {
   Stepper,
   Step,
@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Box,
-  TextField,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -28,16 +27,19 @@ const steps = [
 
 const EventStepper: FC = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Flag to check if the form is submitting
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<{ submitForm: () => Promise<boolean> } | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const venueTitle = useSelector(
     (state: RootState) => state.event.event.venueTitle
-  ); // from Event state
+  );
   const isVenueCreated = useSelector(
     (state: RootState) => state.venue.isVenueCreated
-  ); // from Venue state
+  );
+  const ticketsLength = useSelector(
+    (state: RootState) => state.ticket.tickets
+  ).length;
 
   const isStepOptional = (step: number) => step === 1;
 
@@ -46,15 +48,39 @@ const EventStepper: FC = () => {
       await formRef.current.submitForm();
     }
 
-    if (activeStep === 1 && !isVenueCreated && !venueTitle) {
-      toast.error("Please select or create a new venue to proceed.");
+    if (activeStep === 1 && !validateVenue()) {
       return;
     }
+
+    if (activeStep === steps.length - 1 && !validateTickets()) {
+      return;
+    }
+
     if (activeStep === steps.length - 1) {
       await handleFinish();
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
+  };
+
+  const validateVenue = () => {
+    if (!isVenueCreated && !venueTitle) {
+      toast.error(
+        EventStepperConstants.TOAST_MESSAGES.VENUE_VALIDATION_MESSAGE
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const validateTickets = () => {
+    if (ticketsLength === 0) {
+      toast.error(
+        EventStepperConstants.TOAST_MESSAGES.TICKET_VALIDATION_MESSAGE
+      );
+      return false;
+    }
+    return true;
   };
 
   const handleBack = () => {
@@ -71,10 +97,12 @@ const EventStepper: FC = () => {
 
     try {
       await dispatch(submitEventPayload());
-      toast.success("Event submitted successfully!");
+      toast.success(
+        EventStepperConstants.TOAST_MESSAGES.EVENT_SUBMISSION_SUCCESS
+      );
       setActiveStep(steps.length);
     } catch (error) {
-      toast.error("An error occurred while submitting the event.");
+      toast.error(EventStepperConstants.TOAST_MESSAGES.EVENT_SUBMISSION_FAIL);
     } finally {
       setIsSubmitting(false);
     }
@@ -136,38 +164,28 @@ const EventStepper: FC = () => {
           </Box>
         </>
       ) : (
-        <>
-          {/* Box for form and buttons for navigation of the stepper */}
-          <Box sx={{ pt: 2 }}>
-            <Box sx={EventStepperStyles.ButtonBox}>
-              <Button
-                disabled={activeStep === 0}
-                sx={EventStepperStyles.stepButton}
-                onClick={handleBack}
-              >
-                <ArrowBackIosIcon
-                  sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
-                />
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {/* {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
-                </Button>
-              )} */}
-              <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
-                {activeStep === steps.length - 1 ? (
-                  EventStepperConstants.FINISH_STEP
-                ) : (
-                  <ArrowForwardIosIcon
-                    sx={EventStepperStyles.arrowForwardIos}
-                  />
-                )}
-              </Button>
-            </Box>
-            {renderStepForm()}
+        <Box sx={{ pt: 2 }}>
+          <Box sx={EventStepperStyles.ButtonBox}>
+            <Button
+              disabled={activeStep === 0}
+              sx={EventStepperStyles.stepButton}
+              onClick={handleBack}
+            >
+              <ArrowBackIosIcon
+                sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
+              />
+            </Button>
+            <Box sx={{ flex: "1 1 auto" }} />
+            <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
+              {activeStep === steps.length - 1 ? (
+                EventStepperConstants.FINISH_STEP
+              ) : (
+                <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />
+              )}
+            </Button>
           </Box>
-        </>
+          {renderStepForm()}
+        </Box>
       )}
     </Box>
   );

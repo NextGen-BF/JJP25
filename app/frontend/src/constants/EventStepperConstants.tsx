@@ -11,7 +11,11 @@ export const EventStepperConstants = {
   OPTIONAL_STEP: "Optional",
   RESET_STEPS: "Reset",
 
-  Errors: {
-    SKIP_ERROR: "You can't skip a step that isn't optional.",
+  TOAST_MESSAGES: {
+    TICKET_VALIDATION_MESSAGE:
+      "Please add at least one ticket before finishing.",
+    VENUE_VALIDATION_MESSAGE: "Please select or create a new venue to proceed.",
+    EVENT_SUBMISSION_SUCCESS: "Event submitted successfully!",
+    EVENT_SUBMISSION_FAIL: "An error occurred while submitting the event.",
   },
 };

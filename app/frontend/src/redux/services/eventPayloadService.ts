@@ -1,6 +1,5 @@
 import axiosInstance from "../../api/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Event } from "../slices/eventSlice";
 import { RootState } from "../store";
 
 export const submitEventPayload = createAsyncThunk(
