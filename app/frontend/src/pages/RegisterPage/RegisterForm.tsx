@@ -1,4 +1,10 @@
-// MUI components
+// React libraries
+import { FC, useEffect } from "react";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+// Third party libraries
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -11,18 +17,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-// React libraries
-import { FC, useEffect } from "react";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
-// Other libraries
+// Utility
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-// Styling
+// Assets
 import googleLogo from "../../assets/google-color.png";
 import "./RegisterForm.scss";
 
