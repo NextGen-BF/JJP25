@@ -2,15 +2,16 @@ package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.response.UserResponse;
+import com.blankfactor.auth.entity.dto.imp.AssignRoleRequest;
+import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/users")
 @RestController
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     @GetMapping("/user-profile")
     public ResponseEntity<UserResponse> getAuthenticatedUser() {
@@ -34,6 +36,14 @@ public class UserController {
         );
         log.debug("UserResponseDTO: {}", userResponse);
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/assign-role")
+    public ResponseEntity<String> assignRole(@RequestBody AssignRoleRequest request) {
+        log.info("Assigning role request received for user with id: {}", request.getUserId());
+        authService.assignAdminRole(request.getUserId(), request.getRole());
+        return ResponseEntity.ok("Role assigned successfully");
     }
 
 }
