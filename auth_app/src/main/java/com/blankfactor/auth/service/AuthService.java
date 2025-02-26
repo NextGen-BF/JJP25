@@ -56,10 +56,10 @@ public class AuthService {
     private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment";
 
     @Value("${app.reset-password.url}")
-    private final String resetPasswordBaseUrl;
+    private String resetPasswordBaseUrl;
 
     @Value("${app.register.endpoint}")
-    private final String registerEndpoint;
+    private String registerEndpoint;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
