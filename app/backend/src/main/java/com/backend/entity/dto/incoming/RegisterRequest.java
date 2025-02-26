@@ -1,4 +1,4 @@
-package com.backend.entity.dto.imp;
+package com.backend.entity.dto.incoming;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

@@ -1,7 +1,7 @@
 package com.backend.controller.user;
 
-import com.backend.entity.dto.exp.RegisterResponse;
-import com.backend.entity.dto.imp.RegisterRequest;
+import com.backend.entity.dto.outgoing.RegisterResponse;
+import com.backend.entity.dto.incoming.RegisterRequest;
 import com.backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

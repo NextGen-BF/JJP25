@@ -1,4 +1,4 @@
-package com.backend.entity.dto.exp;
+package com.backend.entity.dto.outgoing;
 
 import lombok.*;
 

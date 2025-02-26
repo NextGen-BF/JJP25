@@ -2,11 +2,11 @@ package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.LoginRequest;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.outgoing.RegisterResponse;
+import com.blankfactor.auth.entity.dto.outgoing.VerifyResponse;
+import com.blankfactor.auth.entity.dto.incoming.LoginRequest;
+import com.blankfactor.auth.entity.dto.incoming.RegisterRequest;
+import com.blankfactor.auth.entity.dto.incoming.VerifyRequest;
 import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
 import com.blankfactor.auth.exception.custom.InvalidInformRequestException;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;

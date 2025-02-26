@@ -1,4 +1,4 @@
-package com.blankfactor.auth.entity.dto.exp;
+package com.blankfactor.auth.entity.dto.outgoing;
 
 import lombok.*;
 

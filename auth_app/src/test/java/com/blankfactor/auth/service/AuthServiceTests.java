@@ -2,10 +2,10 @@ package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.imp.LoginRequest;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.outgoing.RegisterResponse;
+import com.blankfactor.auth.entity.dto.incoming.LoginRequest;
+import com.blankfactor.auth.entity.dto.incoming.RegisterRequest;
+import com.blankfactor.auth.entity.dto.incoming.VerifyRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;

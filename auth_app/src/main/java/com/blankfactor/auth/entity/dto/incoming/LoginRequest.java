@@ -1,4 +1,4 @@
-package com.blankfactor.auth.entity.dto.imp;
+package com.blankfactor.auth.entity.dto.incoming;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
