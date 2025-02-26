@@ -1,4 +1,4 @@
-package com.blankfactor.auth.exception.custom;
+package com.blankfactor.auth.exception.custom.credentials;
 
 public class InvalidCredentialsException extends RuntimeException {
   public InvalidCredentialsException(String message) {

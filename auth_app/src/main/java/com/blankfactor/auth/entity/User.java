@@ -47,7 +47,7 @@ public class User implements UserDetails {
     private Boolean enabled;
 
     @OneToOne
-    @JoinColumn(referencedColumnName = "uuid", name = "email_verification_uuid")
+    @JoinColumn(referencedColumnName = "id", name = "email_verification_id")
     private EmailVerification emailVerification;
 
     @ElementCollection(fetch = FetchType.EAGER)

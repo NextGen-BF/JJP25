@@ -16,8 +16,11 @@ import java.util.UUID;
 public class EmailVerification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
+    private String uuid;
 
     @Column
     private String code;

@@ -5,12 +5,18 @@ import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.dto.requests.InformRequest;
 import com.blankfactor.auth.entity.dto.requests.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
+import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
+import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.credentials.InvalidCredentialsException;
+import com.blankfactor.auth.exception.custom.credentials.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.email.VerificationEmailNotSentException;
 import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.responses.RegisterResponse;
 import com.blankfactor.auth.entity.dto.responses.VerifyResponse;
 import com.blankfactor.auth.entity.dto.requests.RegisterRequest;
 import com.blankfactor.auth.entity.dto.requests.VerifyRequest;
+import com.blankfactor.auth.exception.custom.email.EmailVerificationNotFound;
 import com.blankfactor.auth.repository.EmailVerificationRepository;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -40,6 +46,7 @@ import java.util.*;
 public class AuthService {
 
     private static final String USER_NOT_FOUND = "%s is not found";
+    private static final String VERIFICATION_NOT_FOUND = "%s is not found";
     private static final String USER_FOUND = "%s is already in use";
     private static final String USER_EXISTS = "User with id: %s already exists";
     private static final String USER_NOT_AUTHENTICATED = "The request might not have token or has an expired one";
@@ -75,6 +82,7 @@ public class AuthService {
         log.debug("Registering user with email: {}", registerRequest.getEmail());
         validateCredentials(registerRequest);
         EmailVerification emailVerification = this.emailVerificationRepository.saveAndFlush(EmailVerification.builder()
+                .uuid(UUID.randomUUID().toString())
                 .code(generateVerificationCode())
                 .codeExpirationDate(LocalDateTime.now().plusMinutes(15))
                 .user(null)
@@ -93,7 +101,7 @@ public class AuthService {
         emailVerification.setUser(user);
         this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
-        // sendVerificationEmail(user);
+        sendVerificationEmail(user);
         return this.modelMapper.map(user, RegisterResponse.class);
     }
 
@@ -136,34 +144,36 @@ public class AuthService {
 
     @Transactional
     public VerifyResponse verify(VerifyRequest verifyRequest) {
-        log.debug("Verifying user with email: {}", verifyRequest.getEmail());
-        String userEmail = verifyRequest.getEmail();
-        String userVerificationCode = verifyRequest.getVerificationCode();
-        Optional<User> optionalUser = this.userRepository.findByEmail(userEmail);
-        if (optionalUser.isEmpty()) {
-            log.warn("User with email {} is not found", userEmail);
-            throw new UserNotFoundException(String.format(USER_NOT_FOUND, userEmail));
+        log.debug("Verifying user with email verification id: {}", verifyRequest.getUuid());
+        String requestUuid = verifyRequest.getUuid();
+        String requestCode = verifyRequest.getCode();
+        Optional<EmailVerification> optionalEmailVerification = this.emailVerificationRepository.findByUuid(requestUuid);
+        if (optionalEmailVerification.isEmpty()) {
+            log.warn("Email verification with id {} is not found", requestUuid);
+            throw new EmailVerificationNotFound(String.format(VERIFICATION_NOT_FOUND, requestUuid));
         }
-        User user = optionalUser.get();
-        // LocalDateTime verificationCodeExpiresAt = user.getVerificationCodeExpiresAt();
+        EmailVerification emailVerification = optionalEmailVerification.get();
+        User user = emailVerification.getUser();
+        String userEmail = user.getEmail();
         if (user.isEnabled()) {
             log.warn("User with email {} is already verified", userEmail);
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, userEmail));
         }
-        /* if (!user.getVerificationCode().equals(userVerificationCode)) {
-            log.warn("Incorrect verification code: {} for email: {}", userVerificationCode, userEmail);
-            throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, userVerificationCode));
+        if (!emailVerification.getCode().equals(requestCode)) {
+            log.warn("Incorrect verification code: {} for email: {}", requestCode, userEmail);
+            throw new IncorrectVerificationCodeException(String.format(CODE_INCORRECT, requestCode));
         }
-        if (verificationCodeExpiresAt.isBefore(LocalDateTime.now())) {
-            log.warn("Verification code expired: {} for email: {}", userVerificationCode, userEmail);
-            throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, userVerificationCode));
-        } */
+        if (emailVerification.getCodeExpirationDate().isBefore(LocalDateTime.now())) {
+            log.warn("Verification code expired: {} for email: {}", requestCode, userEmail);
+            throw new ExpiredVerificationCodeException(String.format(CODE_EXPIRED, requestCode));
+        }
         user.setEnabled(true);
-        // user.setVerificationCode(null);
-        // user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
+        emailVerification.setCode(null);
+        emailVerification.setCodeExpirationDate(null);
+        this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} verified successfully", userEmail);
-        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
+        // informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
         log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
     }
@@ -182,26 +192,27 @@ public class AuthService {
             throw new UserVerifiedException(String.format(USER_ALREADY_VERIFIED, email));
         }
         String newCode = generateVerificationCode();
-        // user.setVerificationCode(newCode);
-        // user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-        this.userRepository.saveAndFlush(user);
-        // sendVerificationEmail(user);
+        EmailVerification emailVerification = user.getEmailVerification();
+        emailVerification.setCode(newCode);
+        emailVerification.setCodeExpirationDate(LocalDateTime.now().plusMinutes(15));
+        this.emailVerificationRepository.saveAndFlush(emailVerification);
+        sendVerificationEmail(user);
         log.debug("Verification code resent successfully to email: {}", email);
         return newCode;
     }
 
-    /* public void sendVerificationEmail(User user) {
+    public void sendVerificationEmail(User user) {
         try {
             this.emailService.sendVerificationEmail(
                     user.getEmail(),
                     EMAIL_SUBJECT,
-                    htmlMessage(user.getUsername(), user.getVerificationCode()));
+                    htmlMessage(user.getUsername(), user.getEmailVerification().getCode()));
             log.debug("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
             log.error("Failed to send verification email to: {}", user.getEmail());
             throw new VerificationEmailNotSentException(String.format(EMAIL_NOT_SENT, user.getEmail()), e);
         }
-    } */
+    }
 
     public void validateCredentials(RegisterRequest registerRequest) {
         log.debug("Validating credentials for email: {}", registerRequest.getEmail());

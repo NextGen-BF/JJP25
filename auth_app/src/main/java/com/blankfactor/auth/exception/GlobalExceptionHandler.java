@@ -3,6 +3,10 @@ package com.blankfactor.auth.exception;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.credentials.InvalidCredentialsException;
+import com.blankfactor.auth.exception.custom.credentials.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.email.EmailVerificationNotFound;
+import com.blankfactor.auth.exception.custom.email.VerificationEmailNotSentException;
 import com.blankfactor.auth.exception.custom.user.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -46,7 +50,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, EmailVerificationNotFound.class})
     public ResponseEntity<Map<String, String>> handleNotFound(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("404", "NOT_FOUND", ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND);

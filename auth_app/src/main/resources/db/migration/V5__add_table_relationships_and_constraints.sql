@@ -1,5 +1,5 @@
 alter table users
-add constraint UKf35spte677km4kuqc38kr8va4 unique (email_verification_uuid);
+add constraint UKob8vaqnvmkoxxfx10tphyv1hi unique (email_verification_id);
 
 alter table users
 add constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email);
@@ -12,5 +12,5 @@ add constraint FKhfh9dx7w3ubf1co1vdev94g3f
 foreign key (user_id) references users (id);
 
 alter table users
-add constraint FKs6sybvudkccf5dufgi2antjgu
-foreign key (email_verification_uuid) references email_verifications (uuid);
+add constraint FKmphla94gah714990r9apprr2p
+foreign key (email_verification_id) references email_verifications (id);

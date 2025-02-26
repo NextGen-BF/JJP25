@@ -33,9 +33,9 @@ public class AuthController {
 
     @PostMapping("/verify")
     public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
-        log.info("Verification request received for email: {}", verifyRequest.getEmail());
+        log.info("Verification request received for email verification id: {}", verifyRequest.getUuid());
         VerifyResponse response = this.authService.verify(verifyRequest);
-        log.info("User verified successfully with email: {}", verifyRequest.getEmail());
+        log.info("User verified successfully with email verification id: {}", verifyRequest.getUuid());
         return ResponseEntity.ok(response);
     }
 
