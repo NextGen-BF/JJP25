@@ -74,7 +74,12 @@ public class AuthService {
     public RegisterResponse register(RegisterRequest registerRequest) {
         log.debug("Registering user with email: {}", registerRequest.getEmail());
         validateCredentials(registerRequest);
-        User user = User.builder()
+        EmailVerification emailVerification = this.emailVerificationRepository.saveAndFlush(EmailVerification.builder()
+                .code(generateVerificationCode())
+                .codeExpirationDate(LocalDateTime.now().plusMinutes(15))
+                .user(null)
+                .build());
+        User user = this.userRepository.saveAndFlush(User.builder()
                 .email(registerRequest.getEmail())
                 .password(this.passwordEncoder.encode(registerRequest.getPassword()))
                 .username(registerRequest.getUsername())
@@ -82,14 +87,10 @@ public class AuthService {
                 .lastName(registerRequest.getLastName())
                 .birthDate(registerRequest.getBirthDate())
                 .enabled(false)
+                .emailVerification(emailVerification)
                 .roles(registerRequest.getRole().equals("attendee") ? Set.of(Role.ROLE_USER) : Set.of(Role.ROLE_USER, Role.ROLE_ADMIN))
-                .build();
-        User savedUser = this.userRepository.saveAndFlush(user);
-        EmailVerification emailVerification = EmailVerification.builder()
-                .code(generateVerificationCode())
-                .codeExpirationDate(LocalDateTime.now().plusMinutes(15))
-                .user(savedUser)
-                .build();
+                .build());
+        emailVerification.setUser(user);
         this.emailVerificationRepository.saveAndFlush(emailVerification);
         log.debug("User with email {} registered successfully", registerRequest.getEmail());
         // sendVerificationEmail(user);

@@ -25,8 +25,7 @@ public class EmailVerification {
     @Column(name = "code_expiration_date")
     private LocalDateTime codeExpirationDate;
 
-    @OneToOne
-    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    @OneToOne(mappedBy = "emailVerification")
     private User user;
 
 }

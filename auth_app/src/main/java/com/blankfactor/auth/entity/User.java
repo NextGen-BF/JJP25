@@ -46,6 +46,10 @@ public class User implements UserDetails {
     @Column(name = "is_enabled", nullable = false)
     private Boolean enabled;
 
+    @OneToOne
+    @JoinColumn(referencedColumnName = "uuid", name = "email_verification_uuid")
+    private EmailVerification emailVerification;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
