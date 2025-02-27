@@ -7,11 +7,13 @@ import com.blankfactor.auth.entity.dto.responses.VerifyResponse;
 import com.blankfactor.auth.entity.dto.requests.LoginRequest;
 import com.blankfactor.auth.entity.dto.requests.RegisterRequest;
 import com.blankfactor.auth.entity.dto.requests.VerifyRequest;
+import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.credentials.InvalidCredentialsException;
 import com.blankfactor.auth.exception.custom.InvalidInformRequestException;
 import com.blankfactor.auth.exception.custom.credentials.PasswordsDoNotMatchException;
 import com.blankfactor.auth.exception.custom.ServiceUnavailableException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
+import com.blankfactor.auth.exception.custom.email.EmailVerificationNotFound;
 import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
@@ -44,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerTests {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
-    private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
+    private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify/%s";
     private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
     private static final String RESET_PASSWORD_ENDPOINT = "/api/v1/auth/reset-password";
@@ -54,6 +56,7 @@ public class AuthControllerTests {
     private static final String TEST_FIRST_NAME = "John";
     private static final String TEST_LAST_NAME = "Doe";
     private static final String TEST_VERIFICATION_CODE = "123456";
+    private static final String TEST_VERIFYING_UUID = "45418f6e-b309-4a7e-abea-57b6fcbe18ec";
 
     private static final String VALID_TOKEN = "validToken";
     private static final String INVALID_TOKEN = "invalidToken";
@@ -312,29 +315,29 @@ public class AuthControllerTests {
 
         /* ---> TEST CASES <---
          * 1.Successful verification
-         * 2.User not found
-         * 3.Incorrect verification code
-         * 4.User already verified
-         * 5.Blank values (ex. "email": "")
-         * 6.Plain object (ex. {})
-         * 7.Method informEmsApp() throws Forbidden
-         * 8.Method informEmsApp() throws Conflict
-         * 9.Verification not possible */
+         * 2.Email verification id not found
+         * 3.User already verified
+         * 4.Incorrect verification code
+         * 5.Expired verification code
+         * 6.Blank values (ex. "email": "")
+         * 7.Plain object (ex. {})
+         * 8.Method informEmsApp() throws Forbidden
+         * 9.Method informEmsApp() throws Conflict
+         * 10.Verification not possible */
 
         @Test
         void shouldSuccessfullyVerifyUser() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                         {
-                            "email": "example@email.com",
-                            "verificationCode": "123123"
+                            "code": "123123"
                         }
                     """;
             VerifyResponse verifyResponse = new VerifyResponse(TEST_EMAIL, true);
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenReturn(verifyResponse);
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenReturn(verifyResponse);
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isOk())
@@ -343,19 +346,18 @@ public class AuthControllerTests {
         }
 
         @Test
-        void shouldReturnResponseWithEmailNotFoundError() throws Exception {
+        void shouldReturnResponseWithEmailVerificationNotFoundError() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                         {
-                            "email": "example@email.com",
-                            "verificationCode": "123123"
+                            "code": "123123"
                         }
                     """;
-            String ERROR_MESSAGE = TEST_EMAIL + " is not found";
+            String ERROR_MESSAGE = TEST_VERIFYING_UUID + " is not found";
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new EmailVerificationNotFound(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isNotFound())
@@ -363,39 +365,18 @@ public class AuthControllerTests {
         }
 
         @Test
-        void shouldReturnResponseWithIncorrectVerificationCodeError() throws Exception {
-            // Given
-            String requestBody = """
-                    {
-                        "email": "example@email.com",
-                        "verificationCode": "123456"
-                    }
-                    """;
-            String ERROR_MESSAGE = "Incorrect verification code: " + TEST_VERIFICATION_CODE;
-
-            // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new IncorrectVerificationCodeException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-
-                    // Then
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
-        }
-
-        @Test
         void shouldReturnResponseWithUserIsAlreadyVerifiedError() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                     {
-                        "email": "example@email.com",
-                        "verificationCode": "123123"
+                        "code": "123123"
                     }
                     """;
             String ERROR_MESSAGE = TEST_EMAIL + " is already verified";
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isConflict())
@@ -403,53 +384,85 @@ public class AuthControllerTests {
         }
 
         @Test
+        void shouldReturnResponseWithIncorrectCodeError() throws Exception {
+            // Given
+            String verifyRequest = """
+                    {
+                        "code": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "Incorrect verification code: " + TEST_VERIFICATION_CODE;
+
+            // When
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new IncorrectVerificationCodeException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
+
+                    // Then
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithExpiredCodeError() throws Exception {
+            // Given
+            String verifyRequest = """
+                    {
+                        "code": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "Verification code " + TEST_VERIFICATION_CODE + " has expired.";
+
+            // When
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new ExpiredVerificationCodeException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
+
+                    // Then
+                    .andExpect(status().isGone())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
         void shouldReturnResponseIncludingAllFieldErrors() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                             {
-                                "email": "",
-                                "verificationCode": ""
+                                "code": ""
                             }
                     """;
 
             // When
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.email").isArray())
-                    .andExpect(jsonPath("$.email", hasSize(1)))
-                    .andExpect(jsonPath("$.verificationCode").isArray())
-                    .andExpect(jsonPath("$.verificationCode", hasSize(1)));
+                    .andExpect(jsonPath("$.code").isArray())
+                    .andExpect(jsonPath("$.code", hasSize(1)));
         }
 
         @Test
         void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {
             // When
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content("{}"))
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content("{}"))
 
                     // Then
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.email").isArray())
-                    .andExpect(jsonPath("$.email", hasSize(1)))
-                    .andExpect(jsonPath("$.verificationCode").isArray())
-                    .andExpect(jsonPath("$.verificationCode", hasSize(1)));
+                    .andExpect(jsonPath("$.code").isArray())
+                    .andExpect(jsonPath("$.code", hasSize(1)));
         }
 
         @Test
         void shouldReturnResponseWithInvalidInformRequestError() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                     {
-                        "email": "example@email.com",
-                        "verificationCode": "123456"
+                        "code": "123456"
                     }
                     """;
             String ERROR_MESSAGE = "The request might not have token or has an expired one";
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new InvalidInformRequestException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new InvalidInformRequestException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isForbidden())
@@ -459,17 +472,16 @@ public class AuthControllerTests {
         @Test
         void shouldReturnResponseWithUserExistsError() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                     {
-                        "email": "example@email.com",
-                        "verificationCode": "123456"
+                        "code": "123456"
                     }
                     """;
             String ERROR_MESSAGE = "User with id: 1 already exists";
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserExistsException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new UserExistsException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isConflict())
@@ -479,17 +491,16 @@ public class AuthControllerTests {
         @Test
         void shouldReturnResponseWithServiceUnavailableError() throws Exception {
             // Given
-            String requestBody = """
+            String verifyRequest = """
                     {
-                        "email": "example@email.com",
-                        "verificationCode": "123456"
+                        "code": "123456"
                     }
                     """;
             String ERROR_MESSAGE = "Sorry, verification is not possible at the moment.";
 
             // When
-            when(authService.verify(any(VerifyRequest.class))).thenThrow(new ServiceUnavailableException(ERROR_MESSAGE));
-            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+            when(authService.verify(eq(TEST_VERIFYING_UUID), any(VerifyRequest.class))).thenThrow(new ServiceUnavailableException(ERROR_MESSAGE));
+            mockMvc.perform(post(String.format(VERIFY_ENDPOINT, TEST_VERIFYING_UUID)).contentType(MediaType.APPLICATION_JSON).content(verifyRequest))
 
                     // Then
                     .andExpect(status().isServiceUnavailable())
@@ -709,7 +720,7 @@ public class AuthControllerTests {
         }
 
         @Test
-        void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
+        void shouldReturnUnauthorizedWhenTokenIsInvalid() throws Exception {
             String requestBody = String.format("""
                     {
                         "token": "%s",
@@ -724,7 +735,7 @@ public class AuthControllerTests {
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.message").value(JWT_TOKEN_EXPIRED_ERROR_MESSAGE));
         }
 
