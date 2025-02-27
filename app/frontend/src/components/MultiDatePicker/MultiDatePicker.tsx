@@ -4,14 +4,9 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Button, Stack, Chip } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 import { MultiDatePickerConstants } from "../../constants/MultiDatePickerConstants";
 import { MultiDatePickerStyles } from "./MultiDatePickerStyles";
 import Box from "@mui/material/Box";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 interface MultiDatePickerProps {
   selectedDates: Dayjs[];

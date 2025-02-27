@@ -13,7 +13,7 @@ export enum VenueType {
 
 export interface Venue {
   name: string;
-  type?: VenueType;
+  venueType?: VenueType;
   country: string;
   city: string;
   address: string;
@@ -32,7 +32,7 @@ export interface VenueState {
 const initialState: VenueState = {
   venue: {
     name: "",
-    type: undefined,
+    venueType: undefined,
     country: "",
     city: "",
     address: "",

@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import { AppStyles } from "./AppStyles";
 import AppRoutes from "./AppRoutes";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const isSideBarOpen = useSelector((state: RootState) => state.sidebar.isOpen);
@@ -17,6 +18,7 @@ export default function App() {
 
   return (
     <Router>
+      <ToastContainer />
       <CssBaseline />
       <Navbar />
       <Box sx={AppStyles.outerBoxStyles}>

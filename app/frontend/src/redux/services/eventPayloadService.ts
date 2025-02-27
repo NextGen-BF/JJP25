@@ -13,7 +13,7 @@ export const submitEventPayload = createAsyncThunk(
 
     const formattedEventData = {
       ...eventData,
-      dates: eventData.dates.map((date) => date.toISOString()),
+      dates: eventData.dates.map((date) => date.format("HH:mm DD/MM/YYYY")),
     };
 
     const eventPayload = {
