@@ -1,14 +1,24 @@
 :root {
   // Global color variables (by Blankfactor design guidelines)
-  --blankfactor-oxford-color: #080731;
+  // Primary palette
   --blankfactor-ultramarine-color: #2b6aff;
+  --blankfactor-oxford-color: #080731;
   --blankfactor-sky-color: #00c3e5;
+  // Neutral colors
+  --blankfactor-gray-1-color: #f5f5f7;
+  --blankfactor-gray-2-color: #e1e1e6;
+  --blankfactor-gray-3-color: #d2d2da;
+  --blankfactor-gray-4-color: #c4c4ce;
+
   --background-ghostwhite: #f8f8ff;
   --border-color: #ccc;
   --error-color: #ff0000;
   --separator-line-color: #ddd;
   --separator-text-color: #666;
   --white-color: #fff;
+  --black-color: #000;
   --anti-flash-white-color: #f0f0f0;
+  --active-link-sidebar-color: #ffffff65;
+  --list-item-text-color: #000;
   --rsvp-create-page-bgcolor: #f4f4f4;
 }

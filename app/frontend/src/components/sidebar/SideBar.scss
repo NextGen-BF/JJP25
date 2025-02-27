@@ -1,0 +1,53 @@
+@import "../../styles/globalstyles.scss";
+
+.link-styles {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-left: 5px;
+  border-radius: 5px; 
+  width: 240px;
+  transition: 0.3s all;
+}
+
+.link-active-open {
+  display: flex;
+    align-items: center;
+    text-decoration: none;
+    margin-left: 5px;
+    background-color: var(--active-link-sidebar-color);
+    border-radius: 5px; 
+    width: 240px;
+    transition: 0.3s all;
+}
+
+.link-active-closed {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    margin-left: 5px;
+    background-color: var(--active-link-sidebar-color);
+    width: 60px;
+    border-radius: 5px;
+    transition: 0.3s all;
+}
+
+.list-subheader {
+    display: flex-start;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s all;
+  }
+  
+  .list-item-text {
+    white-space: nowrap;
+    color: "var(--list-item-text-color)";
+    text-decoration: none;
+  }
+  
+  .list-item-button {
+    justify-content: flex-start;
+    padding-right: 0;
+    height: 48px;
+  }
+  
