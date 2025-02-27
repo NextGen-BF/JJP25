@@ -23,11 +23,7 @@ export const submitEventPayload = createAsyncThunk(
     };
 
     try {
-      const response = await axiosInstance.post("/events", eventPayload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axiosInstance.post("/events", eventPayload, {});
 
       return response.data;
     } catch (error: any) {
