@@ -11,7 +11,7 @@ export interface Ticket {
   eventDate: string;
   ticketType: TicketType;
   price: number;
-  quantity: number;
+  totalQuantity: number;
 }
 
 interface TicketState {

@@ -1,14 +1,10 @@
-import {
-  Drawer,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Drawer, useMediaQuery, useTheme } from "@mui/material";
 import { FC } from "react";
 import ViewSidebarIcon from "@mui/icons-material/ViewSidebarOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toggleSidebarStatus } from "../../redux/slices/sidebarSlice";
-import { SideBarStyles } from "./SideBarStyles";;
+import { SideBarStyles } from "./SideBarStyles";
 import IconButtonComponent from "../IconButton/IconButtonComponent";
 import DrawerContent from "./DrawerContent/DrawerContent";
 
@@ -29,20 +25,12 @@ export const SideBar: FC = () => {
 
   return (
     <>
-      {isMobile && (
-        <IconButtonComponent
-          onClick={toggleDrawer}
-          sx={SideBarStyles.iconButtonStyles}
-          icon={<ViewSidebarIcon />}
-        />
-      ) }
       <Drawer
         variant="permanent"
         open={isOpen}
         sx={{
           "& .MuiDrawer-paper": {
-            width: isOpen ? expandedWidth : 
-            isMobile ? 0 : collapsedWidth,
+            width: isOpen ? expandedWidth : isMobile ? 0 : collapsedWidth,
             ...SideBarStyles.drawerStyles,
           },
         }}

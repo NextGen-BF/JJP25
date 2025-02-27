@@ -5,7 +5,7 @@ export const VenueFormConstants = {
     COUNTRY: "country",
     CITY: "city",
     ADDRESS: "address",
-    TYPE: "type",
+    TYPE: "venueType",
     PHONE: "phone",
     WEBSITE: "website",
   },

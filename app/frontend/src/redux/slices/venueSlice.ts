@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { submitVenue } from "../services/venueService";
 
 export enum VenueType {
   STADIUM = "Stadium",
@@ -14,7 +13,7 @@ export enum VenueType {
 
 export interface Venue {
   name: string;
-  type?: VenueType;
+  venueType?: VenueType;
   country: string;
   city: string;
   address: string;
@@ -33,7 +32,7 @@ export interface VenueState {
 const initialState: VenueState = {
   venue: {
     name: "",
-    type: undefined,
+    venueType: undefined,
     country: "",
     city: "",
     address: "",
@@ -67,20 +66,6 @@ const venueSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
-  },
-
-  extraReducers: (builder) => {
-    builder
-      .addCase(submitVenue.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(submitVenue.fulfilled, (state) => {
-        state.status = "succeeded";
-      })
-      .addCase(submitVenue.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-      });
   },
 });
 

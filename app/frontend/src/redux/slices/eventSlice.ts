@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Dayjs } from "dayjs";
-import { submitEvent } from "../services/eventService";
+import { submitEventPayload } from "../services/eventPayloadService";
 
 export enum EventCategory {
   CONCERT = "Concert",
@@ -72,13 +72,13 @@ const eventSlice = createSlice({
   // TODO:
   extraReducers: (builder) => {
     builder
-      .addCase(submitEvent.pending, (state) => {
+      .addCase(submitEventPayload.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(submitEvent.fulfilled, (state) => {
+      .addCase(submitEventPayload.fulfilled, (state) => {
         state.status = "succeeded";
       })
-      .addCase(submitEvent.rejected, (state, action) => {
+      .addCase(submitEventPayload.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });
