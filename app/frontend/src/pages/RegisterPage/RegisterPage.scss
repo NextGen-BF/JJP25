@@ -1,0 +1,27 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 95vh;
+}
+
+.register-box {
+  display: flex;
+  width: 100%;
+  background-color: var(--blankfactor-gray-1-color);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border-radius: 5px;
+}
+
+.image-box {
+  flex: 1;
+  background-image: url("../../assets//register-image.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 5px 0 0 5px;
+  display: none;
+
+  @media (min-width: 988px) {
+    display: block;
+  }
+}

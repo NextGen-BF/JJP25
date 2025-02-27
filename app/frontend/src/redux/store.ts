@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import usersReducer from "./slices/usersSlice";
 import eventReducer from "./slices/eventSlice";
+import registerReducer from "./slices/registerSlice";
 import venueReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
-import sidebarReducer from "./slices/sidebarSlice"
+import sidebarReducer from "./slices/sidebarSlice";
 import ticketReducer from "./slices/ticketSlice";
 
 export const store = configureStore({
-  
   reducer: {
     sidebar: sidebarReducer,
     users: usersReducer,
@@ -15,6 +15,7 @@ export const store = configureStore({
     venue: venueReducer,
     auth: authReducer,
     ticket: ticketReducer,
+    registerData: registerReducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -24,7 +25,6 @@ export const store = configureStore({
         ignoredPaths: ["event.event.dates"],
       },
     }),
-
 });
 
 export type RootState = ReturnType<typeof store.getState>;
