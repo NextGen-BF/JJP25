@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%style{%d{ISO8601}}{black} %highlight{%-5level} [%style{%t}{bright,blue}]
+                    %style{%C{1}}{bright,yellow}: %msg%n%throwable
+                </Pattern>
+            </PatternLayout>
+        </Console>
+        <RollingFile name="RollingFile" fileName="./logs/ems-app.log"
+                     filePattern="./logs/$${date:yyyy-MM}/ems-app-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

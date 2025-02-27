@@ -89,10 +89,8 @@ public class JwtService {
             log.warn("JWT token has expired.");
             throw new ExpiredJwtException(null, null, "JWT token has expired");
         }
-
         return true;
     }
-
 
     private boolean isTokenExpired(String token) {
         log.debug("Checking if token is expired.");

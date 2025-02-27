@@ -1,10 +1,10 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.LoginResponse;
-import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.*;
+import com.blankfactor.auth.entity.dto.response.LoginResponse;
+import com.blankfactor.auth.entity.dto.response.RegisterResponse;
+import com.blankfactor.auth.entity.dto.response.VerifyResponse;
+import com.blankfactor.auth.entity.dto.request.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
 import jakarta.validation.Valid;

@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @WebMvcTest(controllers = UserController.class)
-public class UserControllerUT {
+public class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;

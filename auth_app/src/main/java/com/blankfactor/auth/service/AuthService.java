@@ -1,31 +1,33 @@
 package com.blankfactor.auth.service;
 
 import com.blankfactor.auth.entity.Role;
-import com.blankfactor.auth.entity.dto.imp.LoginRequest;
+import com.blankfactor.auth.entity.dto.request.InformRequest;
+import com.blankfactor.auth.entity.dto.request.LoginRequest;
 import com.blankfactor.auth.exception.custom.*;
 import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.response.RegisterResponse;
+import com.blankfactor.auth.entity.dto.response.VerifyResponse;
+import com.blankfactor.auth.entity.dto.request.RegisterRequest;
+import com.blankfactor.auth.entity.dto.request.VerifyRequest;
 import com.blankfactor.auth.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -39,6 +41,8 @@ public class AuthService {
 
     private static final String USER_NOT_FOUND = "%s is not found";
     private static final String USER_FOUND = "%s is already in use";
+    private static final String USER_EXISTS = "User with id: %s already exists";
+    private static final String USER_NOT_AUTHENTICATED = "The request might not have token or has an expired one";
     private static final String USER_ALREADY_VERIFIED = "%s is already verified";
     private static final String CODE_EXPIRED = "Verification code %s has expired";
     private static final String CODE_INCORRECT = "Incorrect verification code: %s";
@@ -48,9 +52,13 @@ public class AuthService {
     private static final String USER_NOT_VERIFIED = "Account is not verified!";
     private static final String INVALID_CREDENTIALS = "Incorrect username/email or password.";
     private static final String TOKEN_PARAM_STRING = "?token=";
+    private static final String SERVICE_UNAVAILABLE = "Sorry, verification is not possible at the moment";
 
     @Value("${app.reset-password.url}")
     private String resetPasswordBaseUrl;
+
+    @Value("${app.register.endpoint}")
+    private String registerEndpoint;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -59,6 +67,7 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RestClient restClient;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -148,6 +157,8 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} verified successfully", userEmail);
+        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
+        log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
         return this.modelMapper.map(user, VerifyResponse.class);
     }
 
@@ -224,7 +235,7 @@ public class AuthService {
         log.info("Resetting password using token.");
         if (!newPassword.equals(confirmPassword)) {
             log.warn("Passwords do not match");
-            throw new PasswordsDoNotMatchException("Passwords do not match. Please try again.");
+            throw new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH);
         }
 
         String username = jwtService.extractUsername(token);
@@ -243,9 +254,9 @@ public class AuthService {
         log.info("Processing forgot password for email: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                        log.warn("User not found with email: {}", email);
-                        return new UserNotFoundException(String.format("Email %s is not found", email));
-                        });
+                    log.warn("User not found with email: {}", email);
+                    return new UserNotFoundException(String.format("Email %s is not found", email));
+                });
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("reset", true);
         String resetToken = jwtService.generateToken(extraClaims, user);
@@ -264,6 +275,34 @@ public class AuthService {
         } catch (MessagingException e) {
             log.error("Failed to send reset password email to: {}", email, e);
             throw new VerificationEmailNotSentException(String.format("Failed to send reset password email to %s", email), e);
+        }
+    }
+
+    private void informEmsApp(Long id, String role, String token) {
+        log.debug("Sending { \"id\": \"{}\", \"role:\" \"{}\" } to ems_app backend", id, role);
+        try {
+            this.restClient
+                    .post()
+                    .uri(registerEndpoint)
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(InformRequest.builder()
+                            .id(id)
+                            .role(role.toUpperCase())
+                            .build())
+                    .exchange((request, response) -> {
+                        if (response.getStatusCode().isSameCodeAs(HttpStatus.FORBIDDEN)) {
+                            log.error("The request was forbidden due to missing or expired token.");
+                            throw new InvalidInformRequestException(USER_NOT_AUTHENTICATED);
+                        }
+                        if (response.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
+                            log.error("The request faced a conflict due to the existence of user with id: {}", id);
+                            throw new UserExistsException(String.format(USER_EXISTS, id));
+                        }
+                        return true;
+                    });
+        } catch (ResourceAccessException e) {
+            throw new ServiceUnavailableException(SERVICE_UNAVAILABLE);
         }
     }
 

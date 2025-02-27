@@ -1,18 +1,18 @@
 package com.blankfactor.auth.controller;
 
+import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
-import com.blankfactor.auth.entity.dto.exp.RegisterResponse;
-import com.blankfactor.auth.entity.dto.exp.VerifyResponse;
-import com.blankfactor.auth.entity.dto.imp.LoginRequest;
-import com.blankfactor.auth.entity.dto.imp.RegisterRequest;
-import com.blankfactor.auth.entity.dto.imp.VerifyRequest;
+import com.blankfactor.auth.entity.dto.response.RegisterResponse;
+import com.blankfactor.auth.entity.dto.response.VerifyResponse;
+import com.blankfactor.auth.entity.dto.request.LoginRequest;
+import com.blankfactor.auth.entity.dto.request.RegisterRequest;
+import com.blankfactor.auth.entity.dto.request.VerifyRequest;
 import com.blankfactor.auth.exception.custom.InvalidCredentialsException;
+import com.blankfactor.auth.exception.custom.InvalidInformRequestException;
 import com.blankfactor.auth.exception.custom.PasswordsDoNotMatchException;
+import com.blankfactor.auth.exception.custom.ServiceUnavailableException;
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
-import com.blankfactor.auth.exception.custom.user.UserFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
-import com.blankfactor.auth.exception.custom.user.UserNotVerifiedException;
-import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
+import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -41,13 +41,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = {AuthController.class})
-public class AuthControllerUT {
+public class AuthControllerTests {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
     private static final String RESEND_ENDPOINT = "/api/v1/auth/resend";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
     private static final String RESET_PASSWORD_ENDPOINT = "/api/v1/auth/reset-password";
+
+    private static final String TEST_EMAIL = "example@email.com";
+    private static final String TEST_USERNAME = "john_doe";
+    private static final String TEST_FIRST_NAME = "John";
+    private static final String TEST_LAST_NAME = "Doe";
+    private static final String TEST_VERIFICATION_CODE = "123456";
+
     private static final String VALID_TOKEN = "validToken";
     private static final String INVALID_TOKEN = "invalidToken";
     private static final String NEW_PASSWORD = "newPassword1!";
@@ -56,8 +63,6 @@ public class AuthControllerUT {
     private static final String PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE = "Passwords do not match. Please try again.";
     private static final String JWT_TOKEN_EXPIRED_ERROR_MESSAGE = "JWT token is expired or invalid";
     private static final String USER_NOT_FOUND_ERROR_MESSAGE = "User is not found";
-
-
 
     @Autowired
     private MockMvc mockMvc;
@@ -82,21 +87,22 @@ public class AuthControllerUT {
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponseForUser() throws Exception {
             // Given
-            RegisterResponse registerResponse = new RegisterResponse(
-                    "example@email.com",
-                    "username",
-                    "firstName",
-                    "lastName",
-                    false,
-                    Set.of("ROLE_USER"));
+            RegisterResponse registerResponse = RegisterResponse.builder()
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .enabled(false)
+                    .roles(Set.of(Role.ROLE_USER.name()))
+                    .build();
             String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
                                 "confirmPassword": "Password1!",
-                                "username": "username",
-                                "firstName": "firstName",
-                                "lastName": "lastName",
+                                "username": "john_doe",
+                                "firstName": "John",
+                                "lastName": "Doe",
                                 "birthDate": "2000-01-01T01:01:01",
                                 "role": "attendee"
                             }
@@ -108,34 +114,35 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.username").value("username"))
-                    .andExpect(jsonPath("$.firstName").value("firstName"))
-                    .andExpect(jsonPath("$.lastName").value("lastName"))
+                    .andExpect(jsonPath("$.email").value(TEST_EMAIL))
+                    .andExpect(jsonPath("$.username").value(TEST_USERNAME))
+                    .andExpect(jsonPath("$.firstName").value(TEST_FIRST_NAME))
+                    .andExpect(jsonPath("$.lastName").value(TEST_LAST_NAME))
                     .andExpect(jsonPath("$.enabled").value(false))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(1)))
-                    .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
+                    .andExpect(jsonPath("$.roles[0]").value(Role.ROLE_USER.name()));
         }
 
         @Test
         void shouldSuccessfullySendRequestAndReceiveResponseForAdmin() throws Exception {
             // Given
-            RegisterResponse registerResponse = new RegisterResponse(
-                    "example@email.com",
-                    "username",
-                    "firstName",
-                    "lastName",
-                    false,
-                    Set.of("ROLE_USER", "ROLE_ADMIN"));
+            RegisterResponse registerResponse = RegisterResponse.builder()
+                    .email(TEST_EMAIL)
+                    .username(TEST_USERNAME)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .enabled(false)
+                    .roles(Set.of(Role.ROLE_USER.name(), Role.ROLE_ADMIN.name()))
+                    .build();
             String registerRequest = """
                             {
                                 "email": "example@email.com",
                                 "password": "Password1!",
                                 "confirmPassword": "Password1!",
-                                "username": "username",
-                                "firstName": "firstName",
-                                "lastName": "lastName",
+                                "username": "john_doe",
+                                "firstName": "John",
+                                "lastName": "Doe",
                                 "birthDate": "2000-01-01T01:01:01",
                                 "role": "organiser"
                             }
@@ -147,14 +154,14 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("example@email.com"))
-                    .andExpect(jsonPath("$.username").value("username"))
-                    .andExpect(jsonPath("$.firstName").value("firstName"))
-                    .andExpect(jsonPath("$.lastName").value("lastName"))
+                    .andExpect(jsonPath("$.email").value(TEST_EMAIL))
+                    .andExpect(jsonPath("$.username").value(TEST_USERNAME))
+                    .andExpect(jsonPath("$.firstName").value(TEST_FIRST_NAME))
+                    .andExpect(jsonPath("$.lastName").value(TEST_LAST_NAME))
                     .andExpect(jsonPath("$.enabled").value(false))
                     .andExpect(jsonPath("$.roles").isArray())
                     .andExpect(jsonPath("$.roles", hasSize(2)))
-                    .andExpect(jsonPath("$.roles", containsInAnyOrder("ROLE_USER", "ROLE_ADMIN")));
+                    .andExpect(jsonPath("$.roles", containsInAnyOrder(Role.ROLE_USER.name(), Role.ROLE_ADMIN.name())));
         }
 
         @Test
@@ -165,14 +172,14 @@ public class AuthControllerUT {
                                 "email": "example@email.com",
                                 "password": "Password1!",
                                 "confirmPassword": "Password1!",
-                                "username": "username",
-                                "firstName": "firstName",
-                                "lastName": "lastName",
+                                "username": "john_doe",
+                                "firstName": "John",
+                                "lastName": "Doe",
                                 "birthDate": "2000-01-01T01:01:01",
                                 "role": "attendee"
                             }
                     """;
-            String ERROR_MESSAGE = "example@email.com is already in use";
+            String ERROR_MESSAGE = TEST_EMAIL + " is already in use";
 
             // When
             when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
@@ -191,14 +198,14 @@ public class AuthControllerUT {
                                 "email": "example@email.com",
                                 "password": "Password1!",
                                 "confirmPassword": "Password1!",
-                                "username": "username__",
-                                "firstName": "firstName",
-                                "lastName": "lastName",
+                                "username": "john_doe",
+                                "firstName": "John",
+                                "lastName": "Doe",
                                 "birthDate": "2000-01-01T01:01:01",
                                 "role": "attendee"
                             }
                     """;
-            String ERROR_MESSAGE = "username__ is already in use";
+            String ERROR_MESSAGE = TEST_USERNAME + " is already in use";
 
             // When
             when(authService.register(any(RegisterRequest.class))).thenThrow(new UserFoundException(ERROR_MESSAGE));
@@ -217,9 +224,9 @@ public class AuthControllerUT {
                                 "email": "example@email.com",
                                 "password": "Password1!",
                                 "confirmPassword": "Password2!",
-                                "username": "username__",
-                                "firstName": "firstName",
-                                "lastName": "lastName",
+                                "username": "john_doe",
+                                "firstName": "John",
+                                "lastName": "Doe",
                                 "birthDate": "2000-01-01T01:01:01",
                                 "role": "attendee"
                             }
@@ -309,7 +316,10 @@ public class AuthControllerUT {
          * 3.Incorrect verification code
          * 4.User already verified
          * 5.Blank values (ex. "email": "")
-         * 6.Plain object (ex. {}) */
+         * 6.Plain object (ex. {})
+         * 7.Method informEmsApp() throws Forbidden
+         * 8.Method informEmsApp() throws Conflict
+         * 9.Verification not possible */
 
         @Test
         void shouldSuccessfullyVerifyUser() throws Exception {
@@ -320,7 +330,7 @@ public class AuthControllerUT {
                             "verificationCode": "123123"
                         }
                     """;
-            VerifyResponse verifyResponse = new VerifyResponse("example@email.com", true);
+            VerifyResponse verifyResponse = new VerifyResponse(TEST_EMAIL, true);
 
             // When
             when(authService.verify(any(VerifyRequest.class))).thenReturn(verifyResponse);
@@ -328,7 +338,7 @@ public class AuthControllerUT {
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.email").value("example@email.com"))
+                    .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                     .andExpect(jsonPath("$.enabled").value(true));
         }
 
@@ -341,7 +351,7 @@ public class AuthControllerUT {
                             "verificationCode": "123123"
                         }
                     """;
-            String ERROR_MESSAGE = "example@email.com is not found";
+            String ERROR_MESSAGE = TEST_EMAIL + " is not found";
 
             // When
             when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
@@ -358,10 +368,10 @@ public class AuthControllerUT {
             String requestBody = """
                     {
                         "email": "example@email.com",
-                        "verificationCode": "123123"
+                        "verificationCode": "123456"
                     }
                     """;
-            String ERROR_MESSAGE = "Incorrect verification code: 123123";
+            String ERROR_MESSAGE = "Incorrect verification code: " + TEST_VERIFICATION_CODE;
 
             // When
             when(authService.verify(any(VerifyRequest.class))).thenThrow(new IncorrectVerificationCodeException(ERROR_MESSAGE));
@@ -381,7 +391,7 @@ public class AuthControllerUT {
                         "verificationCode": "123123"
                     }
                     """;
-            String ERROR_MESSAGE = "example@email.com is already verified";
+            String ERROR_MESSAGE = TEST_EMAIL + " is already verified";
 
             // When
             when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
@@ -425,6 +435,67 @@ public class AuthControllerUT {
                     .andExpect(jsonPath("$.verificationCode").isArray())
                     .andExpect(jsonPath("$.verificationCode", hasSize(1)));
         }
+
+        @Test
+        void shouldReturnResponseWithInvalidInformRequestError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "The request might not have token or has an expired one";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new InvalidInformRequestException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithUserExistsError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "User with id: 1 already exists";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new UserExistsException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
+        @Test
+        void shouldReturnResponseWithServiceUnavailableError() throws Exception {
+            // Given
+            String requestBody = """
+                    {
+                        "email": "example@email.com",
+                        "verificationCode": "123456"
+                    }
+                    """;
+            String ERROR_MESSAGE = "Sorry, verification is not possible at the moment.";
+
+            // When
+            when(authService.verify(any(VerifyRequest.class))).thenThrow(new ServiceUnavailableException(ERROR_MESSAGE));
+            mockMvc.perform(post(VERIFY_ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+
+                    // Then
+                    .andExpect(status().isServiceUnavailable())
+                    .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
+        }
+
     }
 
     @Nested
@@ -439,29 +510,23 @@ public class AuthControllerUT {
 
         @Test
         void shouldSuccessfullyResendVerificationEmail() throws Exception {
-            // Given
-            String code = "123123";
-            String RESPONSE_TEXT = "Verification code resent successfully!";
-            String to = "?email=example@email.com";
-
             // When
-            when(authService.resend(any(String.class))).thenReturn(code);
-            mockMvc.perform(post(RESEND_ENDPOINT + to))
+            when(authService.resend(any(String.class))).thenReturn(TEST_VERIFICATION_CODE);
+            mockMvc.perform(post(RESEND_ENDPOINT + "?email=" + TEST_EMAIL))
 
                     // Then
                     .andExpect(status().isOk())
-                    .andExpect(content().string(RESPONSE_TEXT));
+                    .andExpect(content().string("Verification code resent successfully!"));
         }
 
         @Test
         void shouldReturnResponseWithUserNotFoundError() throws Exception {
             // Given
-            String ERROR_MESSAGE = "example@email.com is not found";
-            String to = "?email=example@email.com";
+            String ERROR_MESSAGE = TEST_EMAIL + " is not found";
 
             // When
             when(authService.resend(any(String.class))).thenThrow(new UserNotFoundException(ERROR_MESSAGE));
-            mockMvc.perform(post(RESEND_ENDPOINT + to))
+            mockMvc.perform(post(RESEND_ENDPOINT + "?email=" + TEST_EMAIL))
 
                     // Then
                     .andExpect(status().isNotFound())
@@ -471,12 +536,11 @@ public class AuthControllerUT {
         @Test
         void shouldReturnResponseWithUserAlreadyVerifiedError() throws Exception {
             // Given
-            String ERROR_MESSAGE = "example@email.com is already verified";
-            String to = "?email=example@email.com";
+            String ERROR_MESSAGE = TEST_EMAIL + " is already verified";
 
             // When
             when(authService.resend(any(String.class))).thenThrow(new UserVerifiedException(ERROR_MESSAGE));
-            mockMvc.perform(post(RESEND_ENDPOINT + to))
+            mockMvc.perform(post(RESEND_ENDPOINT + "?email=" + TEST_EMAIL))
 
                     // Then
                     .andExpect(status().isConflict())
@@ -609,12 +673,12 @@ public class AuthControllerUT {
         @Test
         void shouldSuccessfullyResetPassword() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
             doNothing().when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
@@ -627,12 +691,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnBadRequestWhenPasswordsDoNotMatch() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
 
             doThrow(new PasswordsDoNotMatchException(PASSWORDS_DO_NOT_MATCH_ERROR_MESSAGE))
                     .when(authService).resetPassword(VALID_TOKEN, NEW_PASSWORD, DIFFERENT_PASSWORD);
@@ -647,12 +711,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
             doThrow(new ExpiredJwtException(null, null, JWT_TOKEN_EXPIRED_ERROR_MESSAGE))
                     .when(authService).resetPassword(INVALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
@@ -667,12 +731,12 @@ public class AuthControllerUT {
         @Test
         void shouldReturnNotFoundWhenUserIsNotFound() throws Exception {
             String requestBody = String.format("""
-                {
-                    "token": "%s",
-                    "newPassword": "%s",
-                    "confirmPassword": "%s"
-                }
-                """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
+                    {
+                        "token": "%s",
+                        "newPassword": "%s",
+                        "confirmPassword": "%s"
+                    }
+                    """, VALID_TOKEN, NEW_PASSWORD, NEW_PASSWORD);
 
 
             doThrow(new UserNotFoundException(USER_NOT_FOUND_ERROR_MESSAGE))

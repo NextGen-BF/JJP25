@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceUT {
+class UserServiceTests {
 
     @Mock
     private UserRepository userRepository;
