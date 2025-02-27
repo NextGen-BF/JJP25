@@ -7,6 +7,7 @@ import "./LoginPage.scss";
 import sideImage from "../../assets/side-image.png";
 import gmailLogo from "../../assets/google-color.png";
 import { LoginPageConstants } from "../../constants/LoginPageConstants";
+import GmailButton from "./GmailButton";
 
 interface FormValues {
   username: string;
@@ -127,12 +128,7 @@ const LoginPage: FC = () => {
               </button>
             </form>
             <div className="or-separator">{LoginPageConstants.OR_SEPARATOR}</div>
-            <div className="gmail-login">
-              <button onClick={handleGmailLogin} className="gmail-button">
-                <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
-                <span>{LoginPageConstants.GMAIL_LOGIN_TEXT}</span>
-              </button>
-            </div>
+            <GmailButton />
           </div>
           <div className="login-form-bottom">
             <p className="signup-prompt">
