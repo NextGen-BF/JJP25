@@ -47,7 +47,12 @@ export const TicketFormStyles = {
 
   tableBox: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
+    paddingBottom: "150px",
+
+    "@media (max-width: 768px)": {
+      paddingBottom: "20px",
+    },
   },
 
   formInfoBox: {

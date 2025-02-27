@@ -22,6 +22,7 @@ import { FormInputStyles } from "../FormInput/FormInputStyles";
 const TicketForm = () => {
   const dispatch = useDispatch();
   const tickets = useSelector((state: RootState) => state.ticket.tickets);
+  const eventDates = useSelector((state: RootState) => state.event.event.dates);
 
   const {
     control,
@@ -36,7 +37,7 @@ const TicketForm = () => {
       eventDate: "",
       ticketType: TicketType.GENERAL_ADMISSION,
       price: 0,
-      quantity: 0,
+      totalQuantity: 0,
     },
     mode: "onChange",
     reValidateMode: "onSubmit",
@@ -80,7 +81,7 @@ const TicketForm = () => {
     setValue("eventDate", ticket.eventDate);
     setValue("ticketType", ticket.ticketType);
     setValue("price", ticket.price);
-    setValue("quantity", ticket.quantity);
+    setValue("totalQuantity", ticket.totalQuantity);
     setEditIndex(index);
     setInitialValues(ticket);
   };
@@ -123,8 +124,10 @@ const TicketForm = () => {
               <FormSelect
                 name={TicketFormConstants.NAMES.EVENT_DATE}
                 control={control}
-                label={TicketFormConstants.NAMES.EVENT_DATE}
-                options={["2025-03-01", "2025-03-02"]}
+                label={TicketFormConstants.LABELS.EVENT_DATE}
+                options={eventDates.map((date) =>
+                  date.format("HH:mm DD/MM/YYYY")
+                )}
                 required
                 error={errors.eventDate?.message}
                 onChange={(e) => handleChange("eventDate", e.target.value)}
@@ -190,13 +193,13 @@ const TicketForm = () => {
 
                 <Box>
                   <FormInput
-                    name={TicketFormConstants.NAMES.QUANTITY}
+                    name={TicketFormConstants.NAMES.TOTAL_QUANTITY}
                     control={control}
-                    label={TicketFormConstants.LABELS.QUANTITY}
+                    label={TicketFormConstants.LABELS.TOTAL_QUANTITY}
                     type="number"
                     defaultValue="0"
                     required
-                    error={errors.quantity?.message}
+                    error={errors.totalQuantity?.message}
                     rules={{
                       min: {
                         value:
@@ -228,7 +231,9 @@ const TicketForm = () => {
                         return true;
                       },
                     }}
-                    onChange={(e) => handleChange("quantity", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("totalQuantity", e.target.value)
+                    }
                   />
                 </Box>
 
@@ -243,7 +248,7 @@ const TicketForm = () => {
             </Box>
           </Box>
 
-          <Box sx={{ paddingBottom: 2 }}>
+          <Box sx={TicketFormStyles.tableBox}>
             <Typography sx={{ pb: 1, ...FormInputStyles.typography }}>
               {TicketFormConstants.LABELS.CREATED_TICKETS}
             </Typography>

@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Box,
-  TextField,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -14,9 +13,11 @@ import { EventStepperStyles } from "./EventStepperStyles";
 import { EventStepperConstants } from "../../constants/EventStepperConstants";
 import EventForm from "../EventForm/EventForm";
 import VenueForm from "../VenueForm/VenueForm";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import TicketForm from "../TicketForm/TicketForm";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
+import { submitEventPayload } from "../../redux/services/eventPayloadService";
 
 const steps = [
   EventStepperConstants.EVENT_CREATION,
@@ -26,58 +27,85 @@ const steps = [
 
 const EventStepper: FC = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<{ submitForm: () => Promise<boolean> } | null>(null);
-  const [skipped, setSkipped] = useState(new Set<number>());
+
+  const dispatch = useDispatch<AppDispatch>();
   const venueTitle = useSelector(
     (state: RootState) => state.event.event.venueTitle
-  ); // from Event state
+  );
   const isVenueCreated = useSelector(
     (state: RootState) => state.venue.isVenueCreated
-  ); // from Venue state
+  );
+  const ticketsLength = useSelector(
+    (state: RootState) => state.ticket.tickets
+  ).length;
 
   const isStepOptional = (step: number) => step === 1;
-
-  const isStepSkipped = (step: number) => skipped.has(step);
 
   const handleNext = async () => {
     if (formRef.current) {
       await formRef.current.submitForm();
     }
 
-    if (activeStep === 1 && !isVenueCreated && !venueTitle) {
-      toast.error("Please select or create a new venue to proceed.");
+    if (activeStep === 1 && !validateVenue()) {
       return;
     }
 
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
+    if (activeStep === steps.length - 1 && !validateTickets()) {
+      return;
     }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
+    if (activeStep === steps.length - 1) {
+      await handleFinish();
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
+
+  const validateVenue = () => {
+    if (!isVenueCreated && !venueTitle) {
+      toast.error(
+        EventStepperConstants.TOAST_MESSAGES.VENUE_VALIDATION_MESSAGE
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const validateTickets = () => {
+    if (ticketsLength === 0) {
+      toast.error(
+        EventStepperConstants.TOAST_MESSAGES.TICKET_VALIDATION_MESSAGE
+      );
+      return false;
+    }
+    return true;
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      throw new Error(EventStepperConstants.Errors.SKIP_ERROR);
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
   const handleReset = () => {
     setActiveStep(0);
+  };
+
+  const handleFinish = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      await dispatch(submitEventPayload());
+      toast.success(
+        EventStepperConstants.TOAST_MESSAGES.EVENT_SUBMISSION_SUCCESS
+      );
+      setActiveStep(steps.length);
+    } catch (error) {
+      toast.error(EventStepperConstants.TOAST_MESSAGES.EVENT_SUBMISSION_FAIL);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepForm = () => {
@@ -87,12 +115,7 @@ const EventStepper: FC = () => {
       case 1:
         return <VenueForm />;
       case 2:
-        return (
-          <Box sx={{ mt: 2 }}>
-            <TextField label="Ticket Type" fullWidth sx={{ mb: 2 }} />
-            <TextField label="Ticket Price" fullWidth sx={{ mb: 2 }} />
-          </Box>
-        );
+        return <TicketForm />;
       default:
         return null;
     }
@@ -111,9 +134,6 @@ const EventStepper: FC = () => {
                 {EventStepperConstants.OPTIONAL_STEP}
               </Typography>
             );
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
           }
 
           return (
@@ -144,38 +164,28 @@ const EventStepper: FC = () => {
           </Box>
         </>
       ) : (
-        <>
-          {/* Box for form and buttons for navigation of the stepper */}
-          <Box sx={{ pt: 2 }}>
-            <Box sx={EventStepperStyles.ButtonBox}>
-              <Button
-                disabled={activeStep === 0}
-                sx={EventStepperStyles.stepButton}
-                onClick={handleBack}
-              >
-                <ArrowBackIosIcon
-                  sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
-                />
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {/* {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
-                </Button>
-              )} */}
-              <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
-                {activeStep === steps.length - 1 ? (
-                  EventStepperConstants.FINISH_STEP
-                ) : (
-                  <ArrowForwardIosIcon
-                    sx={EventStepperStyles.arrowForwardIos}
-                  />
-                )}
-              </Button>
-            </Box>
-            {renderStepForm()}
+        <Box sx={{ pt: 2 }}>
+          <Box sx={EventStepperStyles.ButtonBox}>
+            <Button
+              disabled={activeStep === 0}
+              sx={EventStepperStyles.stepButton}
+              onClick={handleBack}
+            >
+              <ArrowBackIosIcon
+                sx={EventStepperStyles.arrowBackIos(activeStep === 0)}
+              />
+            </Button>
+            <Box sx={{ flex: "1 1 auto" }} />
+            <Button onClick={handleNext} sx={EventStepperStyles.stepButton}>
+              {activeStep === steps.length - 1 ? (
+                EventStepperConstants.FINISH_STEP
+              ) : (
+                <ArrowForwardIosIcon sx={EventStepperStyles.arrowForwardIos} />
+              )}
+            </Button>
           </Box>
-        </>
+          {renderStepForm()}
+        </Box>
       )}
     </Box>
   );

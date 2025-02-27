@@ -38,6 +38,11 @@ export const MultiDatePickerStyles = {
     gap: "8px",
     flexWrap: "wrap",
     justifyContent: "space-between",
+
+    "@media (max-width: 450px)": {
+      gap: "4px",
+      maxWidth: "100%",
+    },
   },
 
   chip: {
@@ -45,14 +50,16 @@ export const MultiDatePickerStyles = {
     justifyContent: "space-between",
     backgroundColor: "var(--blankfactor-ultramarine-color)",
     color: "white",
+    fontSize: "12px",
     fontWeight: "1000",
     marginBottom: "8px",
     flexBasis: "100px",
-    marginRight: "8px",
-    marginLeft: "0px",
 
-    "@media (max-width: 768px)": {
-      flexBasis: "100px",
+    "@media (max-width: 450px)": {
+      fontSize: "11px",
+      "& .MuiChip-deleteIcon": {
+        fontSize: "20px",
+      },
     },
   },
 };

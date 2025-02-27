@@ -91,7 +91,7 @@ const TicketTable: FC<TicketTableProps> = ({ onEdit }) => {
                   ${ticket.price}
                 </TableCell>
                 <TableCell align="right" sx={TicketTableStyles.tableCell}>
-                  {ticket.quantity}
+                  {ticket.totalQuantity}
                 </TableCell>
                 <TableCell align="center" sx={TicketTableStyles.tableCell}>
                   <IconButton

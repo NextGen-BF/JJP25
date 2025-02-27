@@ -146,10 +146,10 @@ const VenueForm: FC = () => {
               control={control}
               label={VenueFormConstants.LABELS.TYPE}
               options={venueTypes}
-              defaultValue={venue.type}
+              defaultValue={venue.venueType}
               required
-              error={errors.type?.message as string}
-              onChange={(value) => handleChange("type", value)}
+              error={errors.venueType?.message as string}
+              onChange={(e) => handleChange("venueType", e.target.value)}
             />
           </Box>
         </Box>
