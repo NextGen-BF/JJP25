@@ -6,14 +6,17 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import OtpInput from "react-otp-input";
+import Button from "@mui/material/Button";
+import SendIcon from "@mui/icons-material/Send";
 
 // Utility
 
 // Assets
-import "./VerifyPage.scss";
+import "./VerifyPageStyles.scss";
+import { VerifyPageStyles } from "./VerifyPageStyles";
 
 // Constants
-import { label } from "./Labels";
+import { labels } from "./Labels";
 
 // Redux related
 
@@ -22,15 +25,16 @@ const RegisterPage: FC = () => {
   const email = "example@email.com";
 
   return (
-    <Container className="verify-container">
-      <Box className="verify-box">
-          <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
-            {label.verifyYourEmailAddress}
-          </Typography>
-          <Typography variant="h6">
-            {label.weEmailedYouA6DigitCodeTo} <strong>{email}</strong>{". "}
-            {label.enterTheCodeBelowToConfirmYourEmailAddress}
-          </Typography>
+    <Container sx={VerifyPageStyles.verifyContainer}>
+      <Box sx={VerifyPageStyles.verifyBox}>
+        <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
+          {labels.verifyYourEmailAddress}
+        </Typography>
+        <Typography variant="h6">
+          {labels.weEmailedYouA6DigitCodeTo} <strong>{email}</strong>
+          {". "}
+          {labels.enterTheCodeBelowToConfirmYourEmailAddress}
+        </Typography>
         <OtpInput
           numInputs={6}
           value={otp}
@@ -40,6 +44,17 @@ const RegisterPage: FC = () => {
           shouldAutoFocus={true}
           renderInput={(props) => <input {...props} />}
         />
+        <Button
+          variant="contained"
+          endIcon={<SendIcon />}
+          sx={VerifyPageStyles.verifyButton}
+        >
+          {labels.verify}
+        </Button>
+        <Typography>
+          {labels.youDidntReceiveAnyEmailFromUs}{" "}
+          <strong>{labels.resendCode}</strong>
+        </Typography>
       </Box>
     </Container>
   );
