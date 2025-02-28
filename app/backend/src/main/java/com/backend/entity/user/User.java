@@ -1,26 +1,20 @@
 package com.backend.entity.user;
 
-import com.backend.entity.BaseEntity;
 import com.backend.entity.feedback.Feedback;
 import com.backend.entity.event.Event;
 import com.backend.entity.notification.Notification;
 import com.backend.entity.rsvp.RSVP;
 import com.backend.entity.ticket.UserTicket;
 import com.backend.entity.payment.Payment;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +29,11 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity {
+public class User {
+
+    @Id
+    private Long id;
+
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Payment> senderPayments = new ArrayList<>();
@@ -72,27 +70,23 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserType type;
 
-    @Column(nullable = false, unique = true, length = 15)
+    @Column(unique = true, length = 15)
+    @ColumnDefault("null")
     private String phone;
 
-    @Column(length = 255)
+    @Column(name = "profile_picture")
+    @ColumnDefault("null")
     private String profilePicture;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @ColumnDefault("current_timestamp(6)")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @ColumnDefault("current_timestamp(6)")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     @Override
     public boolean equals(Object o) {
