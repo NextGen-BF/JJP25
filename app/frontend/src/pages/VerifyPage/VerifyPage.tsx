@@ -8,9 +8,11 @@ import Typography from "@mui/material/Typography";
 import OtpInput from "react-otp-input";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
-import VerifiedIcon from '@mui/icons-material/Verified';
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 // Utility
+import { getItem } from "../../utils/localstorage";
+import { usePersistedState } from "../../hooks/usePersistedState";
 
 // Assets
 import "./VerifyPageStyles.scss";
@@ -24,50 +26,26 @@ import { useSelector } from "react-redux";
 
 const RegisterPage: FC = () => {
   const [verified, setVerified] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [otp, setOtp] = useState("");
-  const email = useSelector((state: any) => state.registerData.email);
+  const email =
+    useSelector((state: any) => state.registerData.email) || getItem("email");
+  const [tooManyEmailsSent, setTooManyEmailsSent] = useState(false);
+  const [timesEmailSent, setTimesEmailSent] = usePersistedState<number>("timesEmailSent", 0);
 
-  function verify() {
-    if (otp.length !== 6) {
-      alert("Please enter a valid 6-digit OTP.");
-      return;
-    }
-
-    fetch("http://localhost:8081/api/v1/auth/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        verificationCode: otp,
-      }),
-    })
-      .then(async (response) => {
-        const data = await response.json();
-
-        if (!response.ok) {
-          alert(data.message || "Verification failed. Please try again.");
-          throw new Error(data.message);
-        }
-
-        setVerified(true);
-      })
-      .catch((error) => console.error("Verification error:", error));
-  }
+  function verify() {}
 
   function resendCode() {
-    setSent(true);
-    fetch(`http://localhost:8081/api/v1/auth/resend?email=${email}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.error("Error:", error));
+    if (timesEmailSent >= 2) {
+      setTooManyEmailsSent(true);
+    } else {
+      console.log("works");
+      setSending(true);
+      setTimeout(() => {}, 50000);
+      // send email
+      setSending(false);
+      setTimesEmailSent(timesEmailSent + 1);
+    }
   }
 
   return (
@@ -101,8 +79,8 @@ const RegisterPage: FC = () => {
         </Button>
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
-          <Button onClick={resendCode} disabled={sent || verified}>
-            {sent ? labels.sent : labels.resendCode}
+          <Button onClick={resendCode} disabled={tooManyEmailsSent || verified}>
+            {sending ? labels.sending : labels.resendCode}
           </Button>
         </Typography>
       </Box>

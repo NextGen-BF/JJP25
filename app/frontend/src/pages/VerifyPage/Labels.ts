@@ -7,5 +7,5 @@ export const labels = {
   verified: "Verified",
   youDidntReceiveAnyEmailFromUs: "You didn't receive any email from us?",
   resendCode: "Resend code!",
-  sent: "Sent"
+  sending: "Sending..."
 };
