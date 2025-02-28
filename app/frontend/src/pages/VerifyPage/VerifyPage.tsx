@@ -1,5 +1,6 @@
 // React libraries
 import { FC, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Third party libraries
 import Box from "@mui/material/Box";
@@ -21,8 +22,43 @@ import { labels } from "./Labels";
 // Redux related
 
 const RegisterPage: FC = () => {
+  const [verified, setVerified] = useState(false);
+  const [sent, setSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const email = "example@email.com";
+  const email = "petar.mitov@blankfactor.com"
+  const navigate = useNavigate();
+
+  function verify() {
+    if (otp.length !== 6) {
+      alert("Please enter a valid 6-digit OTP.");
+      return;
+    }
+    fetch("http://localhost:8081/api/v1/auth/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        verificationCode: otp,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {console.log(data); setVerified(true); navigate("")})
+      .catch((error) => console.error(error));
+  }
+
+  function resendCode() {
+    fetch(`http://localhost:8081/api/v1/auth/resend?email=${email}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then(() => setSent(true))
+      .catch((error) => console.error("Error:", error));
+  }
 
   return (
     <Container sx={VerifyPageStyles.verifyContainer}>
@@ -48,12 +84,16 @@ const RegisterPage: FC = () => {
           variant="contained"
           endIcon={<SendIcon />}
           sx={VerifyPageStyles.verifyButton}
+          onClick={verify}
+          disabled={verified}
         >
           {labels.verify}
         </Button>
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
-          <strong>{labels.resendCode}</strong>
+          <Button onClick={resendCode} disabled={sent || verified}>
+            {sent ? labels.sent : labels.resendCode}
+          </Button>
         </Typography>
       </Box>
     </Container>
