@@ -28,19 +28,18 @@ public class UserServiceImpl implements UserService {
         if (byId.isPresent()) {
             throw new UserFoundException(String.format(USER_FOUND, registerRequest.getId()));
         }
-        User user = User.builder()
+        User user = this.userRepository.saveAndFlush(User.builder()
                 .id(registerRequest.getId())
                 .type(registerRequest.getRole().equals(UserType.ATTENDEE.name()) ? UserType.ATTENDEE : UserType.ORGANISER)
-                .build();
-        User savedUser = this.userRepository.saveAndFlush(user);
+                .build());
         log.debug("User with id {} registered successfully", registerRequest.getId());
         return RegisterResponse.builder()
-                .id(savedUser.getId())
-                .phone(savedUser.getPhone())
-                .profilePicture(savedUser.getProfilePicture())
-                .userType(savedUser.getType().name())
-                .createdAt(savedUser.getCreatedAt())
-                .updatedAt(savedUser.getUpdatedAt())
+                .id(user.getId())
+                .phone(user.getPhone())
+                .profilePicture(user.getProfilePicture())
+                .userType(user.getType().name())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 

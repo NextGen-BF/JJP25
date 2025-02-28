@@ -548,12 +548,6 @@ public class AuthControllerTests {
                     .andExpect(jsonPath("$.message").value(ERROR_MESSAGE));
         }
 
-        @Test
-        void shouldReturnResponseIncludingAllFieldErrors() throws Exception {/*TODO*/}
-
-        @Test
-        void shouldReturnResponseWithOnlyRequiredFieldsErrors() throws Exception {/*TODO*/}
-
     }
 
     @Nested
