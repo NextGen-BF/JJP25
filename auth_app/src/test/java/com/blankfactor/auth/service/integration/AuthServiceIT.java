@@ -1,4 +1,4 @@
-package com.blankfactor.auth.service;
+package com.blankfactor.auth.service.integration;
 
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.response.RegisterResponse;
@@ -12,6 +12,7 @@ import com.blankfactor.auth.exception.custom.user.UserFoundException;
 import com.blankfactor.auth.exception.custom.user.UserNotFoundException;
 import com.blankfactor.auth.exception.custom.user.UserVerifiedException;
 import com.blankfactor.auth.repository.UserRepository;
+import com.blankfactor.auth.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

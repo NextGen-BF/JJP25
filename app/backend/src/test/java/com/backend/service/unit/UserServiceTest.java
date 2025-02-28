@@ -1,4 +1,4 @@
-package com.backend.service.user;
+package com.backend.service.unit;
 
 import com.backend.entity.dto.outgoing.RegisterResponse;
 import com.backend.entity.dto.incoming.RegisterRequest;
@@ -6,6 +6,7 @@ import com.backend.entity.user.User;
 import com.backend.entity.user.UserType;
 import com.backend.exception.user.UserFoundException;
 import com.backend.repository.user.UserRepository;
+import com.backend.service.user.UserServiceImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

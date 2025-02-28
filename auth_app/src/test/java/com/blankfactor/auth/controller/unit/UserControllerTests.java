@@ -1,5 +1,6 @@
-package com.blankfactor.auth.controller;
+package com.blankfactor.auth.controller.unit;
 
+import com.blankfactor.auth.controller.UserController;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.service.JwtService;
 import com.blankfactor.auth.service.UserService;

@@ -1,4 +1,4 @@
-package com.blankfactor.auth.service;
+package com.blankfactor.auth.service.unit;
 
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
@@ -11,6 +11,9 @@ import com.blankfactor.auth.exception.custom.code.ExpiredVerificationCodeExcepti
 import com.blankfactor.auth.exception.custom.code.IncorrectVerificationCodeException;
 import com.blankfactor.auth.exception.custom.user.*;
 import com.blankfactor.auth.repository.UserRepository;
+import com.blankfactor.auth.service.AuthService;
+import com.blankfactor.auth.service.EmailService;
+import com.blankfactor.auth.service.JwtService;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

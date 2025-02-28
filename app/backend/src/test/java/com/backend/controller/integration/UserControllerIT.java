@@ -1,4 +1,4 @@
-package com.backend.controller.user;
+package com.backend.controller.integration;
 
 import com.backend.repository.user.UserRepository;
 import org.hamcrest.Matchers;

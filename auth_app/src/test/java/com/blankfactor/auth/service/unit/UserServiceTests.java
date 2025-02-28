@@ -1,4 +1,4 @@
-package com.blankfactor.auth.service;
+package com.blankfactor.auth.service.unit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.repository.UserRepository;
+import com.blankfactor.auth.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

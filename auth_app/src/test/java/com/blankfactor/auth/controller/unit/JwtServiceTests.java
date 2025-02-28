@@ -1,4 +1,4 @@
-package com.blankfactor.auth.controller;
+package com.blankfactor.auth.controller.unit;
 
 import com.blankfactor.auth.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;

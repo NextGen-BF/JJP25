@@ -1,4 +1,4 @@
-package com.blankfactor.auth.controller;
+package com.blankfactor.auth.controller.integration;
 
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.repository.UserRepository;

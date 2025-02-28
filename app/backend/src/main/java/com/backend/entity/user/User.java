@@ -74,7 +74,7 @@ public class User {
     @ColumnDefault("null")
     private String phone;
 
-    @Column(length = 255)
+    @Column(name = "profile_picture")
     @ColumnDefault("null")
     private String profilePicture;
 

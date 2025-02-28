@@ -1,5 +1,6 @@
-package com.backend.controller.user;
+package com.backend.controller.unit;
 
+import com.backend.controller.user.UserController;
 import com.backend.entity.dto.outgoing.RegisterResponse;
 import com.backend.entity.dto.incoming.RegisterRequest;
 import com.backend.exception.user.UserFoundException;

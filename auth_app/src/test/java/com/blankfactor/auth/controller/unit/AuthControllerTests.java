@@ -1,5 +1,6 @@
-package com.blankfactor.auth.controller;
+package com.blankfactor.auth.controller.unit;
 
+import com.blankfactor.auth.controller.AuthController;
 import com.blankfactor.auth.entity.Role;
 import com.blankfactor.auth.entity.User;
 import com.blankfactor.auth.entity.dto.response.RegisterResponse;
