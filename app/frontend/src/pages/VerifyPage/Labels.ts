@@ -4,6 +4,7 @@ export const labels = {
   enterTheCodeBelowToConfirmYourEmailAddress:
     "Enter the code below to confirm your email address.",
   verify: "Verify",
+  verified: "Verified",
   youDidntReceiveAnyEmailFromUs: "You didn't receive any email from us?",
   resendCode: "Resend code!",
   sent: "Sent"

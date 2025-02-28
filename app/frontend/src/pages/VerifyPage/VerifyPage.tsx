@@ -1,6 +1,5 @@
 // React libraries
 import { FC, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 // Third party libraries
 import Box from "@mui/material/Box";
@@ -9,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import OtpInput from "react-otp-input";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 // Utility
 
@@ -18,6 +18,7 @@ import { VerifyPageStyles } from "./VerifyPageStyles";
 
 // Constants
 import { labels } from "./Labels";
+import { useSelector } from "react-redux";
 
 // Redux related
 
@@ -25,14 +26,14 @@ const RegisterPage: FC = () => {
   const [verified, setVerified] = useState(false);
   const [sent, setSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const email = "petar.mitov@blankfactor.com"
-  const navigate = useNavigate();
+  const email = useSelector((state: any) => state.registerData.email);
 
   function verify() {
     if (otp.length !== 6) {
       alert("Please enter a valid 6-digit OTP.");
       return;
     }
+
     fetch("http://localhost:8081/api/v1/auth/verify", {
       method: "POST",
       headers: {
@@ -43,12 +44,21 @@ const RegisterPage: FC = () => {
         verificationCode: otp,
       }),
     })
-      .then((response) => response.json())
-      .then((data) => {console.log(data); setVerified(true); navigate("")})
-      .catch((error) => console.error(error));
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          alert(data.message || "Verification failed. Please try again.");
+          throw new Error(data.message);
+        }
+
+        setVerified(true);
+      })
+      .catch((error) => console.error("Verification error:", error));
   }
 
   function resendCode() {
+    setSent(true);
     fetch(`http://localhost:8081/api/v1/auth/resend?email=${email}`, {
       method: "POST",
       headers: {
@@ -56,7 +66,7 @@ const RegisterPage: FC = () => {
       },
     })
       .then((response) => response.json())
-      .then(() => setSent(true))
+      .then((data) => console.log(data))
       .catch((error) => console.error("Error:", error));
   }
 
@@ -82,12 +92,12 @@ const RegisterPage: FC = () => {
         />
         <Button
           variant="contained"
-          endIcon={<SendIcon />}
+          endIcon={verified ? <VerifiedIcon /> : <SendIcon />}
           sx={VerifyPageStyles.verifyButton}
           onClick={verify}
           disabled={verified}
         >
-          {labels.verify}
+          {verified ? labels.verified : labels.verify}
         </Button>
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
