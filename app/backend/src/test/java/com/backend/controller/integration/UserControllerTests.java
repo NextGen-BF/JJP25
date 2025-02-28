@@ -12,9 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.regex.Matcher;
-
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
-public class UserControllerIT {
+public class UserControllerTests {
 
     // Expires at Aug 29 2034
     private static final String VALID_JWT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9obl9kb2UzIiwiaWF0IjoxNzQwNDkwNDIxLCJleHAiOjIwNDA0OTQwMjF9.pLcvmCgtbB_VEWG-qLSLBFGio6NGaxLUDkMl3jrm4xw";
@@ -37,7 +34,7 @@ public class UserControllerIT {
     private final UserRepository userRepository;
 
     @Autowired
-    public UserControllerIT(MockMvc mockMvc, UserRepository userRepository) {
+    public UserControllerTests(MockMvc mockMvc, UserRepository userRepository) {
         this.mockMvc = mockMvc;
         this.userRepository = userRepository;
     }

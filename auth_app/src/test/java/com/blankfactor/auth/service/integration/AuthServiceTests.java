@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class AuthServiceIT {
+public class AuthServiceTests {
 
     private static final String TEST_EMAIL = "example@email.com";
     private static final String TEST_PASSWORD = "Password1!";
@@ -43,7 +43,7 @@ public class AuthServiceIT {
     private final UserRepository userRepository;
 
     @Autowired
-    public AuthServiceIT(AuthService authService, UserRepository userRepository) {
+    public AuthServiceTests(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
         this.userRepository = userRepository;
     }

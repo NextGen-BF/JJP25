@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServiceTests {
 
     private static final String TEST_ATTENDEE_ROLE = "ATTENDEE";
     private static final String TEST_ORGANISER_ROLE = "ORGANISER";

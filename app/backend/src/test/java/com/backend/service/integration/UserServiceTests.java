@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class UserServiceIT {
+public class UserServiceTests {
 
     private static final String TEST_ATTENDEE_ROLE = "ATTENDEE";
     private static final String TEST_ORGANISER_ROLE = "ORGANISER";
@@ -27,7 +27,7 @@ public class UserServiceIT {
     private final UserService userService;
 
     @Autowired
-    public UserServiceIT(UserRepository userRepository, UserService userService) {
+    public UserServiceTests(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }

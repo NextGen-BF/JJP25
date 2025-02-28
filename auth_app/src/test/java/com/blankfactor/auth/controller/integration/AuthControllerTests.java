@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
-public class AuthControllerIT {
+public class AuthControllerTests {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String VERIFY_ENDPOINT = "/api/v1/auth/verify";
@@ -35,7 +35,7 @@ public class AuthControllerIT {
     private final UserRepository userRepository;
 
     @Autowired
-    public AuthControllerIT(MockMvc mockMvc, UserRepository userRepository) {
+    public AuthControllerTests(MockMvc mockMvc, UserRepository userRepository) {
         this.mockMvc = mockMvc;
         this.userRepository = userRepository;
     }

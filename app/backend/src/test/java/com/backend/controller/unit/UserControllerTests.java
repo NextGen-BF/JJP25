@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = {UserController.class})
-public class UserControllerTest {
+public class UserControllerTests {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
 
