@@ -1,4 +1,3 @@
-// React libraries
 import { FC, useState } from "react";
 
 // Third party libraries
@@ -9,6 +8,8 @@ import OtpInput from "react-otp-input";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 // Utility
 import { getItem } from "../../utils/localstorage";
@@ -22,8 +23,6 @@ import { VerifyPageStyles } from "./VerifyPageStyles";
 import { labels } from "./Labels";
 import { useSelector } from "react-redux";
 
-// Redux related
-
 const RegisterPage: FC = () => {
   const [verified, setVerified] = useState(false);
   const [sending, setSending] = useState(false);
@@ -36,18 +35,43 @@ const RegisterPage: FC = () => {
     0
   );
 
-  const verify = (): void => {};
+  // Alert state for Snackbar/Alert
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleAlertClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setAlertOpen(false);
+  };
+
+  const verify = (): void => {
+    // Verification logic here...
+  };
 
   const resendCode = (): void => {
-    if (timesEmailSent >= 2) {
+    if (timesEmailSent > 2) {
       setTooManyEmailsSent(true);
+      setAlertMessage("Too many emails sent, please try again later.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
     } else {
       console.log("works");
       setSending(true);
+      setAlertMessage("Email has been resent successfully!");
+      setAlertSeverity("success");
       setTimeout(() => {
+        setAlertOpen(true);
         setSending(false);
-        setTimesEmailSent(timesEmailSent + 1);
-      }, 50000);
+      }, 3000);
+      setTimesEmailSent(timesEmailSent + 1);
     }
   };
 
@@ -82,11 +106,24 @@ const RegisterPage: FC = () => {
         </Button>
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
-          <Button onClick={resendCode} disabled={tooManyEmailsSent || verified}>
+          <Button onClick={resendCode} disabled={tooManyEmailsSent || verified || sending}>
             {sending ? labels.sending : labels.resendCode}
           </Button>
         </Typography>
       </Box>
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={5000}
+        onClose={handleAlertClose}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
