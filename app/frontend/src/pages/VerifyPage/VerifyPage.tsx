@@ -24,20 +24,18 @@ import { labels } from "./Labels";
 import { useSelector } from "react-redux";
 
 const RegisterPage: FC = () => {
-  const [verified, setVerified] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [verified, setVerified] = useState<boolean>(false);
+  const [sending, setSending] = useState<boolean>(false);
+  const [otp, setOtp] = useState<string>("");
   const email: string =
     useSelector((state: any) => state.registerData.email) || getItem("email");
-  const [tooManyEmailsSent, setTooManyEmailsSent] = useState(false);
+  const [tooManyEmailsSent, setTooManyEmailsSent] = useState<boolean>(false);
   const [timesEmailSent, setTimesEmailSent] = usePersistedState<number>(
     "timesEmailSent",
     0
   );
-
-  // Alert state for Snackbar/Alert
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState<string>("");
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
   );
@@ -45,12 +43,13 @@ const RegisterPage: FC = () => {
   const handleAlertClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
-  ) => {
+  ): void => {
     if (reason === "clickaway") {
       return;
     }
     setAlertOpen(false);
   };
+
 
   const verify = (): void => {
     // Verification logic here...
@@ -63,7 +62,7 @@ const RegisterPage: FC = () => {
       setAlertSeverity("error");
       setAlertOpen(true);
     } else {
-      console.log("works");
+      // send email
       setSending(true);
       setAlertMessage("Email has been resent successfully!");
       setAlertSeverity("success");
@@ -106,7 +105,10 @@ const RegisterPage: FC = () => {
         </Button>
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
-          <Button onClick={resendCode} disabled={tooManyEmailsSent || verified || sending}>
+          <Button
+            onClick={resendCode}
+            disabled={tooManyEmailsSent || verified || sending}
+          >
             {sending ? labels.sending : labels.resendCode}
           </Button>
         </Typography>
@@ -115,6 +117,7 @@ const RegisterPage: FC = () => {
         open={alertOpen}
         autoHideDuration={5000}
         onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
           onClose={handleAlertClose}

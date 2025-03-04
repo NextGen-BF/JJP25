@@ -16,7 +16,7 @@ export const registerUser = createAsyncThunk(
   "registerData/register",
   async (userData: RegisterPayload, { rejectWithValue }) => {
     try {
-      const url = import.meta.env.VITE_SIGN_UP_URL;
+      const url = import.meta.env.VITE_API_URL + import.meta.env.VITE_REGISTER_URL;
       const response = await axios.post(url, userData);
       return response.data;
     } catch (error: any) {
