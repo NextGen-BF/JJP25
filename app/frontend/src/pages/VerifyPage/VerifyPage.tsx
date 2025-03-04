@@ -28,25 +28,28 @@ const RegisterPage: FC = () => {
   const [verified, setVerified] = useState(false);
   const [sending, setSending] = useState(false);
   const [otp, setOtp] = useState("");
-  const email =
+  const email: string =
     useSelector((state: any) => state.registerData.email) || getItem("email");
   const [tooManyEmailsSent, setTooManyEmailsSent] = useState(false);
-  const [timesEmailSent, setTimesEmailSent] = usePersistedState<number>("timesEmailSent", 0);
+  const [timesEmailSent, setTimesEmailSent] = usePersistedState<number>(
+    "timesEmailSent",
+    0
+  );
 
-  function verify() {}
+  const verify = (): void => {};
 
-  function resendCode() {
+  const resendCode = (): void => {
     if (timesEmailSent >= 2) {
       setTooManyEmailsSent(true);
     } else {
       console.log("works");
       setSending(true);
-      setTimeout(() => {}, 50000);
-      // send email
-      setSending(false);
-      setTimesEmailSent(timesEmailSent + 1);
+      setTimeout(() => {
+        setSending(false);
+        setTimesEmailSent(timesEmailSent + 1);
+      }, 50000);
     }
-  }
+  };
 
   return (
     <Container sx={VerifyPageStyles.verifyContainer}>
