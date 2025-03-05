@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, selectPasswordReset, showErrorMessage } from "../../redux/slices/passwordResetSlice";
@@ -6,9 +6,7 @@ import { AppDispatch } from "../../redux/store";
 import "./ResetPasswordPage.scss";
 import { ResetPasswordConstants } from "../../constants/AuthenticationConstants";
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/;
-
-const ResetPasswordPage: React.FC = () => {
+const ResetPasswordPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error, success } = useSelector(selectPasswordReset);
@@ -49,7 +47,7 @@ const ResetPasswordPage: React.FC = () => {
     ) {
       return ResetPasswordConstants.ERROR_PASSWORDS_DONT_MATCH;
     }
-    if (touched.newPassword &&!PASSWORD_REGEX.test(values.newPassword)) {
+    if (touched.newPassword &&!ResetPasswordConstants.PASSWORD_REGEX.test(values.newPassword)) {
       return ResetPasswordConstants.ERROR_INVALID_PASSWORD_FORMAT;
     }
     return "";
