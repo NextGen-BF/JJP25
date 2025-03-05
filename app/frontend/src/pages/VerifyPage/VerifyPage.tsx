@@ -83,7 +83,7 @@ const VerifyPage: FC = () => {
 
       if (verifyUser.fulfilled.match(resultAction)) {
         const successMsg: string = labels.emailVerifiedSuccessfullyRedirecting;
-        setVerified(true);
+        setVerified((prev) => !prev);
         setAlert((prevAlert) => ({
           ...prevAlert,
           open: true,
@@ -117,7 +117,7 @@ const VerifyPage: FC = () => {
 
   const resend = async (): Promise<void> => {
     if (timesEmailSent > 2) {
-      setTooManyEmailsSent(true);
+      setTooManyEmailsSent((prev) => !prev);
       setAlert((prevAlert) => ({
         ...prevAlert,
         open: true,
@@ -125,7 +125,7 @@ const VerifyPage: FC = () => {
         severity: "error",
       }));
     } else {
-      setSending(true);
+      setSending((prev) => !prev);
       try {
         const resultAction = await dispatch(resendCode(email));
         if (resendCode.fulfilled.match(resultAction)) {
@@ -136,9 +136,9 @@ const VerifyPage: FC = () => {
               message: labels.emailHasBeenResentSuccessfully,
               severity: "success",
             }));
-            setSending(false);
+            setSending((prev) => !prev);
           }, 2000);
-          setTimesEmailSent(timesEmailSent + 1);
+          setTimesEmailSent((prev) => prev + 1);
         } else {
           const errorPayload = resultAction.payload as { message?: string };
           const errorMsg: string =
