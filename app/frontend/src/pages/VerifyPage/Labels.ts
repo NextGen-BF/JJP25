@@ -16,4 +16,5 @@ export const labels = {
     "Too many emails sent, please try again later.",
   emailHasBeenResentSuccessfully: "Email has been resent successfully!",
   resendingFailedPleaseTryAgain: "Resending failed. Please try again.",
+  pleaseEnterCode: "Please, enter code."
 };

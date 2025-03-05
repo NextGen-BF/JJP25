@@ -31,6 +31,12 @@ import { AppDispatch } from "../../redux/store";
 import { resendCode } from "../../redux/services/resendService";
 import { verifyUser } from "../../redux/services/verifyService";
 
+interface AlertState {
+  open: boolean;
+  message: string;
+  severity: "success" | "error";
+}
+
 const VerifyPage: FC = () => {
   const [verified, setVerified] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
@@ -42,11 +48,11 @@ const VerifyPage: FC = () => {
     "timesEmailSent",
     0
   );
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState<string>("");
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "success"
-  );
+  const [alert, setAlert] = useState<AlertState>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -57,14 +63,17 @@ const VerifyPage: FC = () => {
     if (reason === "clickaway") {
       return;
     }
-    setAlertOpen(false);
+    setAlert((prevAlert) => ({ ...prevAlert, open: false }));
   };
 
   const verify = async (): Promise<void> => {
     if (!otp) {
-      setAlertMessage("Please enter the OTP.");
-      setAlertSeverity("error");
-      setAlertOpen(true);
+      setAlert((prevAlert) => ({
+        ...prevAlert,
+        open: true,
+        message: labels.pleaseEnterCode,
+        severity: "error",
+      }));
       return;
     }
 
@@ -75,9 +84,12 @@ const VerifyPage: FC = () => {
       if (verifyUser.fulfilled.match(resultAction)) {
         const successMsg: string = labels.emailVerifiedSuccessfullyRedirecting;
         setVerified(true);
-        setAlertMessage(successMsg);
-        setAlertSeverity("success");
-        setAlertOpen(true);
+        setAlert((prevAlert) => ({
+          ...prevAlert,
+          open: true,
+          message: successMsg,
+          severity: "success",
+        }));
         setTimesEmailSent(0);
         setTimeout(() => {
           navigate("/");
@@ -86,32 +98,44 @@ const VerifyPage: FC = () => {
         const errorPayload = resultAction.payload as { message?: string };
         const errorMsg: string =
           errorPayload.message || labels.verificationFailedPleaseTryAgain;
-        setAlertMessage(errorMsg);
-        setAlertSeverity("error");
-        setAlertOpen(true);
+        setAlert((prevAlert) => ({
+          ...prevAlert,
+          open: true,
+          message: errorMsg,
+          severity: "error",
+        }));
       }
     } catch (error) {
-      setAlertMessage(labels.anUnexpectedErrorOccured);
-      setAlertSeverity("error");
-      setAlertOpen(true);
+      setAlert((prevAlert) => ({
+        ...prevAlert,
+        open: true,
+        message: labels.anUnexpectedErrorOccured,
+        severity: "error",
+      }));
     }
   };
 
   const resend = async (): Promise<void> => {
     if (timesEmailSent > 2) {
       setTooManyEmailsSent(true);
-      setAlertMessage(labels.tooManyEmailsSentPleaseTryAgainLater);
-      setAlertSeverity("error");
-      setAlertOpen(true);
+      setAlert((prevAlert) => ({
+        ...prevAlert,
+        open: true,
+        message: labels.tooManyEmailsSentPleaseTryAgainLater,
+        severity: "error",
+      }));
     } else {
       setSending(true);
       try {
         const resultAction = await dispatch(resendCode(email));
         if (resendCode.fulfilled.match(resultAction)) {
-          setAlertMessage(labels.emailHasBeenResentSuccessfully);
-          setAlertSeverity("success");
           setTimeout(() => {
-            setAlertOpen(true);
+            setAlert((prevAlert) => ({
+              ...prevAlert,
+              open: true,
+              message: labels.emailHasBeenResentSuccessfully,
+              severity: "success",
+            }));
             setSending(false);
           }, 2000);
           setTimesEmailSent(timesEmailSent + 1);
@@ -119,14 +143,20 @@ const VerifyPage: FC = () => {
           const errorPayload = resultAction.payload as { message?: string };
           const errorMsg: string =
             errorPayload.message || labels.resendingFailedPleaseTryAgain;
-          setAlertMessage(errorMsg);
-          setAlertSeverity("error");
-          setAlertOpen(true);
+          setAlert((prevAlert) => ({
+            ...prevAlert,
+            open: true,
+            message: errorMsg,
+            severity: "error",
+          }));
         }
       } catch (error) {
-        setAlertMessage(labels.anUnexpectedErrorOccured);
-        setAlertSeverity("error");
-        setAlertOpen(true);
+        setAlert((prevAlert) => ({
+          ...prevAlert,
+          open: true,
+          message: labels.anUnexpectedErrorOccured,
+          severity: "error",
+        }));
       }
     }
   };
@@ -171,17 +201,17 @@ const VerifyPage: FC = () => {
         </Typography>
       </Box>
       <Snackbar
-        open={alertOpen}
+        open={alert.open}
         autoHideDuration={5000}
         onClose={handleAlertClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
           onClose={handleAlertClose}
-          severity={alertSeverity}
+          severity={alert.severity}
           sx={{ width: "100%" }}
         >
-          {alertMessage}
+          {alert.message}
         </Alert>
       </Snackbar>
     </Container>
