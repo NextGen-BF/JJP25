@@ -1,4 +1,8 @@
+// React libraries
 import { FC, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // Third party libraries
 import Box from "@mui/material/Box";
@@ -18,12 +22,15 @@ import { usePersistedState } from "../../hooks/usePersistedState";
 // Assets
 import "./VerifyPageStyles.scss";
 import { VerifyPageStyles } from "./VerifyPageStyles";
+import { verifyUser } from "../../redux/services/verifyService";
 
 // Constants
 import { labels } from "./Labels";
-import { useSelector } from "react-redux";
 
-const RegisterPage: FC = () => {
+// Redux related
+import { AppDispatch } from "../../redux/store";
+
+const VerifyPage: FC = () => {
   const [verified, setVerified] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
   const [otp, setOtp] = useState<string>("");
@@ -39,6 +46,8 @@ const RegisterPage: FC = () => {
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
   );
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const handleAlertClose = (
     event?: React.SyntheticEvent | Event,
@@ -50,9 +59,41 @@ const RegisterPage: FC = () => {
     setAlertOpen(false);
   };
 
+  const verify = async (): Promise<void> => {
+    if (!otp) {
+      setAlertMessage("Please enter the OTP.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
 
-  const verify = (): void => {
-    // Verification logic here...
+    try {
+      const verifyRequest = { email, verificationCode: otp };
+      const resultAction = await dispatch(verifyUser(verifyRequest));
+
+      if (verifyUser.fulfilled.match(resultAction)) {
+        const successMsg: string =
+          "Email verified successfully! Redirecting...";
+        setVerified(true);
+        setAlertMessage(successMsg);
+        setAlertSeverity("success");
+        setAlertOpen(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      } else {
+        const errorPayload = resultAction.payload as { message?: string };
+        const errorMsg: string =
+          errorPayload.message || "Verification failed. Please try again.";
+        setAlertMessage(errorMsg);
+        setAlertSeverity("error");
+        setAlertOpen(true);
+      }
+    } catch (error) {
+      setAlertMessage("An unexpected error occurred during verification.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+    }
   };
 
   const resendCode = (): void => {
@@ -131,4 +172,4 @@ const RegisterPage: FC = () => {
   );
 };
 
-export default RegisterPage;
+export default VerifyPage;

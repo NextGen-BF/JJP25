@@ -6,7 +6,7 @@ type VerifyPayload = {
   verificationCode: string;
 };
 
-export const registerUser = createAsyncThunk(
+export const verifyUser = createAsyncThunk(
   "verify/VerifyUser",
   async (verifyData: VerifyPayload, { rejectWithValue }) => {
     try {
