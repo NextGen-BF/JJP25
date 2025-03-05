@@ -73,25 +73,25 @@ const VerifyPage: FC = () => {
       const resultAction = await dispatch(verifyUser(verifyRequest));
 
       if (verifyUser.fulfilled.match(resultAction)) {
-        const successMsg: string =
-          "Email verified successfully! Redirecting...";
+        const successMsg: string = labels.emailVerifiedSuccessfullyRedirecting;
         setVerified(true);
         setAlertMessage(successMsg);
         setAlertSeverity("success");
         setAlertOpen(true);
+        setTimesEmailSent(0);
         setTimeout(() => {
           navigate("/");
         }, 3000);
       } else {
         const errorPayload = resultAction.payload as { message?: string };
         const errorMsg: string =
-          errorPayload.message || "Verification failed. Please try again.";
+          errorPayload.message || labels.verificationFailedPleaseTryAgain;
         setAlertMessage(errorMsg);
         setAlertSeverity("error");
         setAlertOpen(true);
       }
     } catch (error) {
-      setAlertMessage("An unexpected error occurred during verification.");
+      setAlertMessage(labels.anUnexpectedErrorOccured);
       setAlertSeverity("error");
       setAlertOpen(true);
     }
@@ -100,7 +100,7 @@ const VerifyPage: FC = () => {
   const resend = async (): Promise<void> => {
     if (timesEmailSent > 2) {
       setTooManyEmailsSent(true);
-      setAlertMessage("Too many emails sent, please try again later.");
+      setAlertMessage(labels.tooManyEmailsSentPleaseTryAgainLater);
       setAlertSeverity("error");
       setAlertOpen(true);
     } else {
@@ -108,7 +108,7 @@ const VerifyPage: FC = () => {
       try {
         const resultAction = await dispatch(resendCode(email));
         if (resendCode.fulfilled.match(resultAction)) {
-          setAlertMessage("Email has been resent successfully!");
+          setAlertMessage(labels.emailHasBeenResentSuccessfully);
           setAlertSeverity("success");
           setTimeout(() => {
             setAlertOpen(true);
@@ -118,13 +118,13 @@ const VerifyPage: FC = () => {
         } else {
           const errorPayload = resultAction.payload as { message?: string };
           const errorMsg: string =
-            errorPayload.message || "Resending failed. Please try again.";
+            errorPayload.message || labels.resendingFailedPleaseTryAgain;
           setAlertMessage(errorMsg);
           setAlertSeverity("error");
           setAlertOpen(true);
         }
       } catch (error) {
-        setAlertMessage("An unexpected error occurred during resending.");
+        setAlertMessage(labels.anUnexpectedErrorOccured);
         setAlertSeverity("error");
         setAlertOpen(true);
       }

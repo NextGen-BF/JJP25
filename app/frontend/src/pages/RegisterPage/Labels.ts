@@ -1,4 +1,4 @@
-export const label = {
+export const labels = {
     singUp: "Sign Up",
     alreadyHaveAnAccount: "Already have an account? ",
     signIn: "Sign In!",
