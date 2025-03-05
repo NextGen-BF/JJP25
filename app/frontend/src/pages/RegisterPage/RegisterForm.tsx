@@ -98,7 +98,7 @@ const RegisterForm: FC = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <Box sx={{ color: "var(--blankfactor-oxford-color)" }}>
-        <Box sx={{ fontSize: "2em" }}>{labels.singUp}</Box>
+        <Box sx={{ fontSize: "2em" }}>{labels.signUp}</Box>
         <Box>
           {labels.alreadyHaveAnAccount}
           <Link to="/login">
@@ -254,7 +254,7 @@ const RegisterForm: FC = () => {
         type="submit"
         disabled={loading}
       >
-        {loading ? labels.loading : labels.singUp}
+        {loading ? labels.loading : labels.signUp}
       </Button>
       <Box className="or-box">
         <Box className="or-hr" />

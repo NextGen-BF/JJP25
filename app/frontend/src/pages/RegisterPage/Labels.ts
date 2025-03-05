@@ -1,5 +1,5 @@
 export const labels = {
-    singUp: "Sign Up",
+    signUp: "Sign Up",
     alreadyHaveAnAccount: "Already have an account? ",
     signIn: "Sign In!",
     loading: "Loading...",
