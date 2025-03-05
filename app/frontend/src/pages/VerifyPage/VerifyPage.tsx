@@ -22,13 +22,14 @@ import { usePersistedState } from "../../hooks/usePersistedState";
 // Assets
 import "./VerifyPageStyles.scss";
 import { VerifyPageStyles } from "./VerifyPageStyles";
-import { verifyUser } from "../../redux/services/verifyService";
 
 // Constants
 import { labels } from "./Labels";
 
 // Redux related
 import { AppDispatch } from "../../redux/store";
+import { resendCode } from "../../redux/services/resendService";
+import { verifyUser } from "../../redux/services/verifyService";
 
 const VerifyPage: FC = () => {
   const [verified, setVerified] = useState<boolean>(false);
@@ -96,22 +97,37 @@ const VerifyPage: FC = () => {
     }
   };
 
-  const resendCode = (): void => {
+  const resend = async (): Promise<void> => {
     if (timesEmailSent > 2) {
       setTooManyEmailsSent(true);
       setAlertMessage("Too many emails sent, please try again later.");
       setAlertSeverity("error");
       setAlertOpen(true);
     } else {
-      // send email
       setSending(true);
-      setAlertMessage("Email has been resent successfully!");
-      setAlertSeverity("success");
-      setTimeout(() => {
+      try {
+        const resultAction = await dispatch(resendCode(email));
+        if (resendCode.fulfilled.match(resultAction)) {
+          setAlertMessage("Email has been resent successfully!");
+          setAlertSeverity("success");
+          setTimeout(() => {
+            setAlertOpen(true);
+            setSending(false);
+          }, 2000);
+          setTimesEmailSent(timesEmailSent + 1);
+        } else {
+          const errorPayload = resultAction.payload as { message?: string };
+          const errorMsg: string =
+            errorPayload.message || "Resending failed. Please try again.";
+          setAlertMessage(errorMsg);
+          setAlertSeverity("error");
+          setAlertOpen(true);
+        }
+      } catch (error) {
+        setAlertMessage("An unexpected error occurred during resending.");
+        setAlertSeverity("error");
         setAlertOpen(true);
-        setSending(false);
-      }, 3000);
-      setTimesEmailSent(timesEmailSent + 1);
+      }
     }
   };
 
@@ -147,7 +163,7 @@ const VerifyPage: FC = () => {
         <Typography>
           {labels.youDidntReceiveAnyEmailFromUs}{" "}
           <Button
-            onClick={resendCode}
+            onClick={resend}
             disabled={tooManyEmailsSent || verified || sending}
           >
             {sending ? labels.sending : labels.resendCode}
