@@ -8,11 +8,12 @@ export const labels = {
   youDidntReceiveAnyEmailFromUs: "You didn't receive any email from us?",
   resendCode: "Resend code!",
   sending: "Sending...",
-  emailVerifiedSuccessfullyRedirecting: "Email verified successfully! Redirecting...",
+  emailVerifiedSuccessfullyRedirecting:
+    "Email verified successfully! Redirecting...",
   verificationFailedPleaseTryAgain: "Verification failed. Please try again.",
   anUnexpectedErrorOccured: "An unexpected error occurred.",
-  tooManyEmailsSentPleaseTryAgainLater: "Too many emails sent, please try again later.",
+  tooManyEmailsSentPleaseTryAgainLater:
+    "Too many emails sent, please try again later.",
   emailHasBeenResentSuccessfully: "Email has been resent successfully!",
   resendingFailedPleaseTryAgain: "Resending failed. Please try again.",
-
 };
