@@ -40,6 +40,7 @@ const registerSlice = createSlice({
         state.success = true;
         const { email, username, firstName, lastName } = action.payload;
         setItem("email", email);
+        setItem("username", username)
         state.email = email;
         state.username = username;
         state.firstName = firstName;

@@ -16,7 +16,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
 // Utility
-import { getItem } from "../../utils/localstorage";
+import { getItem, setItem } from "../../utils/localstorage";
 import { usePersistedState } from "../../hooks/usePersistedState";
 
 // Assets
@@ -82,6 +82,8 @@ const VerifyPage: FC = () => {
       const resultAction = await dispatch(verifyUser(verifyRequest));
 
       if (verifyUser.fulfilled.match(resultAction)) {
+        const successPayload = resultAction.payload as { token?: string};
+        setItem("token", successPayload.token)
         const successMsg: string = labels.emailVerifiedSuccessfullyRedirecting;
         setVerified((prev) => !prev);
         setAlert((prevAlert) => ({
