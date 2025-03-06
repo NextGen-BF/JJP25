@@ -43,14 +43,4 @@ public class NotificationController {
         throw new IllegalStateException("Unable to extract user id from authentication");
     }
 
-
-
-    @PostMapping("/send")
-    public ResponseEntity<String> sendTestNotification(@RequestBody PaymentNotificationDTO notification) {
-        User admin = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Admin user not found"));
-        notificationService.sendPaymentNotification(notification, admin);
-        return ResponseEntity.ok("Notification sent");
-    }
-
 }
