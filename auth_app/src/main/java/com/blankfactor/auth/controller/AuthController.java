@@ -7,6 +7,8 @@ import com.blankfactor.auth.entity.dto.response.VerifyResponse;
 import com.blankfactor.auth.entity.dto.request.*;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,9 +34,15 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest) {
+    public ResponseEntity<VerifyResponse> verify(@RequestBody @Valid VerifyRequest verifyRequest, HttpServletResponse httpServletResponse) {
         log.info("Verification request received for email: {}", verifyRequest.getEmail());
         VerifyResponse response = this.authService.verify(verifyRequest);
+        Cookie cookie = new Cookie("token", response.getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(15 * 60);
+        cookie.setPath("/");
+        httpServletResponse.addCookie(cookie);
         log.info("User verified successfully with email: {}", verifyRequest.getEmail());
         return ResponseEntity.ok(response);
     }
@@ -56,7 +64,6 @@ public class AuthController {
         log.debug("Generated JWT token for user: {}", loginRequest.getLoginIdentifier());
         return ResponseEntity.ok(loginResponse);
     }
-
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
