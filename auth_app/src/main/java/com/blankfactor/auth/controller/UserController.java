@@ -1,8 +1,10 @@
 package com.blankfactor.auth.controller;
 
 import com.blankfactor.auth.entity.User;
+
+
+import com.blankfactor.auth.entity.dto.request.ModifyRoleRequest;
 import com.blankfactor.auth.entity.dto.response.UserResponse;
-import com.blankfactor.auth.entity.dto.imp.AssignRoleRequest;
 import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +42,18 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/assign-role")
-    public ResponseEntity<String> assignRole(@RequestBody AssignRoleRequest request) {
+    public ResponseEntity<String> assignRole(@RequestBody ModifyRoleRequest request) {
         log.info("Assigning role request received for user with id: {}", request.getUserId());
         authService.assignAdminRole(request.getUserId(), request.getRole());
         return ResponseEntity.ok("Role assigned successfully");
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/revoke-role")
+    public ResponseEntity<String> revokeRole(@RequestBody ModifyRoleRequest request) {
+        log.info("Revoking role request received for user with id: {}", request.getUserId());
+        authService.revokeUserRole(request.getUserId(), request.getRole());
+        return ResponseEntity.ok("Role revoked successfully");
     }
 
 }

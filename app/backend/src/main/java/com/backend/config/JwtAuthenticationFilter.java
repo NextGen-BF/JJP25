@@ -56,11 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         try {
             Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-            String username = claims.getSubject();
+            //String username = claims.getSubject();
+            Long userId = claims.get("userId", Long.class);
             List<String> roles = claims.get("roles", List.class);
             List<? extends GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
-            if (username != null) {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            if (userId != null) {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (ExpiredJwtException e) {

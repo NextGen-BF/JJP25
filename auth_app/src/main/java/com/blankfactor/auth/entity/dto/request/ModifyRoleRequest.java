@@ -1,4 +1,4 @@
-package com.blankfactor.auth.entity.dto.imp;
+package com.blankfactor.auth.entity.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignRoleRequest {
+public class ModifyRoleRequest {
     private Long userId;
     private String role;
 }

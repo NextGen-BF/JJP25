@@ -307,7 +307,40 @@ public class AuthService {
         userToPromote.getRoles().add(Role.valueOf(role));
         userRepository.saveAndFlush(userToPromote);
 
-        log.info("User {} promoted to role '{}' by user {}", userToPromote.getId(), role, authenticatedUser.getId());
+        log.debug("User {} promoted to role '{}' by user {}", userToPromote.getId(), role, authenticatedUser.getId());
+    }
+
+    @Transactional
+    public void revokeUserRole(Long userId, String role) {
+        log.debug("Attempting to revoke role '{}' from user with id: {}", role, userId);
+
+        User authenticatedUser = getAuthenticatedUser();
+
+        if (!authenticatedUser.getRoles().contains(Role.ROLE_ADMIN)) {
+            log.warn("Non-admin user {} attempted to revoke role from user {}", authenticatedUser.getId(), userId);
+            throw new AccessDeniedException("Only admins can revoke roles");
+        }
+
+        if (authenticatedUser.getId().equals(userId)) {
+            log.warn("Admin {} attempted to revoke their own admin role", authenticatedUser.getId());
+            throw new IllegalArgumentException("Admins cannot revoke their own role");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", userId);
+                    return new UserNotFoundException("User not found");
+                });
+
+        if (!user.getRoles().contains(Role.valueOf(role))) {
+            log.warn("User {} does not have role {}", user.getId(), role);
+            throw new IllegalArgumentException("User does not have the role");
+        }
+
+        user.getRoles().remove(Role.valueOf(role));
+        userRepository.saveAndFlush(user);
+
+        log.debug("User {} had role '{}' revoked by user {}", user.getId(), role, authenticatedUser.getId());
     }
 
 
