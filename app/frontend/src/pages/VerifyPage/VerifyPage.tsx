@@ -16,7 +16,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
 // Utility
-import { getItem, setItem } from "../../utils/localstorage";
+import { getItem, setItem, removeItem } from "../../utils/localstorage";
 import { usePersistedState } from "../../hooks/usePersistedState";
 
 // Assets
@@ -44,10 +44,7 @@ const VerifyPage: FC = () => {
   const email: string =
     useSelector((state: any) => state.registerData.email) || getItem("email");
   const [tooManyEmailsSent, setTooManyEmailsSent] = useState<boolean>(false);
-  const [timesEmailSent, setTimesEmailSent] = usePersistedState<number>(
-    "timesEmailSent",
-    0
-  );
+  const [counter, setCounter] = usePersistedState<number>("counter", 0);
   const [alert, setAlert] = useState<AlertState>({
     open: false,
     message: "",
@@ -82,8 +79,9 @@ const VerifyPage: FC = () => {
       const resultAction = await dispatch(verifyUser(verifyRequest));
 
       if (verifyUser.fulfilled.match(resultAction)) {
-        const successPayload = resultAction.payload as { token?: string};
-        setItem("token", successPayload.token)
+        const successPayload = resultAction.payload as { token?: string };
+        setItem("token", successPayload.token);
+        removeItem("counter");
         const successMsg: string = labels.emailVerifiedSuccessfullyRedirecting;
         setVerified((prev) => !prev);
         setAlert((prevAlert) => ({
@@ -92,7 +90,6 @@ const VerifyPage: FC = () => {
           message: successMsg,
           severity: "success",
         }));
-        setTimesEmailSent(0);
         setTimeout(() => {
           navigate("/");
         }, 3000);
@@ -118,7 +115,7 @@ const VerifyPage: FC = () => {
   };
 
   const resend = async (): Promise<void> => {
-    if (timesEmailSent > 2) {
+    if (counter > 2) {
       setTooManyEmailsSent((prev) => !prev);
       setAlert((prevAlert) => ({
         ...prevAlert,
@@ -140,7 +137,7 @@ const VerifyPage: FC = () => {
             }));
             setSending((prev) => !prev);
           }, 2000);
-          setTimesEmailSent((prev) => prev + 1);
+          setCounter((prev) => prev + 1);
         } else {
           const errorPayload = resultAction.payload as { message?: string };
           const errorMsg: string =
