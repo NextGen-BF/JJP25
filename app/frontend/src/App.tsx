@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import { AppStyles } from "./AppStyles";
 import AppRoutes from "./AppRoutes";
+import { AuthProvider } from "./fireabase_context/AuthContext";
+import AuthRedirect from "./fireabase_context/AuthRedirect";
 import { ToastContainer } from "react-toastify";
 
 export default function App() {
@@ -18,21 +20,25 @@ export default function App() {
 
   return (
     <Router>
-      <ToastContainer />
-      <CssBaseline />
-      <Navbar />
-      <Box sx={AppStyles.outerBoxStyles}>
-        <SideBar />
-        <Box
-          sx={{
-            ...AppStyles.routesBoxStyles,
-            marginLeft: isSideBarOpen ? "260px" : isMobile ? 0 : "80px",
-          }}
-        >
-          <AppRoutes />
+      <AuthProvider>
+        <ToastContainer />
+        <CssBaseline />
+        <Navbar />
+        <Box sx={AppStyles.outerBoxStyles}>
+          <SideBar />
+          <Box
+            sx={{
+              ...AppStyles.routesBoxStyles,
+              marginLeft: isSideBarOpen ? "260px" : isMobile ? 0 : "80px",
+            }}
+          >
+            <AuthRedirect>
+              <AppRoutes />
+            </AuthRedirect>
+          </Box>
+          <Footer />
         </Box>
-        <Footer />
-      </Box>
+      </AuthProvider>
     </Router>
   );
 }

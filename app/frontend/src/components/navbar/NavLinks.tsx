@@ -1,16 +1,28 @@
-import { Box, Button } from "@mui/material";
+//React
 import { FC } from "react";
 import { Link } from "react-router-dom";
-import { NavbarStyles } from "./NavbarStyles";
+
+//Material UI
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
+import { Box, Button } from "@mui/material";
+
+//Redux
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+
+//Components
+import LogOutButton from "./LogOutButton";
+import { NavbarStyles } from "./NavbarStyles";
 
 interface NavLinksProps {
   flexDirection: "row" | "row-reverse" | "column-reverse" | "column";
 }
 
 const NavLinks: FC<NavLinksProps> = ({ flexDirection }) => {
+  const { user } = useSelector((state: RootState) => state.googleAuth);
+
   return (
     <Box display={"flex"} flexDirection={flexDirection}>
       <Button color="inherit" component={Link} to="/events">
@@ -35,6 +47,9 @@ const NavLinks: FC<NavLinksProps> = ({ flexDirection }) => {
         <Link to="/" style={NavbarStyles.iconStyles}>
           <PersonIcon />
         </Link>
+        {user?.name && (
+          <LogOutButton />
+        )}
       </Box>
     </Box>
   );

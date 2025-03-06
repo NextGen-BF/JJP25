@@ -8,9 +8,11 @@ import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import NotificationsPage from "./pages/NotificationsPage/NotificationsPage";
 import TicketsPage from "./pages/TicketsPage/TicketsPage";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import SelectRolePage from "./pages/SelectRolePage/SelectRolePage";
 
 const UserRoutes = (
     <>
+      <Route path="/select-role" element={<SelectRolePage />} />
       <Route path="/" element={<HomePage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />

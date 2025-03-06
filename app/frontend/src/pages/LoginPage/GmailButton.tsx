@@ -1,56 +1,29 @@
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from "@react-oauth/google";
-import axios from "axios";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FC } from "react";
+import { UserAuth } from "../../fireabase_context/AuthContext";
+import { toast } from "react-toastify";
+import { LoginPageConstants } from "../../constants/LoginPageConstants";
+import gmailLogo from "../../assets/google-color.png"
+import { SelectRoleConstants } from "../../constants/SelectRoleConstants";
 
-const clientId = "449311094395-e0nhgs5m3of6lk6e045terrji11acnv8.apps.googleusercontent.com";
+const GoogleLoginButton: FC = () => {
+  const { signInWithGoogle } = UserAuth();
 
-function GmailButton() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      toast.error(SelectRoleConstants.ERROR_MESSAGES.ERROR_OCCURED);
+    }
+  };
 
-    const handleGoogleLogin = async (response: CredentialResponse) => {
-        setLoading(true);
-        setError("");
+  return (
+    <div className="gmail-login">
+      <button onClick={handleGoogleLogin} className="gmail-button">
+        <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
+        <span>{LoginPageConstants.GMAIL_LOGIN_TEXT}</span>
+      </button>
+    </div>
+  );
+};
 
-        console.log(response.credential);
-        
-        if (response.credential) {
-            try {
-                const res = await axios.post("http://localhost:8081/auth/google", {
-                    token: response.credential,
-                }, {
-                    headers: { "Content-Type": "application/json" },
-                    withCredentials: true,
-                });
-
-                console.log("Backend response:", res.data);
-                localStorage.setItem("token", res.data.token); 
-
-                navigate("/dashboard"); 
-            } catch (error) {
-                console.error("Authentication failed:", error);
-                setError("Google login failed. Please try again.");
-            }
-        }
-        
-        setLoading(false);
-    };
-
-    return (
-        <GoogleOAuthProvider clientId={clientId}>
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => setError("Google login failed. Try again.")}
-                />
-            )}
-            {error && <p style={{ color: "red" }}>{error}</p>}
-        </GoogleOAuthProvider>
-    );
-}
-
-export default GmailButton;
+export default GoogleLoginButton;

@@ -8,6 +8,7 @@ import passwordResetReducer from "./slices/passwordResetSlice";
 ;
 import sidebarReducer from "./slices/sidebarSlice";
 import ticketReducer from "./slices/ticketSlice";
+import googleAuthReducer from "./slices/googleAuthSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ export const store = configureStore({
     auth: authReducer,
     ticket: ticketReducer,
     registerData: registerReducer,
-    passwordReset: passwordResetReducer
+    passwordReset: passwordResetReducer,
+    googleAuth: googleAuthReducer
   },
 
   middleware: (getDefaultMiddleware) =>
