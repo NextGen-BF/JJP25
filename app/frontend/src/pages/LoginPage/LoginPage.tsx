@@ -1,12 +1,16 @@
 import { FC, useState, FormEvent, ChangeEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, selectAuth, clearError } from '../../redux/slices/authSlice';
-import { AppDispatch } from '../../redux/store';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginUser,
+  selectAuth,
+  clearError,
+} from "../../redux/slices/authSlice";
+import { AppDispatch } from "../../redux/store";
 import "./LoginPage.scss";
 import sideImage from "../../assets/side-image.png";
-import gmailLogo from "../../assets/google-color.png";
 import { LoginPageConstants } from "../../constants/AuthenticationConstants";
+import GoogleLoginButton from "./GmailButton";
 
 interface FormValues {
   username: string;
@@ -24,23 +28,23 @@ const LoginPage: FC = () => {
   const navigate = useNavigate();
   const { loading, error } = useSelector(selectAuth);
   const [formValues, setFormValues] = useState<FormValues>({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
     rememberMe: false,
   });
-  const [errors, setErrors] = useState<Errors>({ username: '', password: '' });
+  const [errors, setErrors] = useState<Errors>({ username: "", password: "" });
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormValues({
-    ...formValues,
-      [name]: type === 'checkbox'? checked: value,
+      ...formValues,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const validateForm = (): boolean => {
     let valid = true;
-    const newErrors: Errors = { username: '', password: '' };
+    const newErrors: Errors = { username: "", password: "" };
     if (!formValues.username) {
       newErrors.username = LoginPageConstants.ERROR_MISSING_IDENTIFIER;
       valid = false;
@@ -59,15 +63,11 @@ const LoginPage: FC = () => {
     if (!validateForm()) return;
 
     dispatch(loginUser(formValues))
-    .unwrap()
-    .then(() => navigate('/dashboard'))
-    .catch((error: any) => {
+      .unwrap()
+      .then(() => navigate("/dashboard"))
+      .catch((error: any) => {
         console.error(LoginPageConstants.LOGIN_FAILED, error);
       });
-  };
-
-  const handleGmailLogin = () => {
-    alert('Gmail login clicked (to be implemented)');
   };
 
   return (
@@ -81,11 +81,13 @@ const LoginPage: FC = () => {
           <div className="login-form-top">
             <h1>{LoginPageConstants.LOGIN_TEXT}</h1>
             <div className="error-container">
-              {error && <p className="error">{error}</p>} 
+              {error && <p className="error">{error}</p>}
             </div>
             <form className="login-form" onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label htmlFor="username">{LoginPageConstants.EMAIL_USERNAME_LABEL}</label>
+                <label htmlFor="username">
+                  {LoginPageConstants.EMAIL_USERNAME_LABEL}
+                </label>
                 <input
                   type="text"
                   id="username"
@@ -99,14 +101,16 @@ const LoginPage: FC = () => {
                 )}
               </div>
               <div className="form-group">
-                <label htmlFor="password">{LoginPageConstants.PASSWORD_LABEL}</label>
+                <label htmlFor="password">
+                  {LoginPageConstants.PASSWORD_LABEL}
+                </label>
                 <input
                   type="password"
                   id="password"
                   name="password"
                   value={formValues.password}
                   onChange={handleInputChange}
-                  placeholder= {LoginPageConstants.PLACEHOLDER_FOR_PASSWORD}
+                  placeholder={LoginPageConstants.PLACEHOLDER_FOR_PASSWORD}
                 />
                 {errors.password && (
                   <span className="error">{errors.password}</span>
@@ -120,19 +124,20 @@ const LoginPage: FC = () => {
                   checked={formValues.rememberMe}
                   onChange={handleInputChange}
                 />
-                <label htmlFor="rememberMe">{LoginPageConstants.REMEMBER_ME_LABEL}</label>
+                <label htmlFor="rememberMe">
+                  {LoginPageConstants.REMEMBER_ME_LABEL}
+                </label>
               </div>
               <button type="submit" className="login-button" disabled={loading}>
-                {loading ? LoginPageConstants.LOGGING_IN : LoginPageConstants.LOGIN_TEXT}
+                {loading
+                  ? LoginPageConstants.LOGGING_IN
+                  : LoginPageConstants.LOGIN_TEXT}
               </button>
             </form>
-            <div className="or-separator">{LoginPageConstants.OR_SEPARATOR}</div>
-            <div className="gmail-login">
-              <button onClick={handleGmailLogin} className="gmail-button">
-                <img src={gmailLogo} alt="Gmail Logo" className="gmail-logo" />
-                <span>{LoginPageConstants.GMAIL_LOGIN_TEXT}</span>
-              </button>
+            <div className="or-separator">
+              {LoginPageConstants.OR_SEPARATOR}
             </div>
+            <GoogleLoginButton />
           </div>
           <div className="login-form-bottom">
             <p className="signup-prompt">
@@ -145,6 +150,6 @@ const LoginPage: FC = () => {
         </div>
       </div>
     </div>
-  );  
-}  
+  );
+};
 export default LoginPage;
