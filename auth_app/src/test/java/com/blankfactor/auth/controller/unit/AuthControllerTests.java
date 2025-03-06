@@ -704,7 +704,7 @@ public class AuthControllerTests {
         }
 
         @Test
-        void shouldReturnBadRequestWhenTokenIsInvalid() throws Exception {
+        void shouldReturnUnauthorizedWhenTokenIsInvalid() throws Exception {
             String requestBody = String.format("""
                     {
                         "token": "%s",
@@ -719,7 +719,7 @@ public class AuthControllerTests {
             mockMvc.perform(post(RESET_PASSWORD_ENDPOINT)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.message").value(JWT_TOKEN_EXPIRED_ERROR_MESSAGE));
         }
 

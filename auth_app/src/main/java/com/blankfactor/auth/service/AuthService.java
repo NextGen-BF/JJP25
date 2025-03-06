@@ -157,9 +157,12 @@ public class AuthService {
         user.setVerificationCodeExpiresAt(null);
         this.userRepository.saveAndFlush(user);
         log.debug("User with email {} verified successfully", userEmail);
-        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", this.jwtService.generateToken(user));
+        String token = this.jwtService.generateToken(user);
+        informEmsApp(user.getId(), user.getAuthorities().size() == 2 ? "ORGANISER" : "ATTENDEE", token);
         log.debug("ems_app was successfully informed about the creation of user {}", userEmail);
-        return this.modelMapper.map(user, VerifyResponse.class);
+        VerifyResponse map = this.modelMapper.map(user, VerifyResponse.class);
+        map.setToken(token);
+        return map;
     }
 
     @Transactional

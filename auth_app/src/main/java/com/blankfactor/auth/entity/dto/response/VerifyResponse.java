@@ -17,4 +17,6 @@ public class VerifyResponse implements Serializable {
 
     private Boolean enabled;
 
+    private String token;
+
 }
