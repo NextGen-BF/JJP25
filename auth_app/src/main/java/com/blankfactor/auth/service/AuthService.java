@@ -20,9 +20,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -278,6 +282,83 @@ public class AuthService {
         }
     }
 
+    @Transactional
+    public void assignAdminRole(Long userId, String role) {
+        log.debug("Attempting to assign role '{}'] to user with id: {}", role, userId);
+
+        User authenticatedUser = getAuthenticatedUser();
+
+        if (!authenticatedUser.getRoles().contains(Role.ROLE_ADMIN)) {
+            log.warn("Non-admin user {} attempted to assign admin role to user {}", authenticatedUser.getId(), userId);
+            throw new AccessDeniedException("Only admins can assign roles");
+        }
+
+        User userToPromote = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", userId);
+                    return new UserNotFoundException("User not found");
+                });
+
+        if (userToPromote.getRoles().contains(Role.valueOf(role))) {
+            log.warn("User {} already has role {}", userToPromote.getId(), role);
+            throw new IllegalArgumentException("User already has the role");
+        }
+
+        userToPromote.getRoles().add(Role.valueOf(role));
+        userRepository.saveAndFlush(userToPromote);
+
+        log.debug("User {} promoted to role '{}' by user {}", userToPromote.getId(), role, authenticatedUser.getId());
+    }
+
+    @Transactional
+    public void revokeUserRole(Long userId, String role) {
+        log.debug("Attempting to revoke role '{}' from user with id: {}", role, userId);
+
+        User authenticatedUser = getAuthenticatedUser();
+
+        if (!authenticatedUser.getRoles().contains(Role.ROLE_ADMIN)) {
+            log.warn("Non-admin user {} attempted to revoke role from user {}", authenticatedUser.getId(), userId);
+            throw new AccessDeniedException("Only admins can revoke roles");
+        }
+
+        if (authenticatedUser.getId().equals(userId)) {
+            log.warn("Admin {} attempted to revoke their own admin role", authenticatedUser.getId());
+            throw new IllegalArgumentException("Admins cannot revoke their own role");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", userId);
+                    return new UserNotFoundException("User not found");
+                });
+
+        if (!user.getRoles().contains(Role.valueOf(role))) {
+            log.warn("User {} does not have role {}", user.getId(), role);
+            throw new IllegalArgumentException("User does not have the role");
+        }
+
+        user.getRoles().remove(Role.valueOf(role));
+        userRepository.saveAndFlush(user);
+
+        log.debug("User {} had role '{}' revoked by user {}", user.getId(), role, authenticatedUser.getId());
+    }
+
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            log.error("No authenticated user found in security context");
+            throw new AuthenticationCredentialsNotFoundException("No authenticated user found");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof User) {
+            return (User) principal;
+        }
+        log.error("Expected authentication principal of type User, but found: {}", principal.getClass().getName());
+        throw new IllegalStateException(
+                "Expected authentication principal of type User, but found: " + principal.getClass().getName()
+        );
+    }
     private void informEmsApp(Long id, String role, String token) {
         log.debug("Sending { \"id\": \"{}\", \"role:\" \"{}\" } to ems_app backend", id, role);
         try {

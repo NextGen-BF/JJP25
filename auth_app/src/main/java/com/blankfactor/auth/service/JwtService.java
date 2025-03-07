@@ -1,5 +1,6 @@
 package com.blankfactor.auth.service;
 
+import com.blankfactor.auth.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -46,7 +47,13 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         extraClaims.put("roles", roles);
-        return generateToken(extraClaims, userDetails);
+
+        if (userDetails instanceof User) {
+            extraClaims.put("userId", ((User) userDetails).getId());
+        }
+
+        return buildToken(extraClaims, userDetails.getUsername(), jwtExpiration);
+        //return generateToken(extraClaims, userDetails);
 
     }
 

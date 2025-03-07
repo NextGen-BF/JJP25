@@ -15,6 +15,8 @@ import com.blankfactor.auth.service.AuthService;
 import com.blankfactor.auth.service.EmailService;
 import com.blankfactor.auth.service.JwtService;
 import jakarta.mail.MessagingException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +24,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.ResourceAccessException;
@@ -32,8 +37,7 @@ import org.springframework.web.client.RestClient;
 import org.thymeleaf.TemplateEngine;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -83,6 +87,14 @@ public class AuthServiceTests {
     private static final String VALID_TOKEN = "validToken";
     private static final String NEW_PASSWORD = "newPassword1!";
     private static final String DIFFERENT_PASSWORD = "differentPassword";
+    private User adminUser;
+    private User targetUser;
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ADMIN_EMAIL = "admin@example.com";
+    private static final String USER_EMAIL = "user@example.com";
+    private static final String NON_ADMIN_EMAIL = "nonadmin@example.com";
+
 
     @Nested
     class ValidateCredentialsTests {
@@ -614,5 +626,160 @@ public class AuthServiceTests {
         }
 
     }
+
+    @Nested
+    class AssignRoleTests {
+
+        @BeforeEach
+        void setUp() {
+            adminUser = new User();
+            adminUser.setId(1L);
+            adminUser.setEmail(ADMIN_EMAIL);
+            adminUser.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_ADMIN)));
+            Authentication auth = new UsernamePasswordAuthenticationToken(adminUser, null, adminUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
+        @AfterEach
+        void tearDown() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void shouldAssignRoleWhenAdminIsAuthenticatedAndUserDoesNotHaveRole() {
+            targetUser = new User();
+            targetUser.setId(2L);
+            targetUser.setEmail(USER_EMAIL);
+            targetUser.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_USER)));
+            when(userRepository.findById(2L)).thenReturn(Optional.of(targetUser));
+            authService.assignAdminRole(2L, ROLE_ADMIN);
+            assertTrue(targetUser.getRoles().contains(Role.ROLE_ADMIN));
+            verify(userRepository).saveAndFlush(targetUser);
+        }
+
+        @Test
+        void shouldThrowAccessDeniedExceptionWhenNonAdminAttemptsAssignment() {
+            User nonAdmin = new User();
+            nonAdmin.setId(3L);
+            nonAdmin.setEmail(NON_ADMIN_EMAIL);
+            nonAdmin.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_USER)));
+            Authentication auth = new UsernamePasswordAuthenticationToken(nonAdmin, null, nonAdmin.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            AccessDeniedException exception = assertThrows(AccessDeniedException.class, () ->
+                    authService.assignAdminRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("Only admins can assign roles", exception.getMessage());
+            verify(userRepository, never()).findById(anyLong());
+        }
+
+        @Test
+        void shouldThrowUserNotFoundExceptionWhenTargetUserDoesNotExist() {
+            when(userRepository.findById(2L)).thenReturn(Optional.empty());
+            UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
+                    authService.assignAdminRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("User not found", exception.getMessage());
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentExceptionWhenTargetUserAlreadyHasRole() {
+            targetUser = new User();
+            targetUser.setId(2L);
+            targetUser.setEmail(USER_EMAIL);
+            targetUser.setRoles(new HashSet<>(Arrays.asList(Role.ROLE_ADMIN, Role.ROLE_USER)));
+            when(userRepository.findById(2L)).thenReturn(Optional.of(targetUser));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    authService.assignAdminRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("User already has the role", exception.getMessage());
+            verify(userRepository, never()).saveAndFlush(any(User.class));
+        }
+    }
+
+    @Nested
+    class RevokeRoleTests {
+
+        @BeforeEach
+        void setUp() {
+            adminUser = new User();
+            adminUser.setId(1L);
+            adminUser.setEmail(ADMIN_EMAIL);
+            adminUser.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_ADMIN)));
+            Authentication auth = new UsernamePasswordAuthenticationToken(adminUser, null, adminUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
+        @AfterEach
+        void tearDown() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void shouldSuccessfullyRevokeRoleWhenAdminIsAuthenticatedAndUserHasRole() {
+            targetUser = new User();
+            targetUser.setId(2L);
+            targetUser.setEmail(USER_EMAIL);
+            targetUser.setRoles(new HashSet<>(Arrays.asList(Role.ROLE_USER, Role.ROLE_ADMIN)));
+
+            when(userRepository.findById(2L)).thenReturn(Optional.of(targetUser));
+
+            authService.revokeUserRole(2L, ROLE_ADMIN);
+
+            assertFalse(targetUser.getRoles().contains(Role.ROLE_ADMIN));
+            verify(userRepository).saveAndFlush(targetUser);
+        }
+
+        @Test
+        void shouldThrowAccessDeniedExceptionWhenNonAdminAttemptsRevoke() {
+            User nonAdmin = new User();
+            nonAdmin.setId(3L);
+            nonAdmin.setEmail(NON_ADMIN_EMAIL);
+            nonAdmin.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_USER)));
+            Authentication auth = new UsernamePasswordAuthenticationToken(nonAdmin, null, nonAdmin.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            AccessDeniedException exception = assertThrows(AccessDeniedException.class, () ->
+                    authService.revokeUserRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("Only admins can revoke roles", exception.getMessage());
+            verify(userRepository, never()).findById(anyLong());
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentExceptionWhenAdminAttemptsToRevokeTheirOwnRole() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    authService.revokeUserRole(adminUser.getId(), ROLE_ADMIN)
+            );
+            assertEquals("Admins cannot revoke their own role", exception.getMessage());
+            verify(userRepository, never()).findById(anyLong());
+        }
+
+        @Test
+        void shouldThrowUserNotFoundExceptionWhenTargetUserDoesNotExist() {
+            when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
+            UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
+                    authService.revokeUserRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("User not found", exception.getMessage());
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentExceptionWhenTargetUserDoesNotHaveRole() {
+            targetUser = new User();
+            targetUser.setId(2L);
+            targetUser.setEmail(USER_EMAIL);
+            targetUser.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_USER)));
+
+            when(userRepository.findById(2L)).thenReturn(Optional.of(targetUser));
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    authService.revokeUserRole(2L, ROLE_ADMIN)
+            );
+            assertEquals("User does not have the role", exception.getMessage());
+            verify(userRepository, never()).saveAndFlush(any(User.class));
+        }
+    }
+
 
 }

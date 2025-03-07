@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,7 +41,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(getErrorsMap("401", "UNAUTHORIZED", ex.getMessage()), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler({UserNotVerifiedException.class, InvalidInformRequestException.class})
+    @ExceptionHandler({UserNotVerifiedException.class, InvalidInformRequestException.class, AccessDeniedException.class})
     public ResponseEntity<Map<String, String>> handleForbidden(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("403", "FORBIDDEN", ex.getMessage()), new HttpHeaders(), HttpStatus.FORBIDDEN);
@@ -53,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({UserVerifiedException.class, UserFoundException.class, UserExistsException.class})
-    public ResponseEntity<Map<String, String>> handleConfilt(RuntimeException ex) {
+    public ResponseEntity<Map<String, String>> handleConflict(RuntimeException ex) {
         log.error("Handled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return new ResponseEntity<>(getErrorsMap("409", "CONFLICT", ex.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
