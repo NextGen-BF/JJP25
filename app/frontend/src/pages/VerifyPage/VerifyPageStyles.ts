@@ -12,7 +12,7 @@ export const VerifyPageStyles = {
     gap: "1em",
     widht: "100%",
     backgroundColor: "var(--blankfactor-gray-1-color)",
-    boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+    boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
     borderRadius: "5px",
     padding: "1em",
   },

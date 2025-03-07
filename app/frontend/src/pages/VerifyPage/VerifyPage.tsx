@@ -160,7 +160,7 @@ const VerifyPage: FC = () => {
   return (
     <Container sx={VerifyPageStyles.verifyContainer}>
       <Box sx={VerifyPageStyles.verifyBox}>
-        <Typography variant="h3" fontWeight="bold" sx={{ mb: 2}}>
+        <Typography variant="h4" fontWeight="bold" sx={{ mb: 2}}>
           {labels.verifyYourEmailAddress}
         </Typography>
         <Typography variant="h6">
