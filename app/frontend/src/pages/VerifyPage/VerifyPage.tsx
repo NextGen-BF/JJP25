@@ -30,7 +30,6 @@ import { labels } from "./Labels";
 import { AppDispatch } from "../../redux/store";
 import { resendCode } from "../../redux/services/resendService";
 import { verifyUser } from "../../redux/services/verifyService";
-import { test } from "../../redux/services/testService";
 
 interface AlertState {
   open: boolean;
@@ -161,7 +160,7 @@ const VerifyPage: FC = () => {
   return (
     <Container sx={VerifyPageStyles.verifyContainer}>
       <Box sx={VerifyPageStyles.verifyBox}>
-        <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
+        <Typography variant="h3" fontWeight="bold" sx={{ mb: 2}}>
           {labels.verifyYourEmailAddress}
         </Typography>
         <Typography variant="h6">

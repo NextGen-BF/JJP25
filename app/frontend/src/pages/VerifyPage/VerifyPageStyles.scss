@@ -1,9 +1,44 @@
 .otp-input {
-  height: 10em;
-  width: 5em;
-  margin: 1em;
-  font-size: 1.5em;
+  height: 2.5em;
+  width: 1.5em;
+  margin: 0.15em;
+  font-size: 5em;
   text-align: center;
-  border-radius: 1em;
+  border-radius: 0.25em;
   border: 3px solid var(--blankfactor-gray-3-color);
+}
+
+@media (width <= 450px) {
+  .otp-input {
+    margin: 0.10em;
+    font-size: 1.75em;
+  }
+}
+
+@media (450px < width <= 650px) {
+  .otp-input {
+    margin: 0.11em;
+    font-size: 2em;
+  }
+}
+
+@media (650px < width <= 850px) {
+  .otp-input {
+    margin: 0.12em;
+    font-size: 2.25em;
+  }
+}
+
+@media (850px < width <= 1050px) {
+  .otp-input {
+    margin: 0.13em;
+    font-size: 2.75em;
+  }
+}
+
+@media (1050px < width <= 1250px) {
+  .otp-input {
+    margin: 0.14em;
+    font-size: 3em;
+  }
 }
