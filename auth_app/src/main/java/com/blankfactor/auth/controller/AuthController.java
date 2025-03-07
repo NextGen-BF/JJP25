@@ -57,7 +57,6 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
-
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         log.info("Forgot password request received for email: {}", request.getEmail());

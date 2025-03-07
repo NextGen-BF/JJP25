@@ -1,6 +1,7 @@
 import { Navigate, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import VerifyPage from "./pages/VerifyPage/VerifyPage";
 import DashboardPage from "./pages/DashboardPage/DashboardPage";
 import EventsPage from "./pages/EventsPage/EventsPage";
 import MockUserList from "./pages/MockUserList/MockUserList";
@@ -13,6 +14,7 @@ const UserRoutes = (
     <>
       <Route path="/" element={<HomePage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify" element={<VerifyPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/events" element={<EventsPage />} />
       <Route path="/tickets" element={<TicketsPage />} />

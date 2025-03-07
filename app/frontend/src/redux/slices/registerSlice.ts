@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { registerUser } from "../services/registerService";
+import { setItem } from "../../utils/localstorage";
 
 type userDataState = {
   email: string | null;
@@ -38,6 +39,8 @@ const registerSlice = createSlice({
         state.loading = false; 
         state.success = true;
         const { email, username, firstName, lastName } = action.payload;
+        setItem("email", email);
+        setItem("username", username)
         state.email = email;
         state.username = username;
         state.firstName = firstName;

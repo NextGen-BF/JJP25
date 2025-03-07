@@ -29,7 +29,7 @@ import "./RegisterForm.scss";
 // Constants
 import { validationErrors } from "./ValidationErrors";
 import { regex } from "./Regex";
-import { label } from "./Labels";
+import { labels } from "./Labels";
 
 // Redux related
 import { AppDispatch } from "../../redux/store";
@@ -98,11 +98,11 @@ const RegisterForm: FC = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <Box sx={{ color: "var(--blankfactor-oxford-color)" }}>
-        <Box sx={{ fontSize: "2em" }}>{label.singUp}</Box>
+        <Box sx={{ fontSize: "2em" }}>{labels.signUp}</Box>
         <Box>
-          {label.alreadyHaveAnAccount}
+          {labels.alreadyHaveAnAccount}
           <Link to="/login">
-            <strong>{label.signIn}</strong>
+            <strong>{labels.signIn}</strong>
           </Link>
         </Box>
       </Box>
@@ -254,7 +254,7 @@ const RegisterForm: FC = () => {
         type="submit"
         disabled={loading}
       >
-        {loading ? label.loading : label.singUp}
+        {loading ? labels.loading : labels.signUp}
       </Button>
       <Box className="or-box">
         <Box className="or-hr" />
@@ -280,7 +280,7 @@ const RegisterForm: FC = () => {
           },
         }}
       >
-        {label.signUpWithGoogle}
+        {labels.signUpWithGoogle}
       </Button>
     </Box>
   );
