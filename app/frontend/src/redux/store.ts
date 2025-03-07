@@ -4,6 +4,8 @@ import eventReducer from "./slices/eventSlice";
 import registerReducer from "./slices/registerSlice";
 import venueReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
+import passwordResetReducer from "./slices/passwordResetSlice"; 
+;
 import sidebarReducer from "./slices/sidebarSlice";
 import ticketReducer from "./slices/ticketSlice";
 
@@ -16,6 +18,7 @@ export const store = configureStore({
     auth: authReducer,
     ticket: ticketReducer,
     registerData: registerReducer,
+    passwordReset: passwordResetReducer
   },
 
   middleware: (getDefaultMiddleware) =>
